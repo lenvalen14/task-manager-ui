@@ -186,9 +186,9 @@ export default function DashboardPage() {
                     </div>
                     <CardDescription>
                       <div className="relative mb-3">
-                        <div className="w-full h-4 bg-gray-200 rounded-full border-2 border-black shadow-inner overflow-hidden">
+                        <div className="w-full h-4 bg-gray-200 rounded-full shadow-inner overflow-hidden">
                           <div 
-                            className={`h-full ${project.color} rounded-full transition-all duration-500 ease-out border-r-2 border-black`}
+                            className={`h-full ${project.color} rounded-full transition-all duration-500 ease-out`}
                             style={{ width: `${project.progress}%` }}
                           ></div>
                         </div>

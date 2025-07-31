@@ -81,7 +81,7 @@ export default function TimeReportsPage() {
             <CardContent className="grid gap-6 p-6">
               <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border-2 border-black">
                 <span className="text-lg font-bold text-gray-900">Current Task:</span>
-                <span className="text-lg font-black text-blue-600 bg-blue-100 px-4 py-1 rounded-full border-2 border-black">
+                <span className="text-lg font-black text-blue-600 bg-blue-100 px-4 py-1 rounded-full">
                   Wireframing
                 </span>
               </div>
