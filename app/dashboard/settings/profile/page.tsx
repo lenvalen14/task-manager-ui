@@ -32,7 +32,6 @@ export default function ProfileSettingsPage() {
 
   return (
     <>
-      <Header />
       <div className="flex-1 min-h-screen bg-white">
         {/* Header - Fixed */}
         <div className="sticky top-0 z-50 bg-white border-b-4 border-pink-200 shadow-lg">
@@ -77,7 +76,7 @@ export default function ProfileSettingsPage() {
         </div>
 
         {/* Main Content - Scrollable */}
-        <div className="h-[calc(100vh-100px)] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-pink-300 hover:scrollbar-thumb-pink-400">
+        <div className="h-[calc(100vh-100px)] scrollbar-thin scrollbar-track-transparent scrollbar-thumb-pink-300 hover:scrollbar-thumb-pink-400">
           {/* Cover and Avatar Section */}
           <div className="relative">
           <div className="px-8 pt-20 pb-8">

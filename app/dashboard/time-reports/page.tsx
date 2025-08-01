@@ -41,7 +41,6 @@ export default function TimeReportsPage() {
 
   return (
     <>
-      <Header />
       <div className="flex-1 min-h-screen p-8 overflow-auto bg-white w-full">
         {/* Decorative elements */}
         <div className="absolute top-4 right-8">

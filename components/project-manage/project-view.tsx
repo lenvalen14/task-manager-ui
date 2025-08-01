@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TaskBoard } from "@/components/dashboard/task-board"
-import { OverviewTab } from "@/components/dashboard/overview-tab"
-import { NotesTab } from "@/components/dashboard/notes-tab"
+import { TaskBoard } from "@/components/project-manage/task-board"
+import { OverviewTab } from "@/components/project-manage/overview-tab"
+import { NotesTab } from "@/components/project-manage/notes-tab"
 import { Edit, ArrowLeft, Star } from "lucide-react"
 import Link from "next/link"
 
@@ -30,7 +30,7 @@ export function ProjectView() {
               asChild 
               className="text-gray-600 hover:text-gray-800 hover:bg-pink-50 rounded-full transition-all duration-200"
             >
-              <Link href="/dashboard/projects">
+              <Link href="/dashboard/project">
                 <ArrowLeft className="w-5 h-5" />
                 <span className="sr-only">Back to Projects</span>
               </Link>

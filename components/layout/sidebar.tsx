@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { EllipsisVertical, Plus, LayoutDashboard, Bell, Settings, Clock } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { AddProjectDialog } from "@/components/project/add-project-dialog"
+import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
 import React from "react"
 
 type Project = {
@@ -23,9 +23,9 @@ const projects: Project[] = [
 
 const mainNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Notifications", href: "/notifications", icon: Bell },
-  { name: "Time & Reports", href: "/time-reports", icon: Clock },
-  { name: "Settings", href: "/settings/profile", icon: Settings },
+  { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
+  { name: "Time & Reports", href: "/dashboard/time-reports", icon: Clock },
+  { name: "Settings", href: "/dashboard/settings/profile", icon: Settings },
 ]
 
 export function Sidebar() {
@@ -48,7 +48,7 @@ export function Sidebar() {
             {projects.map((project) => (
               <Link
                 key={project.id}
-                href={`/project/${project.id}`}
+                href={`/dashboard/project/${project.id}`}
                 className={`flex items-center justify-between p-2 rounded-lg text-sm transition-colors ${
                   project.active ? "bg-blue-100 text-blue-700 font-medium" : "hover:bg-gray-100 text-gray-700"
                 }`}

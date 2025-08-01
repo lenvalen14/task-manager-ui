@@ -10,7 +10,6 @@ import Link from "next/link"
 export default function SystemSettingsPage() {
   return (
     <>
-      <Header />
       <div className="flex-1 p-6 overflow-auto flex flex-col items-center justify-center bg-gray-50">
         <Card className="w-full max-w-2xl shadow-lg rounded-xl border border-gray-200">
           <CardHeader>

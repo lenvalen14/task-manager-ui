@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Plus, ArrowRight, ListTodo, Clock, CheckCircle, TrendingUp, Sparkles, Star, Heart, Zap } from "lucide-react"
 import Link from "next/link"
-import { AddProjectDialog } from "@/components/project/add-project-dialog"
+import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
 import React from "react"
 
 // Dữ liệu giả định cho biểu đồ và thống kê
@@ -98,7 +98,6 @@ export default function DashboardPage() {
 
   return (
     <>
-      <Header />
       <div className="flex-1 min-h-screen overflow-auto bg-gradient-to-br from-yellow-100 via-pink-50 to-blue-100 w-full">
         {/* Hero Section */}
         <div className="relative px-6 pt-8 pb-8 md:px-12 md:pt-12 md:pb-10">
@@ -208,7 +207,7 @@ export default function DashboardPage() {
                       asChild
                       className="border-2 border-black bg-white text-gray-900 rounded-xl font-black shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-50"
                     >
-                      <Link href={`/project/${project.id}`}>View Project</Link>
+                      <Link href={`/dashboard/project/${project.id}`}>View Project</Link>
                     </Button>
                   </CardContent>
                 </Card>

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Search, Plus, ArrowLeft, FolderOpen, Star } from "lucide-react"
 import Link from "next/link"
 import { Progress } from "@/components/ui/progress"
-import { AddProjectDialog } from "@/components/project/add-project-dialog"
+import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
 import React from "react"
 
 type Project = {
@@ -113,7 +113,6 @@ export default function AllProjectsPage() {
 
   return (
     <>
-      <Header />
       <div className="flex-1 min-h-screen overflow-auto bg-white w-full">
         {/* Header Section */}
         <div className="relative px-8 pt-6 bg-white">
@@ -239,7 +238,7 @@ export default function AllProjectsPage() {
                     asChild
                     className="w-full mt-4 h-10 border-3 border-grey hover:border-black hover:bg-blue-300 bg-white text-gray-900 hover:text-gray-900 rounded-xl font-black shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
                   >
-                    <Link href={`/project/${project.id}`}>View Details</Link>
+                    <Link href={`/dashboard/project/${project.id}`}>View Details</Link>
                   </Button>
                 </CardContent>
               </Card>

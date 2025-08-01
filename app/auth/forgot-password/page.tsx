@@ -3,44 +3,75 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Sparkles, Heart, Star, X } from "lucide-react"
 
 export default function ForgotPasswordPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md shadow-xl rounded-xl border border-gray-200">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <Button variant="ghost" size="icon" asChild className="text-gray-600 hover:text-gray-800">
-              <Link href="/auth/login">
-                <ArrowLeft className="w-5 h-5" />
-                <span className="sr-only">Back to Login</span>
-              </Link>
-            </Button>
-            <CardTitle className="text-3xl font-bold text-gray-900">Forgot Password</CardTitle>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
+      <Card className="w-full max-w-md shadow-2xl rounded-2xl border-2 border-black bg-white/95 backdrop-blur-sm">
+        <CardHeader className="text-center pb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="icon" asChild className="text-gray-600 hover:text-gray-800 bg-gray-100 rounded-full p-2">
+                <Link href="/auth/login">
+                  <ArrowLeft className="w-5 h-5" />
+                  <span className="sr-only">Back to Login</span>
+                </Link>
+              </Button>
+              <CardTitle className="text-3xl font-bold text-black">Reset Password</CardTitle>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 bg-blue-400 rounded-sm flex items-center justify-center">
+                <Sparkles className="w-3 h-3 text-white" />
+              </div>
+              <div className="w-4 h-4 bg-pink-400 rounded-sm flex items-center justify-center">
+                <Heart className="w-3 h-3 text-white" />
+              </div>
+              <div className="w-4 h-4 bg-yellow-400 rounded-sm flex items-center justify-center">
+                <Star className="w-3 h-3 text-white" />
+              </div>
+              <button className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
+                <X className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
           </div>
-          <CardDescription className="text-gray-600">Enter your email to reset your password.</CardDescription>
+          
+          {/* Motivational Banner */}
+          <div className="bg-gradient-to-r from-yellow-200 to-orange-200 rounded-xl p-4 border-2 border-black mb-6">
+            <div className="flex items-center justify-center space-x-2">
+              <span className="text-black font-semibold">Don't worry, we'll help you get back in!</span>
+              <Sparkles className="w-4 h-4 text-orange-500" />
+            </div>
+          </div>
+          
+          <CardDescription className="text-gray-600 text-lg">Enter your email to reset your password.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email" className="text-gray-700 font-medium">
-                Email
+          <form className="grid gap-6">
+            <div className="grid gap-3">
+              <Label htmlFor="email" className="text-black font-bold text-lg">
+                Email Address
               </Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="your@example.com"
                 required
-                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg bg-gray-50"
+                className="border-2 border-black focus:border-pink-500 focus:ring-pink-500 rounded-xl bg-white text-black placeholder-gray-400 py-4 text-lg shadow-lg"
               />
             </div>
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-colors shadow-md"
+              className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-xl border-2 border-black transform hover:scale-105"
             >
-              Reset Password
+              + Send Reset Link
             </Button>
+            <div className="mt-6 text-center text-gray-600">
+              Remember your password?{" "}
+              <Link href="/auth/login" className="text-pink-600 hover:text-pink-700 font-semibold underline">
+                Back to login
+              </Link>
+            </div>
           </form>
         </CardContent>
       </Card>

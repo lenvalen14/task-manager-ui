@@ -1,51 +1,118 @@
+"use client"
+
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Bell, Settings, Search } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Bell, Settings, Search, LogOut, User } from "lucide-react"
 
 export function Header() {
+  const user = {
+    name: "Alison Hoper",
+    email: "alison@example.com",
+    avatar: "/placeholder.svg?height=36&width=36"
+  }
+
+  const handleLogout = () => {
+    // Add your logout logic here
+    console.log("Logging out...")
+  }
+
   return (
-    <header className="flex items-center justify-between p-4 bg-white border-b border-gray-200 h-16 shrink-0 shadow-sm">
-      <div className="flex items-center gap-4">
+    <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-100 h-16 shrink-0">
+      {/* Left Section */}
+      <div className="flex items-center gap-6">
+        {/* Logo/Brand */}
+        <div className="flex items-center gap-3">
+          <span className="font-medium text-lg text-gray-900">
+            ManageMate
+          </span>
+        </div>
+
+        {/* Search */}
         <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           <Input
             type="search"
-            placeholder="Search tasks, projects..."
-            className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] rounded-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-gray-50"
+            placeholder="Search..."
+            className="pl-10 w-80 h-9 border-gray-200 focus:border-gray-300 focus:ring-0 bg-gray-50"
           />
         </div>
-        <span className="text-sm text-gray-500 hidden md:block">managemate.com</span>
       </div>
-      <div className="flex items-center gap-4">
+
+      {/* Right Section */}
+      <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+          className="h-9 w-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
           asChild
         >
           <Link href="/notifications">
-            <Bell className="w-5 h-5" />
+            <Bell className="w-4 h-4" />
             <span className="sr-only">Notifications</span>
           </Link>
         </Button>
+
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+          className="h-9 w-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
           asChild
         >
           <Link href="/settings/profile">
-            <Settings className="w-5 h-5" />
+            <Settings className="w-4 h-4" />
             <span className="sr-only">Settings</span>
           </Link>
         </Button>
-        <Avatar className="w-9 h-9 border-2 border-blue-500 shadow-sm">
-          <AvatarImage src="/placeholder.svg?height=36&width=36" alt="Alison Hoper" />
-          <AvatarFallback className="bg-blue-100 text-blue-600">AH</AvatarFallback>
-        </Avatar>
-        <span className="font-medium hidden sm:block text-gray-800">Alison Hoper</span>
+
+        {/* User Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex items-center gap-2 hover:bg-gray-100 h-9 px-2">
+              <Avatar className="w-7 h-7">
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback className="bg-gray-200 text-gray-700 text-xs">
+                  {user.name.split(' ').map(n => n[0]).join('')}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-sm font-medium hidden sm:block text-gray-700">
+                {user.name}
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align="end" 
+            className="w-48 bg-white border border-gray-200 shadow-sm"
+          >
+            <DropdownMenuLabel className="text-gray-900 text-sm">
+              My Account
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild className="text-gray-700 hover:bg-gray-50 text-sm">
+              <Link href="/settings/profile" className="flex items-center">
+                <User className="w-4 h-4 mr-2" />
+                Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              onClick={handleLogout}
+              className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50 cursor-pointer text-sm"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   )

@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { TaskColumn } from "@/components/dashboard/task-column"
+import { TaskColumn } from "@/components/project-manage/task-column"
 import { List, LayoutGrid, Table, Plus, Star } from "lucide-react"
-import { TaskDetailDialog } from "@/components/task/task-detail-dialog"
+import { TaskDetailDialog } from "@/components/project-manage/task/task-detail-dialog"
 import clsx from "clsx"
 
 type SubTask = {

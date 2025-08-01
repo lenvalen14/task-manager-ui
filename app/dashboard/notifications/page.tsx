@@ -26,7 +26,7 @@ const notifications: Notification[] = [
     type: "milestone",
     message: "Milestone 'Project Kickoff' achieved!",
     time: "2 days ago",
-    link: "/project/1",
+    link: "/dashboard/project/1",
   },
   {
     id: "4",
@@ -83,7 +83,6 @@ export default function NotificationsPage() {
 
   return (
     <>
-      <Header />
       <div className="flex-1 min-h-screen overflow-auto bg-white w-full">
         {/* Header Section */}
         <div className="relative px-8 pt-6 pb-8">
