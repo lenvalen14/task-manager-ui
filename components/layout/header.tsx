@@ -56,7 +56,7 @@ export function Header() {
           className="h-9 w-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
           asChild
         >
-          <Link href="/notifications">
+          <Link href="/dashboard/notifications">
             <Bell className="w-4 h-4" />
             <span className="sr-only">Notifications</span>
           </Link>
@@ -68,7 +68,7 @@ export function Header() {
           className="h-9 w-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
           asChild
         >
-          <Link href="/settings/profile">
+          <Link href="/dashboard/settings/profile">
             <Settings className="w-4 h-4" />
             <span className="sr-only">Settings</span>
           </Link>
