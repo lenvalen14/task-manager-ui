@@ -25,7 +25,7 @@ const mainNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
   { name: "Time & Reports", href: "/dashboard/time-reports", icon: Clock },
-  { name: "Settings", href: "/dashboard/settings/profile", icon: Settings },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
 export function Sidebar() {
@@ -49,9 +49,8 @@ export function Sidebar() {
               <Link
                 key={project.id}
                 href={`/dashboard/project/${project.id}`}
-                className={`flex items-center justify-between p-2 rounded-lg text-sm transition-colors ${
-                  project.active ? "bg-blue-100 text-blue-700 font-medium" : "hover:bg-gray-100 text-gray-700"
-                }`}
+                className={`flex items-center justify-between p-2 rounded-lg text-sm transition-colors ${project.active ? "bg-blue-100 text-blue-700 font-medium" : "hover:bg-gray-100 text-gray-700"
+                  }`}
               >
                 <div className="flex items-center gap-2">{project.name}</div>
                 <DropdownMenu>

@@ -40,7 +40,7 @@ const notifications: Notification[] = [
     type: "deadline",
     message: "Project 'Mobile App V2' deadline approaching.",
     time: "4 days ago",
-    link: "/project/3",
+    link: "/dashboard/project/3",
   },
 ]
 
@@ -96,12 +96,12 @@ export default function NotificationsPage() {
           <div className="absolute top-6 right-24">
             <Star className="w-3 h-3 text-yellow-500 fill-yellow-500 animate-pulse delay-700" />
           </div>
-          
+
           <div className="flex items-center gap-8 mb-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              asChild 
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
               className="text-gray-600 hover:text-gray-800 hover:bg-pink-50 rounded-full transition-all duration-200"
             >
               <Link href="/dashboard">
@@ -109,7 +109,7 @@ export default function NotificationsPage() {
                 <span className="sr-only">Back to Dashboard</span>
               </Link>
             </Button>
-            
+
             <div className="flex items-center gap-6">
               <div className="relative">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center text-white border-4 border-black shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
@@ -119,7 +119,7 @@ export default function NotificationsPage() {
                   {notifications.length}
                 </div>
               </div>
-              
+
               <div>
                 <h1 className="text-4xl font-black text-gray-900 mb-2 tracking-tight">
                   Notifications
@@ -138,7 +138,7 @@ export default function NotificationsPage() {
             {notifications.map((notification, index) => {
               const config = getNotificationConfig(notification.type)
               const IconComponent = config.icon
-              
+
               return (
                 <Card
                   key={notification.id}
@@ -149,7 +149,7 @@ export default function NotificationsPage() {
                     <div className={`shrink-0 w-12 h-12 rounded-xl ${config.bgColor} flex items-center justify-center border-3 border-black shadow-md group-hover:scale-110 transition-transform duration-200 transform rotate-3 group-hover:rotate-0`}>
                       <IconComponent className={`w-6 h-6 ${config.color}`} />
                     </div>
-                    
+
                     <div className="flex-1 space-y-2">
                       <p className="font-black text-lg text-gray-900 leading-relaxed">
                         {notification.message}
@@ -158,12 +158,12 @@ export default function NotificationsPage() {
                         {notification.time}
                       </p>
                     </div>
-                    
+
                     {notification.link && (
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        asChild 
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
                         className="shrink-0 border-3 border-black hover:border-black hover:bg-blue-300 bg-white text-gray-900 hover:text-gray-900 rounded-xl font-black shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 px-4 py-2"
                       >
                         <Link href={notification.link}>View Details</Link>

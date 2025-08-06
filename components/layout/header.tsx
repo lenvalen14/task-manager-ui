@@ -68,7 +68,7 @@ export function Header() {
           className="h-9 w-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
           asChild
         >
-          <Link href="/dashboard/settings/profile">
+          <Link href="/dashboard/settings">
             <Settings className="w-4 h-4" />
             <span className="sr-only">Settings</span>
           </Link>
@@ -89,8 +89,8 @@ export function Header() {
               </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="end" 
+          <DropdownMenuContent
+            align="end"
             className="w-48 bg-white border border-gray-200 shadow-sm"
           >
             <DropdownMenuLabel className="text-gray-900 text-sm">
@@ -98,13 +98,13 @@ export function Header() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="text-gray-700 hover:bg-gray-50 text-sm">
-              <Link href="/settings/profile" className="flex items-center">
-                <User className="w-4 h-4 mr-2" />
-                Profile
+              <Link href="/dashboard/settings" className="flex items-center">
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={handleLogout}
               className="text-gray-700 hover:bg-gray-50 focus:bg-gray-50 cursor-pointer text-sm"
             >

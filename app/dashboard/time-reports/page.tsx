@@ -89,12 +89,11 @@ export default function TimeReportsPage() {
                 <span className="text-5xl font-black text-gray-900 tabular-nums">{formatTime(time)}</span>
               </div>
               <div className="flex gap-3">
-                <Button 
-                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${
-                    !isRunning 
-                      ? 'bg-green-400 hover:bg-green-500 text-white' 
+                <Button
+                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${!isRunning
+                      ? 'bg-green-400 hover:bg-green-500 text-white'
                       : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  }`}
+                    }`}
                   onClick={handleStart}
                   disabled={isRunning}
                 >
@@ -102,11 +101,10 @@ export default function TimeReportsPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${
-                    isRunning 
-                      ? 'bg-white hover:bg-gray-50 text-gray-900' 
+                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${isRunning
+                      ? 'bg-white hover:bg-gray-50 text-gray-900'
                       : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  }`}
+                    }`}
                   onClick={handlePause}
                   disabled={!isRunning}
                 >
@@ -114,11 +112,10 @@ export default function TimeReportsPage() {
                 </Button>
                 <Button
                   variant="destructive"
-                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${
-                    time > 0 
-                      ? 'bg-red-400 hover:bg-red-500 text-white' 
+                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${time > 0
+                      ? 'bg-red-400 hover:bg-red-500 text-white'
                       : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  }`}
+                    }`}
                   onClick={handleStop}
                   disabled={time === 0}
                 >
@@ -165,7 +162,7 @@ export default function TimeReportsPage() {
                 <BarChart className="w-4 h-4 mr-2" />
                 Generate Detailed Report
               </Button>
-              <Button 
+              <Button
                 variant="secondary"
                 className="bg-purple-300 hover:bg-purple-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
               >

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TaskBoard } from "@/components/project-manage/task-board"
+import { BoardPage } from "@/components/project-manage/task-board"
 import { OverviewTab } from "@/components/project-manage/overview-tab"
 import { NotesTab } from "@/components/project-manage/notes-tab"
 import { Edit, ArrowLeft, Star } from "lucide-react"
@@ -21,13 +21,13 @@ export function ProjectView() {
         <div className="absolute top-6 right-24">
           <Star className="w-3 h-3 text-yellow-500 fill-yellow-500 animate-pulse delay-700" />
         </div>
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              asChild 
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
               className="text-gray-600 hover:text-gray-800 hover:bg-pink-50 rounded-full transition-all duration-200"
             >
               <Link href="/dashboard/project">
@@ -35,7 +35,7 @@ export function ProjectView() {
                 <span className="sr-only">Back to Projects</span>
               </Link>
             </Button>
-            
+
             <div className="flex items-center gap-6">
               <div className="relative">
                 <div className="w-16 h-16 rounded-2xl bg-pink-400 flex items-center justify-center text-white text-xl font-bold shadow-lg border-4 border-black transform rotate-3 hover:rotate-0 transition-transform duration-300">
@@ -43,7 +43,7 @@ export function ProjectView() {
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-3 border-black rounded-full shadow-md" />
               </div>
-              
+
               <div>
                 <h1 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">
                   Piper Enterprise
@@ -51,7 +51,7 @@ export function ProjectView() {
                 <div className="flex items-center gap-4">
                   {/* Custom Progress Bar */}
                   <div className="relative w-32 h-4 bg-gray-200 rounded-full shadow-inner overflow-hidden">
-                    <div 
+                    <div
                       className="h-full bg-pink-400 rounded-full transition-all duration-500 ease-out"
                       style={{ width: '13%' }}
                     ></div>
@@ -63,7 +63,7 @@ export function ProjectView() {
               </div>
             </div>
           </div>
-          
+
           <Button
             variant="outline"
             size="lg"
@@ -104,7 +104,8 @@ export function ProjectView() {
 
             <TabsContent value="tasks" className="flex-1">
               <div className="bg-white rounded-2xl p-6 mx-2">
-                <TaskBoard className="flex gap-6 [&_.task-column-scroll]:h-[calc(100vh-300px)] [&_.task-column-scroll]:scrollbar-thin [&_.task-column-scroll]:scrollbar-track-transparent [&_.task-column-scroll]:scrollbar-thumb-pink-300 hover:[&_.task-column-scroll]:scrollbar-thumb-pink-400" />
+                <BoardPage />
+                {/* <TaskBoard className="flex gap-6 [&_.task-column-scroll]:h-[calc(100vh-300px)] [&_.task-column-scroll]:scrollbar-thin [&_.task-column-scroll]:scrollbar-track-transparent [&_.task-column-scroll]:scrollbar-thumb-pink-300 hover:[&_.task-column-scroll]:scrollbar-thumb-pink-400" /> */}
               </div>
             </TabsContent>
 
