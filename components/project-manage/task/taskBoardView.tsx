@@ -1,12 +1,18 @@
-// components/project-manage/task-board.tsx
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { TaskColumn } from "@/components/project-manage/task-column"
-import { List, LayoutGrid, Table, Plus, Star } from "lucide-react"
+import { Plus, Star, MoreVertical } from "lucide-react"
 import { TaskDetailDialog } from "@/components/project-manage/task/task-detail-dialog"
+import { renderPriority } from "@/components/project-manage/task-board"
 import clsx from "clsx"
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
 
 export type SubTask = {
     id: string
@@ -22,6 +28,9 @@ export type Task = {
     description: string
     subtasks: SubTask[]
     progress?: number
+    priority?: "Urgent" | "High" | "Medium" | "Low"
+    dueDate?: string
+    commentsCount?: number
 }
 
 export type TaskColumnData = {
@@ -49,6 +58,16 @@ export function TaskBoard({
         setIsDialogOpen(true)
     }
 
+    const handleEdit = (task: Task, columnId: string) => {
+        setSelectedTask(task)
+        setSelectedColumn(columnId)
+        setIsDialogOpen(true)
+    }
+
+    const handleDelete = (taskId: string) => {
+        alert(`Delete task: ${taskId}`)
+    }
+
     return (
         <div className={clsx("flex flex-col flex-1 relative", className)}>
             {/* Decorative stars */}
@@ -65,9 +84,15 @@ export function TaskBoard({
                     <div key={column.id} className="flex-shrink-0 w-80">
                         <div className="mb-4">
                             <div className="flex items-center gap-3 mb-3">
-                                <div className={`w-4 h-4 rounded-full ${column.color} border-2 border-black shadow-sm`} />
-                                <h3 className="text-lg font-black text-gray-900">{column.title}</h3>
-                                <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-bold border-2 border-black">{column.tasks.length}</span>
+                                <div
+                                    className={`w-4 h-4 rounded-full ${column.color} border-2 border-black shadow-sm`}
+                                />
+                                <h3 className="text-lg font-black text-gray-900">
+                                    {column.title}
+                                </h3>
+                                <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-bold border-2 border-black">
+                                    {column.tasks.length}
+                                </span>
                             </div>
                         </div>
                         <div className="space-y-4 max-h-[calc(100vh-350px)] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 pr-2">
@@ -76,22 +101,35 @@ export function TaskBoard({
                                     key={task.id}
                                     onClick={() => {
                                         setSelectedTask(task)
-                                        setIsDialogOpen(true)
+                                        // setIsDialogOpen(true)
                                     }}
-                                    className="bg-white rounded-xl border-2 border-black shadow-lg p-4 hover:shadow-xl transition-all duration-200 transform hover:scale-105 cursor-pointer"
-                                    style={{ animationDelay: `${(index * 100) + (taskIndex * 50)}ms` }}
+                                    className="bg-white rounded-xl border-2 border-black shadow-lg p-4 hover:shadow-xl transition-all duration-190 transform hover:scale-95 cursor-pointer"
+                                    style={{
+                                        animationDelay: `${index * 100 + taskIndex * 50}ms`,
+                                    }}
                                 >
                                     <div className="mb-3">
-                                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${task.tagColor} shadow-sm`}>{task.tag}</span>
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-sm font-bold ${task.tagColor} shadow-sm`}
+                                        >
+                                            {task.tag}
+                                        </span>
                                     </div>
-                                    <h4 className="text-lg font-bold text-gray-900 mb-2 leading-tight">{task.title}</h4>
-                                    <p className="text-gray-700 text-sm leading-relaxed">{task.description}</p>
+                                    <h4 className="text-lg font-bold text-gray-900 mb-2 leading-tight">
+                                        {task.title}
+                                    </h4>
+                                    <p className="text-gray-700 text-sm leading-relaxed">
+                                        {task.description}
+                                    </p>
                                     <div className="mt-4 mb-3">
                                         <div className="flex justify-between text-sm mb-1">
                                             <span className="font-bold text-gray-700">
-                                                {task.subtasks.filter((st) => st.completed).length}/{task.subtasks.length} subtasks
+                                                {task.subtasks.filter((st) => st.completed).length}/
+                                                {task.subtasks.length} subtasks
                                             </span>
-                                            <span className="font-bold text-gray-700">{task.progress ?? 0}%</span>
+                                            <span className="font-bold text-gray-700">
+                                                {task.progress ?? 0}%
+                                            </span>
                                         </div>
                                         <div className="w-full h-2 bg-gray-100 rounded-full border-2 border-black overflow-hidden">
                                             <div
@@ -100,12 +138,38 @@ export function TaskBoard({
                                             />
                                         </div>
                                     </div>
+
                                     <div className="flex justify-between items-center mt-4 pt-3 border-t-2 border-gray-200">
-                                        <div className="flex -space-x-2">
-                                            <div className="w-6 h-6 bg-blue-300 rounded-full border-2 border-black"></div>
-                                            <div className="w-6 h-6 bg-pink-300 rounded-full border-2 border-black"></div>
+                                        <div className="flex flex-col gap-1">
+                                            {renderPriority(task.priority)}
                                         </div>
-                                        <button className="text-gray-500 hover:text-gray-700 font-bold">•••</button>
+
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-6 w-6">
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="w-32">
+                                                <DropdownMenuItem
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleEdit(task, column.id)
+                                                    }}
+                                                >
+                                                    Edit
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleDelete(task.id)
+                                                    }}
+                                                    className="text-red-600"
+                                                >
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 </div>
                             ))}

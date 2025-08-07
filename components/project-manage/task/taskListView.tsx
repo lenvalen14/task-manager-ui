@@ -1,14 +1,25 @@
-// components/project-manage/task-list-view.tsx
 "use client"
 
 import { useState } from "react"
 import { TaskDetailDialog } from "@/components/project-manage/task/task-detail-dialog"
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Plus } from "lucide-react"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+    Plus,
+    MoreVertical,
+    ChevronDown,
+    ChevronUp,
+    CheckCircle,
+    Circle,
+} from "lucide-react"
 import clsx from "clsx"
-
 import type { Task, TaskColumnData } from "@/components/project-manage/task-board"
+import { renderPriority } from "@/components/project-manage/task-board"
 
 export function TaskListView({
     className,
@@ -20,113 +31,178 @@ export function TaskListView({
     const [selectedTask, setSelectedTask] = useState<Task | null>(null)
     const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set())
+    const [collapsedColumns, setCollapsedColumns] = useState<Record<string, boolean>>({})
 
-    const handleClickTask = (task: Task, columnId: string) => {
+    const openDialog = (task: Task | null, columnId: string) => {
         setSelectedTask(task)
         setSelectedColumn(columnId)
         setIsDialogOpen(true)
     }
 
-    const handleClickCreateTask = () => {
-        setSelectedTask(null)
-        setSelectedColumn(null)
-        setIsDialogOpen(true)
+    const toggleTaskSubtasks = (taskId: string) => {
+        setExpandedTaskIds(prev => {
+            const newSet = new Set(prev)
+            if (newSet.has(taskId)) {
+                newSet.delete(taskId)
+            } else {
+                newSet.add(taskId)
+            }
+            return newSet
+        })
+    }
+
+    const toggleColumnCollapse = (columnId: string) => {
+        setCollapsedColumns(prev => ({
+            ...prev,
+            [columnId]: !prev[columnId],
+        }))
     }
 
     return (
-        <div className={clsx("relative space-y-6", className)}>
-            <div className="flex items-center justify-between">
-                <Button onClick={handleClickCreateTask} className="gap-2">
-                    <Plus className="w-4 h-4" />
-                    New Task
-                </Button>
-            </div>
+        <div className={clsx("space-y-6", className)}>
+            {columns.map((column) => {
+                const isCollapsed = collapsedColumns[column.id] ?? false
 
-            <ScrollArea className="rounded-lg border shadow-sm max-h-[70vh]">
-                <table className="min-w-full text-sm">
-                    <thead className="bg-gray-100 sticky top-0 z-10">
-                        <tr className="text-left">
-                            <th className="px-4 py-3 font-semibold">Title</th>
-                            <th className="px-4 py-3 font-semibold">Tag</th>
-                            <th className="px-4 py-3 font-semibold">Status</th>
-                            <th className="px-4 py-3 font-semibold">Subtasks</th>
-                            <th className="px-4 py-3 font-semibold">Progress</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {columns.map((column) =>
-                            column.tasks.map((task) => (
-                                <tr
-                                    key={task.id}
-                                    className="group border border-black rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 bg-white cursor-pointer"
-                                    onClick={() => handleClickTask(task, column.id)}
-                                >
-                                    {/* Title + Description */}
-                                    <td className="px-6 py-4 font-semibold text-gray-900">
-                                        <div className="text-base">{task.title}</div>
-                                        {task.description && (
-                                            <div className="text-xs text-gray-500">{task.description}</div>
-                                        )}
-                                    </td>
+                return (
+                    <div key={column.id} className="border rounded-xl shadow bg-white overflow-hidden">
+                        <div
+                            className="flex justify-between items-center px-4 py-3 border-b bg-gray-50 font-bold text-base cursor-pointer"
+                            onClick={() => toggleColumnCollapse(column.id)}
+                        >
+                            <div className="flex items-center gap-3">
+                                {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                                <div className={`w-4 h-4 rounded-full ${column.color} border-2 border-black shadow-sm`} />
+                                <h3 className="text-lg font-black text-gray-900">{column.title}</h3>
+                                <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-bold border-2 border-black">
+                                    {column.tasks.length}
+                                </span>
+                            </div>
+                        </div>
 
-                                    {/* Tag */}
-                                    <td className="px-6 py-4">
-                                        <span
-                                            className={`inline-block text-xs font-bold px-2 py-1 rounded border border-black ${task.tagColor}`}
-                                        >
-                                            {task.tag}
-                                        </span>
-                                    </td>
-
-                                    {/* Status */}
-                                    <td className="px-6 py-4">
-                                        <span
-                                            className={`inline-block text-xs font-semibold px-2 py-1 rounded-full border border-black ${column.color}`}
-                                        >
-                                            {column.title}
-                                        </span>
-                                    </td>
-
-                                    {/* Subtasks */}
-                                    <td className="px-6 py-4">
-                                        {task.subtasks.length > 0 ? (
-                                            <>
-                                                <div className="text-xs text-gray-600 font-semibold mb-1">
-                                                    ✅ {task.subtasks.filter((st) => st.completed).length}/{task.subtasks.length} subtasks
-                                                </div>
-                                                <ul className="space-y-1 text-xs text-gray-600">
-                                                    {task.subtasks.map((subtask, index) => (
-                                                        <li
-                                                            key={index}
-                                                            className={subtask.completed ? "line-through text-gray-400" : ""}
-                                                        >
-                                                            • {subtask.title}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </>
+                        {!isCollapsed && (
+                            <div className="overflow-auto">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
+                                        <tr>
+                                            <th className="px-4 py-2 w-1/4">Title</th>
+                                            <th className="px-4 py-2 w-1/4">Tag</th>
+                                            <th className="px-4 py-2 w-1/6">Due Date</th>
+                                            <th className="px-4 py-2 w-1/6">Priority</th>
+                                            <th className="px-4 py-2 w-1/6">Subtasks</th>
+                                            <th className="px-4 py-2 w-1/6">Progress</th>
+                                            <th className="px-4 py-2 w-1/12 text-right">
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        openDialog(null, column.id)
+                                                    }}
+                                                    className="gap-1"
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </Button>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {column.tasks.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={7} className="px-4 py-3 italic text-gray-400 text-center">
+                                                    No tasks
+                                                </td>
+                                            </tr>
                                         ) : (
-                                            <span className="text-xs text-gray-400 italic">No subtasks</span>
-                                        )}
-                                    </td>
+                                            column.tasks.map((task) => (
+                                                <>
+                                                    <tr
+                                                        key={task.id}
+                                                        className="border-t hover:bg-gray-50 cursor-pointer"
+                                                        onClick={() => toggleTaskSubtasks(task.id)}
+                                                    >
+                                                        <td className="px-4 py-2 font-medium text-gray-900">{task.title}</td>
+                                                        <td className="px-4 py-2 font-medium text-gray-900">
+                                                            {task.tag && (
+                                                                <span
+                                                                    className={clsx(
+                                                                        "inline-block px-3 py-1 rounded-full text-sm font-bold shadow-sm",
+                                                                        task.tagColor ?? "bg-gray-200 text-gray-700"
+                                                                    )}
+                                                                >
+                                                                    {task.tag}
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-4 py-2 text-gray-700">{task.dueDate || "—"}</td>
+                                                        <td className="px-4 py-2">{renderPriority(task.priority as "Urgent" | "High" | "Medium" | "Low")}</td>
+                                                        <td className="px-4 py-2 text-gray-700">{task.subtasks?.length ?? 0}</td>
+                                                        <td className="px-4 py-2 text-gray-700 font-bold">{task.progress ?? 0}%</td>
+                                                        <td className="px-4 py-2 text-right">
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger asChild>
+                                                                    <Button variant="ghost" size="icon" className="h-6 w-6">
+                                                                        <MoreVertical className="h-4 w-4" />
+                                                                    </Button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent align="end" className="w-32">
+                                                                    <DropdownMenuItem onClick={(e) => {
+                                                                        e.stopPropagation()
+                                                                        openDialog(task, column.id)
+                                                                    }}>
+                                                                        Edit
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation()
+                                                                            alert(`Delete task: ${task.id}`)
+                                                                        }}
+                                                                        className="text-red-600"
+                                                                    >
+                                                                        Delete
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </td>
+                                                    </tr>
 
-                                    {/* Progress */}
-                                    <td className="px-6 py-4 font-semibold text-gray-700">
-                                        {task.progress !== undefined ? `${task.progress}%` : "0%"}
-                                    </td>
-                                </tr>
-                            ))
+                                                    {expandedTaskIds.has(task.id) && (
+                                                        <tr>
+                                                            <td colSpan={7} className="px-6 pb-4 bg-gray-50">
+                                                                <ul className="space-y-2">
+                                                                    {task.subtasks.map((subtask) => (
+                                                                        <li key={subtask.id} className="flex items-center gap-2">
+                                                                            {subtask.completed ? (
+                                                                                <CheckCircle className="w-4 h-4 text-green-500" />
+                                                                            ) : (
+                                                                                <Circle className="w-4 h-4 text-gray-400" />
+                                                                            )}
+                                                                            <span className={subtask.completed ? "line-through text-gray-500" : "text-gray-800"}>
+                                                                                {subtask.title}
+                                                                            </span>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         )}
-                    </tbody>
-                </table>
-            </ScrollArea>
+                    </div>
+                )
+            })}
 
             <TaskDetailDialog
                 open={isDialogOpen}
                 onOpenChange={setIsDialogOpen}
                 task={selectedTask ?? undefined}
                 columnId={selectedColumn}
-                mode="create"
+                mode={selectedTask ? "edit" : "create"}
             />
         </div>
     )
