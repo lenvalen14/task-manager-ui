@@ -48,9 +48,9 @@ export default function RegisterPage() {
     try {
       const response: RegisterResponse = await register(formData).unwrap()
 
-      if (response.code === 200) {
+      if (response.code === 201) {
         toast.success("Account created successfully!")
-        router.push("../login")
+        router.push("/auth/login")
       } else {
         throw new Error(response.message || "Registration failed")
       }
