@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Clock, ListTodo, TrendingUp, Activity, Star } from "lucide-react"
 
@@ -23,15 +25,15 @@ export function OverviewTab() {
           </CardHeader>
           <CardContent className="p-6">
             <div className="text-4xl font-black text-gray-900 mb-3">65% Complete</div>
-            
+
             {/* Custom Progress Bar */}
             <div className="relative w-full h-4 bg-white rounded-full border border-gray-300 shadow-inner overflow-hidden mb-3">
-              <div 
+              <div
                 className="h-full bg-blue-400 rounded-full transition-all duration-500 ease-out"
                 style={{ width: '65%' }}
               ></div>
             </div>
-            
+
             <p className="text-sm font-bold text-gray-700 bg-white px-3 py-1 rounded-full border border-gray-400 inline-block">
               Based on completed tasks
             </p>
@@ -105,7 +107,7 @@ export function OverviewTab() {
                 </div>
               ))}
             </div>
-            
+
             {/* View More Button */}
             <div className="text-center mt-6">
               <button className="bg-yellow-300 hover:bg-yellow-400 text-gray-900 font-black px-6 py-3 rounded-xl border border-gray-400 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">

@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import { TaskCard } from "@/components/project-manage/task-card"
 import { Plus, EllipsisVertical } from "lucide-react"

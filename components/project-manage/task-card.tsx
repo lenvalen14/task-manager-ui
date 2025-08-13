@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { EllipsisVertical } from "lucide-react"
@@ -21,9 +23,9 @@ export function TaskCard({ task }: TaskCardProps) {
         <span className={`text-xs font-medium px-2.5 py-1 rounded-md ${task.tagColor}`}>
           {task.tag}
         </span>
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="w-6 h-6 text-gray-400 hover:text-blue-600 -mr-1 opacity-0 group-hover:opacity-100 transition-opacity"
         >
           <EllipsisVertical className="w-3.5 h-3.5" />
