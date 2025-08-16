@@ -258,6 +258,7 @@ export function TaskBoard({
             <TaskDetailDialog
                 open={isDialogOpen}
                 onOpenChange={setIsDialogOpen}
+                task={selectedTask ?? undefined}
                 columnId={selectedColumn}
                 mode={selectedTask ? "edit" : "create"}
                 onTaskSaved={() => {

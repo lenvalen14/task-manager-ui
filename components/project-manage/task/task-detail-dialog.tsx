@@ -27,6 +27,7 @@ import type { TaskCreateAllRequest, TaskCreateRequset, TaskUpdateRequset } from 
 
 // shadcn toast (nếu bạn dùng sonner thì đổi import/usage tương ứng)
 import { useToast } from "@/components/ui/use-toast"
+import { UITask } from "../task-board"
 
 export type SubTask = {
   id: string // id thật từ server hoặc id tạm "temp-xxxx"
@@ -52,7 +53,7 @@ export type Task = {
 type TaskDetailDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  task?: Task
+  task?: UITask
   columnId?: string | null
   mode?: "create" | "edit"
   onTaskUpdated?: () => void
@@ -99,7 +100,7 @@ export function TaskDetailDialog({
   const [deleteTag] = useDeleteTagMutation()
 
   // ------- Local editable states (draft) -------
-  const [originalTask, setOriginalTask] = useState<Task | null>(null)
+  const [originalTask, setOriginalTask] = useState<UITask | null>(null)
 
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
