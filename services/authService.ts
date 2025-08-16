@@ -1,5 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react"
-import { LoginRequest, LoginResponse, RefreshTokenResponse, RefreshTokenRequest, RegisterRequest, RegisterResponse } from "../types/auth"
+import { LoginRequest, LoginResponse, RefreshTokenResponse, RefreshTokenRequest, RegisterRequest, RegisterResponse } from "../types/authType"
 import { baseQueryWithAuth } from "./baseQuery"
 import { register } from "module"
 

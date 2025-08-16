@@ -8,8 +8,8 @@ export const baseQueryWithAuth = fetchBaseQuery({
             headers.set("Authorization", `Bearer ${accessToken}`)
         }
 
-        const formDataEndpoints = ['createHospitalWithMedia', 'updateHospitalWithMedia', 'createCertification']
-        if (!formDataEndpoints.includes(endpoint)) {
+        const skipEndpoints = ['updateUser', 'uploadAvatar',]
+        if (!skipEndpoints.includes(endpoint)) {
             headers.set("Content-Type", "application/json")
         }
 

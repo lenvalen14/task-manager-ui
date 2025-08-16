@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, Star, MoreVertical } from "lucide-react"
+import { Plus, Star, MoreVertical, MessageSquare } from "lucide-react"
 import { TaskDetailDialog } from "@/components/project-manage/task/task-detail-dialog"
-import { renderPriority } from "@/components/project-manage/task-board"
+import { renderPriority, TaskColumnData, UITask } from "@/components/project-manage/task-board"
 import clsx from "clsx"
 
 import {
@@ -14,43 +14,41 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 
-export type SubTask = {
-    id: string
-    title: string
-    completed: boolean
-}
+import {
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+} from "@/components/ui/popover"
 
-export type Task = {
-    id: string
-    tag: string
-    tagColor: string
-    title: string
-    description: string
-    subtasks: SubTask[]
-    progress?: number
-    priority?: "Urgent" | "High" | "Medium" | "Low"
-    dueDate?: string
-    commentsCount?: number
-}
+import { useDeleteTaskMutation } from "@/services/taskService"
 
-export type TaskColumnData = {
-    id: string
-    title: string
-    status: "to-do" | "in-progress" | "need-review" | "done"
-    tasks: Task[]
-    color: string
+const lightenHex = (hex: string, percent: number = 0.5) => {
+    if (!hex) return "#e5e7eb" // fallback gray
+    let r = parseInt(hex.slice(1, 3), 16)
+    let g = parseInt(hex.slice(3, 5), 16)
+    let b = parseInt(hex.slice(5, 7), 16)
+
+    r = Math.round(r + (255 - r) * percent)
+    g = Math.round(g + (255 - g) * percent)
+    b = Math.round(b + (255 - b) * percent)
+
+    return `rgb(${r}, ${g}, ${b})`
 }
 
 export function TaskBoard({
     className,
     columns,
+    onTaskUpdated,
 }: {
     className?: string
     columns: TaskColumnData[]
+    onTaskUpdated?: () => void
 }) {
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+    const [selectedTask, setSelectedTask] = useState<UITask | null>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
+
+    const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation()
 
     const handleAddTask = (columnId?: string) => {
         setSelectedTask(null)
@@ -58,19 +56,28 @@ export function TaskBoard({
         setIsDialogOpen(true)
     }
 
-    const handleEdit = (task: Task, columnId: string) => {
+    const handleEdit = (task: UITask, columnId: string) => {
         setSelectedTask(task)
         setSelectedColumn(columnId)
         setIsDialogOpen(true)
     }
 
-    const handleDelete = (taskId: string) => {
-        alert(`Delete task: ${taskId}`)
+    const handleDelete = async (taskId: string | number) => {
+        if (!confirm("Bạn có chắc chắn muốn xóa task này?")) return
+
+        try {
+            await deleteTask(Number(taskId)).unwrap()
+            alert("Xóa task thành công!")
+            if (onTaskUpdated) onTaskUpdated() // gọi API lại hoặc refetch dữ liệu
+        } catch (error) {
+            console.error(error)
+            alert("Xóa task thất bại")
+        }
     }
 
     return (
         <div className={clsx("flex flex-col flex-1 relative", className)}>
-            {/* Decorative stars */}
+            {/* Decorative stars (giữ nguyên) */}
             <div className="absolute top-4 right-4 z-10">
                 <Star className="w-5 h-5 text-yellow-400 fill-yellow-400 animate-pulse" />
             </div>
@@ -95,32 +102,47 @@ export function TaskBoard({
                                 </span>
                             </div>
                         </div>
+
                         <div className="space-y-4 max-h-[calc(100vh-350px)] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400 pr-2">
                             {column.tasks.map((task, taskIndex) => (
                                 <div
                                     key={task.id}
                                     onClick={() => {
                                         setSelectedTask(task)
-                                        // setIsDialogOpen(true)
+                                        setSelectedColumn(column.id)
+                                        setIsDialogOpen(true) // mở dialog khi click card
                                     }}
+                                    // GIỮ NGUYÊN animation của bạn
                                     className="bg-white rounded-xl border-2 border-black shadow-lg p-4 hover:shadow-xl transition-all duration-190 transform hover:scale-95 cursor-pointer"
                                     style={{
                                         animationDelay: `${index * 100 + taskIndex * 50}ms`,
                                     }}
                                 >
-                                    <div className="mb-3">
-                                        <span
-                                            className={`px-3 py-1 rounded-full text-sm font-bold ${task.tagColor} shadow-sm`}
-                                        >
-                                            {task.tag}
-                                        </span>
+                                    {/* Tags */}
+                                    <div className="mb-3 flex flex-wrap gap-2">
+                                        {task.tags.map((tag, idx) => (
+                                            <span
+                                                key={`${tag.tag_name}-${idx}`}
+                                                className="px-3 py-1 rounded-full text-sm font-bold shadow-sm"
+                                                style={{
+                                                    backgroundColor: lightenHex(tag.color, 0.5),
+                                                    color: "#000", // chữ đen dễ đọc trên nền pastel
+                                                }}
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                {tag.tag_name}
+                                            </span>
+                                        ))}
                                     </div>
+
                                     <h4 className="text-lg font-bold text-gray-900 mb-2 leading-tight">
                                         {task.title}
                                     </h4>
                                     <p className="text-gray-700 text-sm leading-relaxed">
                                         {task.description}
                                     </p>
+
+                                    {/* Progress */}
                                     <div className="mt-4 mb-3">
                                         <div className="flex justify-between text-sm mb-1">
                                             <span className="font-bold text-gray-700">
@@ -139,31 +161,78 @@ export function TaskBoard({
                                         </div>
                                     </div>
 
+                                    {/* Priority + Notes + Menu */}
                                     <div className="flex justify-between items-center mt-4 pt-3 border-t-2 border-gray-200">
-                                        <div className="flex flex-col gap-1">
-                                            {renderPriority(task.priority)}
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex flex-col gap-1">
+                                                {renderPriority(task.priority)}
+                                            </div>
+
+                                            {/* Notes popover */}
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <button
+                                                        className="flex items-center gap-1 text-gray-600 text-sm hover:text-gray-800"
+                                                        onClick={(e) => e.stopPropagation()} // không mở dialog khi mở notes
+                                                    >
+                                                        <MessageSquare className="w-4 h-4" />
+                                                        {task.commentsCount} notes
+                                                    </button>
+                                                </PopoverTrigger>
+                                                <PopoverContent
+                                                    align="start"
+                                                    side="top"
+                                                    className="w-80 p-2"
+                                                    onClick={(e) => e.stopPropagation()} // tránh nổi bọt click
+                                                >
+                                                    <div className="max-h-60 overflow-y-auto space-y-2">
+                                                        {task.notes.length === 0 && (
+                                                            <div className="text-sm text-gray-500 italic px-1">
+                                                                No notes yet.
+                                                            </div>
+                                                        )}
+                                                        {task.notes.map((n) => (
+                                                            <div
+                                                                key={n.id}
+                                                                className="border rounded-md p-2 bg-gray-50"
+                                                            >
+                                                                <div className="text-xs text-gray-500 mb-1">
+                                                                    <span className="font-semibold">{n.created_by}</span>{" "}
+                                                                    • {new Date(n.created_at).toLocaleString()}
+                                                                </div>
+                                                                <div className="text-sm text-gray-800 whitespace-pre-wrap">
+                                                                    {n.description}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
                                         </div>
 
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-6 w-6">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6"
+                                                    onClick={(e) => e.stopPropagation()} // không mở dialog khi bấm menu
+                                                >
                                                     <MoreVertical className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="w-32">
+                                            <DropdownMenuContent
+                                                align="end"
+                                                className="w-32"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
                                                 <DropdownMenuItem
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        handleEdit(task, column.id)
-                                                    }}
+                                                    onClick={() => handleEdit(task, column.id)}
                                                 >
                                                     Edit
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        handleDelete(task.id)
-                                                    }}
+                                                    onClick={() => handleDelete(task.id)}
                                                     className="text-red-600"
                                                 >
                                                     Delete
@@ -189,10 +258,14 @@ export function TaskBoard({
             <TaskDetailDialog
                 open={isDialogOpen}
                 onOpenChange={setIsDialogOpen}
-                task={selectedTask ?? undefined}
                 columnId={selectedColumn}
-                mode="create"
+                mode={selectedTask ? "edit" : "create"}
+                onTaskSaved={() => {
+                    onTaskUpdated?.()
+                    setIsDialogOpen(false)
+                }}
             />
+
         </div>
     )
 }

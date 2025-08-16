@@ -14,7 +14,7 @@ import { Sparkles, Heart, Star, X, Eye, EyeOff } from "lucide-react"
 
 import { useLoginMutation } from "@/services/authService"
 import { loginRequest, loginSuccess, loginFailure } from "@/lib/slices/authSlice"
-import { LoginRequest, LoginResponse } from "@/types/auth"
+import { LoginRequest, LoginResponse } from "@/types/authType"
 
 export default function LoginPage() {
   const [formData, setFormData] = useState<LoginRequest>({ username: "", password: "" })

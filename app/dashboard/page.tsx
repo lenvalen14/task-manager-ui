@@ -1,12 +1,11 @@
-"use client" // Make this a client component
+"use client"
 
-import { Header } from "@/components/layout/header"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Plus, ArrowRight, ListTodo, Clock, CheckCircle, TrendingUp, Sparkles, Star, Heart, Zap } from "lucide-react"
 import Link from "next/link"
 import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
+import { useGetAllProjectsQuery } from "@/services/projectService"
 import React from "react"
 
 // Dữ liệu giả định cho biểu đồ và thống kê
@@ -49,52 +48,10 @@ const dashboardStats = [
   },
 ]
 
-type ProjectSummary = {
-  id: string
-  name: string
-  progress: number
-  tasksCompleted: number
-  totalTasks: number
-  color: string
-  bgColor: string
-  borderColor: string
-}
-
-const recentProjects: ProjectSummary[] = [
-  { 
-    id: "1", 
-    name: "Piper Enterprise", 
-    progress: 65, 
-    tasksCompleted: 80, 
-    totalTasks: 124, 
-    color: "bg-pink-400",
-    bgColor: "bg-pink-200",
-    borderColor: "border-pink-500"
-  },
-  { 
-    id: "2", 
-    name: "Web Platform Redesign", 
-    progress: 40, 
-    tasksCompleted: 15, 
-    totalTasks: 30, 
-    color: "bg-indigo-400",
-    bgColor: "bg-indigo-200",
-    borderColor: "border-indigo-500"
-  },
-  { 
-    id: "3", 
-    name: "Mobile App V2", 
-    progress: 90, 
-    tasksCompleted: 45, 
-    totalTasks: 50, 
-    color: "bg-emerald-400",
-    bgColor: "bg-emerald-200",
-    borderColor: "border-emerald-500"
-  },
-]
-
 export default function DashboardPage() {
   const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = React.useState(false)
+
+  const { data, isLoading, error, refetch } = useGetAllProjectsQuery();
 
   return (
     <>
@@ -114,7 +71,7 @@ export default function DashboardPage() {
           <div className="absolute top-6 left-8">
             <Sparkles className="w-6 h-6 text-purple-400 animate-spin" style={{ animationDuration: '3s' }} />
           </div>
-          
+
           <div className="flex items-center gap-4 mb-3">
             <div className="w-12 h-12 bg-gradient-to-r from-pink-400 to-purple-400 rounded-2xl flex items-center justify-center border-3 border-black shadow-lg transform rotate-3">
               <Sparkles className="h-6 w-6 text-white animate-pulse" />
@@ -157,61 +114,80 @@ export default function DashboardPage() {
               <h2 className="text-4xl font-black text-gray-900 bg-blue-200 px-6 py-3 rounded-2xl border-3 border-black shadow-lg transform -rotate-1">
                 Recent Projects 🚀
               </h2>
-              <Button 
-                variant="ghost" 
-                asChild 
+              <Button
+                variant="ghost"
+                asChild
                 className="text-gray-900 font-black px-6 py-3 rounded-xl border-2 border-black bg-white hover:bg-pink-100 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
               >
-                <Link href="/dashboard/projects" className="flex items-center gap-3">
-                  View All Projects 
+                <Link href="/dashboard/project" className="flex items-center gap-3">
+                  View All Projects
                   <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
                 </Link>
               </Button>
             </div>
-            
+
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {recentProjects.map((project, index) => (
-                <Card
-                  key={project.id}
-                  className={`group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl border-3 border-black bg-white hover:scale-105 transform hover:-rotate-1`}
-                  style={{ animationDelay: `${index * 150}ms` }}
-                >
-                  <CardHeader className="relative pb-4">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className={`w-12 h-12 rounded-2xl ${project.color} flex items-center justify-center text-white text-lg font-black shadow-lg border-2 border-black transform rotate-3 group-hover:rotate-0 transition-transform duration-300`}>
-                        {project.name.split(' ').map(word => word[0]).join('').slice(0, 2)}
-                      </div>
-                      <CardTitle className="text-xl font-black text-gray-900">{project.name}</CardTitle>
-                    </div>
-                    <CardDescription>
-                      <div className="relative mb-3">
-                        <div className="w-full h-4 bg-gray-200 rounded-full shadow-inner overflow-hidden">
-                          <div 
-                            className={`h-full ${project.color} rounded-full transition-all duration-500 ease-out`}
-                            style={{ width: `${project.progress}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                      <span className="text-lg font-black text-gray-900 bg-yellow-200 px-3 py-1 rounded-full border-2 border-black shadow-sm">
-                        {project.progress}% Complete
-                      </span>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex justify-between items-center pt-0">
-                    <div className="text-sm font-bold text-gray-700">
-                      <span className="text-gray-900 font-black text-lg">{project.tasksCompleted}</span> / {project.totalTasks} Tasks
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      asChild
-                      className="border-2 border-black bg-white text-gray-900 rounded-xl font-black shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-50"
+              {[...(data?.data || [])]
+                .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                .slice(0, 3)
+                .map((project: any, index: number) => {
+                  // Random màu 
+                  const colors = ["bg-red-500", "bg-green-500", "bg-blue-500", "bg-yellow-500", "bg-purple-500", "bg-pink-500"];
+                  const color = project.color || colors[Math.floor(Math.random() * colors.length)];
+
+                  // Xử lý progress và tasks
+                  let totalTasks = project.tasks?.length || 0;
+                  let completedTasks = 0;
+                  let progress = 0;
+
+                  if (totalTasks > 0) {
+                    completedTasks = project.tasks.filter((task: any) => task.status === "done").length;
+                    progress = Math.round((completedTasks / totalTasks) * 100);
+                  }
+
+                  return (
+                    <Card
+                      key={project.id}
+                      className={`group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl border-3 border-black bg-white hover:scale-105 transform hover:-rotate-1`}
+                      style={{ animationDelay: `${index * 150}ms` }}
                     >
-                      <Link href={`/dashboard/project/${project.id}`}>View Project</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                      <CardHeader className="relative pb-4">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className={`w-12 h-12 rounded-2xl ${color} flex items-center justify-center text-white text-lg font-black shadow-lg border-2 border-black transform rotate-3 group-hover:rotate-0 transition-transform duration-300`}>
+                            {project.name.split(" ").map((word: string) => word[0]).join("").slice(0, 2)}
+                          </div>
+                          <CardTitle className="text-xl font-black text-gray-900">{project.name}</CardTitle>
+                        </div>
+                        <CardDescription>
+                          <div className="relative mb-3">
+                            <div className="w-full h-4 bg-gray-200 rounded-full shadow-inner overflow-hidden">
+                              <div
+                                className={`h-full ${color} rounded-full transition-all duration-500 ease-out`}
+                                style={{ width: `${progress}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                          <span className="text-lg font-black text-gray-900 bg-yellow-200 px-3 py-1 rounded-full border-2 border-black shadow-sm">
+                            {progress}% Complete
+                          </span>
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex justify-between items-center pt-0">
+                        <div className="text-sm font-bold text-gray-700">
+                          <span className="text-gray-900 font-black text-lg">{completedTasks}</span> / {totalTasks} Tasks
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="border-2 border-black bg-white text-gray-900 rounded-xl font-black shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-50"
+                        >
+                          <Link href={`/dashboard/project/${project.id}`}>View Project</Link>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
             </div>
           </div>
 
@@ -226,8 +202,16 @@ export default function DashboardPage() {
             </Button>
           </div>
         </div>
-      </div>
-      <AddProjectDialog open={isAddProjectDialogOpen} onOpenChange={setIsAddProjectDialogOpen} />
+      </div >
+      <AddProjectDialog
+        open={isAddProjectDialogOpen}
+        onOpenChange={(open) => {
+          setIsAddProjectDialogOpen(open);
+          if (!open) {
+            refetch();
+          }
+        }}
+      />
     </>
   )
 }

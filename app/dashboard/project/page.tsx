@@ -1,16 +1,15 @@
-"use client" // Make this a client component
+"use client"
 
-import { Header } from "@/components/layout/header"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Plus, ArrowLeft, FolderOpen, Star } from "lucide-react"
 import Link from "next/link"
-import { Progress } from "@/components/ui/progress"
 import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
 import React from "react"
+import { useGetAllProjectsQuery } from "@/services/projectService"
 
-type Project = {
+type ProjectUI = {
   id: string
   name: string
   description: string
@@ -23,80 +22,63 @@ type Project = {
   bgColor: string
 }
 
-const allProjects: Project[] = [
-  {
-    id: "1",
-    name: "Piper Enterprise",
-    description: "Main product development for Q3, focusing on new features and performance.",
-    status: "In Progress",
-    progress: 65,
-    tasksCompleted: 80,
-    totalTasks: 124,
-    updatedAt: "2025-07-30T10:00:00Z",
-    color: "bg-pink-400",
-    bgColor: "bg-pink-50"
-  },
-  {
-    id: "2",
-    name: "Web Platform Redesign",
-    description: "Revamp existing website with new UI/UX, improving user engagement.",
-    status: "Planning",
-    progress: 10,
-    tasksCompleted: 5,
-    totalTasks: 50,
-    updatedAt: "2025-07-29T15:30:00Z",
-    color: "bg-blue-400",
-    bgColor: "bg-blue-50"
-  },
-  {
-    id: "3",
-    name: "Mobile App V2",
-    description: "Develop new features for mobile application, including offline mode.",
-    status: "Completed",
-    progress: 100,
-    tasksCompleted: 45,
-    totalTasks: 45,
-    updatedAt: "2025-07-27T08:00:00Z",
-    color: "bg-green-400",
-    bgColor: "bg-green-50"
-  },
-  {
-    id: "4",
-    name: "Marketing Campaign Q4",
-    description: "Plan and execute Q4 marketing strategies across all channels.",
-    status: "To Do",
-    progress: 0,
-    tasksCompleted: 0,
-    totalTasks: 20,
-    updatedAt: "2025-07-23T11:00:00Z",
-    color: "bg-yellow-400",
-    bgColor: "bg-yellow-50"
-  },
-  {
-    id: "5",
-    name: "Internal Tooling Improvement",
-    description: "Enhance internal tools for efficiency and automation of workflows.",
-    status: "In Progress",
-    progress: 30,
-    tasksCompleted: 10,
-    totalTasks: 35,
-    updatedAt: "2025-07-25T14:00:00Z",
-    color: "bg-purple-400",
-    bgColor: "bg-purple-50"
-  },
+const statusColors: Record<string, string> = {
+  "In Progress": "bg-blue-300 text-gray-900 border-2 border-blue-500",
+  "Planning": "bg-yellow-300 text-gray-900 border-2 border-yellow-500",
+  "Completed": "bg-green-300 text-gray-900 border-2 border-green-500",
+  "To Do": "bg-gray-300 text-gray-900 border-2 border-gray-400"
+}
+
+// 🎨 Màu random cho từng project
+const colorPalette = [
+  { color: "bg-pink-400", bgColor: "bg-pink-50" },
+  { color: "bg-blue-400", bgColor: "bg-blue-50" },
+  { color: "bg-green-400", bgColor: "bg-green-50" },
+  { color: "bg-yellow-400", bgColor: "bg-yellow-50" },
+  { color: "bg-purple-400", bgColor: "bg-purple-50" }
 ]
 
-const statusColors = {
-  "In Progress": "bg-blue-300 text-gray-900 border-2 border-blue",
-  "Planning": "bg-yellow-300 text-gray-900 border-2 border-yellow",
-  "Completed": "bg-green-300 text-gray-900 border-2 border-green",
-  "To Do": "bg-gray-300 text-gray-900 border-2 border-gray"
+// 🔄 Format API -> ProjectUI
+const formatProjects = (apiProjects: any[]): ProjectUI[] => {
+  return apiProjects.map((p, index) => {
+    const totalTasks = p.tasks?.length || 0
+    const tasksCompleted = p.tasks?.filter((t: any) => t.status === "Completed").length || 0
+    const progress = totalTasks ? Math.round((tasksCompleted / totalTasks) * 100) : 0
+    const colors = colorPalette[index % colorPalette.length]
+
+    return {
+      id: String(p.id),
+      name: p.name,
+      description: p.description || "No description provided.",
+      status: progress === 100 ? "Completed" : progress > 0 ? "In Progress" : "To Do",
+      progress,
+      tasksCompleted,
+      totalTasks,
+      updatedAt: p.updated_at,
+      ...colors
+    }
+  })
 }
 
 export default function AllProjectsPage() {
   const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = React.useState(false)
+  const [searchTerm, setSearchTerm] = React.useState("")
 
-  // Helper to format date for display
+  const { data, isLoading, isError, refetch } = useGetAllProjectsQuery()
+
+  const projects = React.useMemo(() => {
+    if (!data?.data) return []
+    return formatProjects(data.data)
+  }, [data])
+
+  // Filter theo search
+  const filteredProjects = React.useMemo(() => {
+    if (!searchTerm) return projects
+    return projects.filter(p =>
+      p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [projects, searchTerm])
+
   const formatRelativeTime = (isoString: string) => {
     const date = new Date(isoString)
     const now = new Date()
@@ -113,140 +95,140 @@ export default function AllProjectsPage() {
 
   return (
     <>
-      <div className="flex-1 min-h-screen overflow-auto bg-white w-full">
-        {/* Header Section */}
-        <div className="relative px-8 pt-6 bg-white">
-          {/* Decorative stars */}
-          <div className="absolute top-4 right-8">
-            <Star className="w-6 h-6 text-yellow-400 fill-yellow-400 animate-pulse" />
+      <div className="flex-1 min-h-screen overflow-auto bg-white w-full px-6 md:px-12 pt-6">
+        {/* Header */}
+        <div className="relative mb-8">
+          <div className="absolute top-4 right-8 animate-pulse">
+            <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
           </div>
-          <div className="absolute top-8 right-16">
-            <Star className="w-4 h-4 text-yellow-300 fill-yellow-300 animate-pulse delay-300" />
+          <div className="absolute top-8 right-16 animate-pulse delay-300">
+            <Star className="w-4 h-4 text-yellow-300 fill-yellow-300" />
           </div>
-          <div className="absolute top-6 right-24">
-            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500 animate-pulse delay-700" />
+          <div className="absolute top-6 right-24 animate-pulse delay-700">
+            <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
           </div>
-          
-          <div className="flex items-center gap-8 mb-4">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              asChild 
-              className="text-gray-600 hover:text-gray-800 hover:bg-pink-50 rounded-full transition-all duration-200"
-            >
-              <Link href="/dashboard">
-                <ArrowLeft className="w-5 h-5" />
-                <span className="sr-only">Back to Dashboard</span>
-              </Link>
-            </Button>
-            
-            <div className="flex items-center gap-6">
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/dashboard">
+                  <ArrowLeft className="w-5 h-5" />
+                  <span className="sr-only">Back to Dashboard</span>
+                </Link>
+              </Button>
               <div className="relative">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white border-4 border-black shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white border-4 border-black shadow-lg">
                   <FolderOpen className="w-8 h-8" />
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-400 border-3 border-black rounded-full shadow-md flex items-center justify-center text-xs font-bold text-gray-900">
-                  {allProjects.length}
+                  {projects.length}
                 </div>
               </div>
-              
-              <div>
-                <h1 className="text-4xl font-black text-gray-900 mb-2 tracking-tight">
-                  All Projects
-                </h1>
-                <p className="text-lg font-bold text-gray-700 bg-yellow-200 px-4 py-2 rounded-full border-2 border-black shadow-sm inline-block">
-                  Manage and track all your projects! ✨
-                </p>
-              </div>
+            </div>
+            <div>
+              <h1 className="text-4xl font-black text-gray-900 mb-2">All Projects</h1>
+              <p className="text-lg font-bold text-gray-700 bg-yellow-200 px-4 py-2 rounded-full border-2 border-black">
+                Manage and track all your projects! ✨
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="px-8 pt-8 pb-12">
-          {/* Search and Add Section */}
-          <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
-            <div className="relative w-full sm:max-w-md">
-              <Search className="absolute left-4 top-4 h-5 w-5 text-gray-600" />
-              <Input
-                type="search"
-                placeholder="Search projects..."
-                className="pl-12 h-12 border-3 border-black focus:border-pink-400 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-200 text-gray-900 font-semibold"
-              />
-            </div>
-            <Button
-              onClick={() => setIsAddProjectDialogOpen(true)}
-              className="w-full sm:w-auto h-12 bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 text-white font-black shadow-lg hover:shadow-xl rounded-xl px-8 py-3 border-3 border-black transition-all duration-200 transform hover:scale-105"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Add New Project
-            </Button>
+        {/* Search + Add */}
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
+          <div className="relative w-full sm:max-w-md">
+            <Search className="absolute left-4 top-4 h-5 w-5 text-gray-600" />
+            <Input
+              type="search"
+              placeholder="Search projects..."
+              className="pl-12 h-12 border-3 border-black"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
+          <Button
+            onClick={() => setIsAddProjectDialogOpen(true)}
+            className="w-full sm:w-auto flex items-center justify-center gap-2"
+          >
+            <Plus className="w-5 h-5" /> Add New Project
+          </Button>
+        </div>
 
-          {/* Projects Grid */}
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {allProjects.map((project, index) => (
-              <Card
-                key={project.id}
-                className="group relative overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 rounded-2xl bg-white hover:scale-105 transform"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardHeader className="pb-4">
-                  <div className="flex items-center gap-4 mb-3">
-                    <div className={`relative w-12 h-12 rounded-xl ${project.color} flex items-center justify-center text-white text-lg font-black shadow-md border-2 border-black group-hover:scale-110 transition-transform duration-200 transform rotate-3 group-hover:rotate-0`}>
-                      {project.name.split(' ').map(word => word[0]).join('').slice(0, 2)}
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full" />
+        {/* Projects Grid */}
+        {isLoading && <p>Loading projects...</p>}
+        {isError && <p>Failed to load projects</p>}
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {[...(data?.data || [])]
+            .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            .map((project: any, index: number) => {
+              // Random màu 
+              const colors = ["bg-red-500", "bg-green-500", "bg-blue-500", "bg-yellow-500", "bg-purple-500", "bg-pink-500"];
+              const color = project.color || colors[Math.floor(Math.random() * colors.length)];
+
+              // Xử lý progress và tasks
+              let totalTasks = project.tasks?.length || 0;
+              let completedTasks = 0;
+              let progress = 0;
+
+              if (totalTasks > 0) {
+                completedTasks = project.tasks.filter((task: any) => task.status === "done").length;
+                progress = Math.round((completedTasks / totalTasks) * 100);
+              }
+
+              return (
+                <Card
+                  key={project.id}
+                  className={`group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl border-3 border-black bg-white hover:scale-105 transform hover:-rotate-1`}
+                  style={{ animationDelay: `${index * 150}ms` }}
+                >
+                  <CardHeader className="relative pb-4">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className={`w-12 h-12 rounded-2xl ${color} flex items-center justify-center text-white text-lg font-black shadow-lg border-2 border-black transform rotate-3 group-hover:rotate-0 transition-transform duration-300`}>
+                        {project.name.split(" ").map((word: string) => word[0]).join("").slice(0, 2)}
+                      </div>
+                      <CardTitle className="text-xl font-black text-gray-900">{project.name}</CardTitle>
                     </div>
-                    <CardTitle className="text-xl font-black text-gray-900 group-hover:text-gray-800 tracking-tight">
-                      {project.name}
-                    </CardTitle>
-                  </div>
-                  <CardDescription className="line-clamp-2 text-gray-700 text-sm font-semibold leading-relaxed">
-                    {project.description}
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className={`px-4 py-2 rounded-full text-sm font-black shadow-md ${statusColors[project.status as keyof typeof statusColors]}`}>
-                      {project.status}
-                    </span>
-                    <span className="text-sm text-gray-900 font-black bg-gray-200 px-3 py-1 rounded-full border-2 border-grey shadow-sm">
-                      {formatRelativeTime(project.updatedAt)}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="relative w-full h-4 bg-gray-200 rounded-full shadow-inner overflow-hidden">
-                      <div 
-                        className={`h-full ${project.color} rounded-full transition-all duration-500 ease-out`}
-                        style={{ width: `${project.progress}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex items-center justify-between text-sm text-gray-900">
-                      <span className="font-black bg-yellow-200 px-3 py-1 rounded-full border-2 border-grey shadow-sm">
-                        {project.progress}% Complete
+                    <CardDescription>
+                      <div className="relative mb-3">
+                        <div className="w-full h-4 bg-gray-200 rounded-full shadow-inner overflow-hidden">
+                          <div
+                            className={`h-full ${color} rounded-full transition-all duration-500 ease-out`}
+                            style={{ width: `${progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                      <span className="text-lg font-black text-gray-900 bg-yellow-200 px-3 py-1 rounded-full border-2 border-black shadow-sm">
+                        {progress}% Complete
                       </span>
-                      <span className="bg-white px-3 py-1 rounded-full border-2 border-grey shadow-sm font-black">
-                        {project.tasksCompleted} / {project.totalTasks} Tasks
-                      </span>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex justify-between items-center pt-0">
+                    <div className="text-sm font-bold text-gray-700">
+                      <span className="text-gray-900 font-black text-lg">{completedTasks}</span> / {totalTasks} Tasks
                     </div>
-                  </div>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
-                    className="w-full mt-4 h-10 border-3 border-grey hover:border-black hover:bg-blue-300 bg-white text-gray-900 hover:text-gray-900 rounded-xl font-black shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-                  >
-                    <Link href={`/dashboard/project/${project.id}`}>View Details</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      asChild
+                      className="border-2 border-black bg-white text-gray-900 rounded-xl font-black shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-50"
+                    >
+                      <Link href={`/dashboard/project/${project.id}`}>View Project</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
         </div>
       </div>
-      <AddProjectDialog open={isAddProjectDialogOpen} onOpenChange={setIsAddProjectDialogOpen} />
+
+      {/* Add Project Dialog */}
+      <AddProjectDialog
+        open={isAddProjectDialogOpen}
+        onOpenChange={(open) => {
+          setIsAddProjectDialogOpen(open)
+          if (!open) refetch()
+        }}
+      />
     </>
   )
 }

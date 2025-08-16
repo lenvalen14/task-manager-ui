@@ -1,64 +1,100 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { TaskBoard } from "@/components/project-manage/task/taskBoardView"
 import { TaskListView } from "@/components/project-manage/task/taskListView"
-import { List, LayoutGrid, Table, Plus, Star } from "lucide-react"
-import { Flag } from "lucide-react"
+import { List, LayoutGrid, Table, Flag } from "lucide-react"
 import clsx from "clsx"
+import { Task, Priority, Status, Tag, Note } from "@/types/taskType"
 
+// ===== UI Types (export để TaskBoardView dùng chung) =====
 export type SubTask = {
   id: string
   title: string
   completed: boolean
 }
 
-export type Task = {
+export type UITask = {
   id: string
-  tag: string
-  tagColor: string
   title: string
   description: string
   subtasks: SubTask[]
-  progress?: number
-  priority?: "Urgent" | "High" | "Medium" | "Low"
+  progress: number
+  priority: Priority
   dueDate?: string
-  commentsCount?: number
+  commentsCount: number
+  tags: Tag[]
+  notes: Note[]
+  status: Status
 }
 
 export type TaskColumnData = {
   id: string
   title: string
-  status: "to-do" | "in-progress" | "need-review" | "done"
-  tasks: Task[]
+  status: Status
+  tasks: UITask[]
   color: string
 }
 
-export const renderPriority = (priority?: "Urgent" | "High" | "Medium" | "Low") => {
+// ===== Meta / Helpers =====
+const statusMeta: Record<Status, { title: string; color: string; id: string }> = {
+  "to-do": { id: "1", title: "To Do", color: "bg-red-400" },
+  "in-progress": { id: "2", title: "In Progress", color: "bg-blue-400" },
+  "need-review": { id: "3", title: "Need Review", color: "bg-orange-400" },
+  "done": { id: "4", title: "Done", color: "bg-green-400" },
+}
+
+const formatDate = (iso?: string | null): string | undefined => {
+  if (!iso) return undefined
+  try {
+    const d = new Date(iso)
+    if (Number.isNaN(d.getTime())) return undefined
+    return d.toISOString().split("T")[0]
+  } catch {
+    return undefined
+  }
+}
+
+// Random màu tag (class tailwind an toàn)
+const randomTagColor = () => {
+  const colors = [
+    "bg-pink-200 text-pink-800",
+    "bg-blue-200 text-blue-800",
+    "bg-green-200 text-green-800",
+    "bg-yellow-200 text-yellow-800",
+    "bg-purple-200 text-purple-800",
+    "bg-red-200 text-red-800",
+    "bg-orange-200 text-orange-800",
+  ]
+  return colors[Math.floor(Math.random() * colors.length)]
+}
+
+// ===== Priority UI (export để TaskBoardView dùng) =====
+export const renderPriority = (priority?: "low" | "medium" | "high" | "urgent") => {
   switch (priority) {
-    case "Urgent":
+    case "urgent":
       return (
         <div className="flex items-center gap-1 text-red-700 font-bold">
           <Flag className="w-4 h-4 fill-red-700" />
           <span>Urgent</span>
         </div>
       )
-    case "High":
+    case "high":
       return (
         <div className="flex items-center gap-1 text-orange-500">
           <Flag className="w-4 h-4 fill-orange-500" />
           <span>High</span>
         </div>
       )
-    case "Medium":
+    case "medium":
       return (
         <div className="flex items-center gap-1 text-yellow-500">
           <Flag className="w-4 h-4 fill-yellow-500" />
           <span>Medium</span>
         </div>
       )
-    case "Low":
+    case "low":
       return (
         <div className="flex items-center gap-1 text-blue-500">
           <Flag className="w-4 h-4 fill-blue-500" />
@@ -70,143 +106,70 @@ export const renderPriority = (priority?: "Urgent" | "High" | "Medium" | "Low") 
   }
 }
 
+// ===== Props =====
+type BoardPageProps = {
+  tasks: Task[];
+  onTaskUpdated?: () => void;
+}
 
-const taskColumns: TaskColumnData[] = [
-  {
-    id: "1",
-    title: "To Do",
-    status: "to-do",
-    color: "bg-red-400",
-    tasks: [
-      {
-        id: "t1",
-        tag: "UX stages",
-        tagColor: "bg-yellow-200 text-yellow-900 border-2 border-black",
-        title: "Wireframing",
-        description: "Create low-fidelity designs that outline the basic structure and layout of the product or service...",
-        subtasks: [
-          { id: "st1", title: "Create user flow diagrams", completed: true },
-          { id: "st2", title: "Design key screens", completed: false },
-          { id: "st3", title: "Review with team", completed: false },
-        ],
-        progress: 33,
-        priority: "High",
-        dueDate: "2025-08-10",
-        commentsCount: 3,
-      },
-      {
-        id: "t2",
-        tag: "Design",
-        tagColor: "bg-purple-200 text-purple-900 border-2 border-black",
-        title: "First design concept",
-        description: "Create a concept based on the research and insights gathered during the discovery phase of the project...",
-        subtasks: [
-          { id: "st4", title: "Research design trends", completed: true },
-          { id: "st5", title: "Create mood board", completed: true },
-          { id: "st6", title: "Design initial concepts", completed: false },
-        ],
-        progress: 66,
-        priority: "Medium",
-        dueDate: "2025-08-12",
-        commentsCount: 2,
-      },
-      {
-        id: "t3",
-        tag: "Design",
-        tagColor: "bg-purple-200 text-purple-900 border-2 border-black",
-        title: "Design library",
-        description: "Create a collection of reusable design elements, such as buttons, forms, and navigation menus.",
-        subtasks: [],
-        priority: "Low",
-        dueDate: "2025-08-14",
-        commentsCount: 0,
-      },
-    ],
-  },
-  {
-    id: "2",
-    title: "In Progress",
-    status: "in-progress",
-    color: "bg-blue-400",
-    tasks: [
-      {
-        id: "t4",
-        tag: "UX stages",
-        tagColor: "bg-yellow-200 text-yellow-900 border-2 border-black",
-        title: "Customer Journey Mapping",
-        description: "Identify the key touchpoints and pain points in the customer journey, and to develop strategies to improve the overall customer...",
-        subtasks: [],
-        priority: "High",
-        dueDate: "2025-08-09",
-        commentsCount: 4,
-      },
-      {
-        id: "t5",
-        tag: "UX stage",
-        tagColor: "bg-yellow-200 text-yellow-900 border-2 border-black",
-        title: "Persona development",
-        description: "Create user personas based on the research data to represent different user groups and their characteristics, goals, and behaviors...",
-        subtasks: [],
-        priority: "Medium",
-        dueDate: "2025-08-11",
-        commentsCount: 1,
-      },
-    ],
-  },
-  {
-    id: "3",
-    title: "Need Review",
-    status: "need-review",
-    color: "bg-orange-400",
-    tasks: [
-      {
-        id: "t6",
-        tag: "UX stages",
-        tagColor: "bg-yellow-200 text-yellow-900 border-2 border-black",
-        title: "Competitor research",
-        description: "Research competitors and identify weakness and strengths each of them. Compare their product features, quality...",
-        subtasks: [],
-        priority: "Low",
-        dueDate: "2025-08-07",
-        commentsCount: 2,
-      },
-    ],
-  },
-  {
-    id: "4",
-    title: "Done",
-    status: "done",
-    color: "bg-green-400",
-    tasks: [
-      {
-        id: "t7",
-        tag: "Branding",
-        tagColor: "bg-pink-200 text-pink-900 border-2 border-black",
-        title: "Branding, visual identity",
-        description: "Create a brand identity system that includes a logo, typography, color palette, and brand guidelines...",
-        subtasks: [],
-        priority: "Medium",
-        dueDate: "2025-08-05",
-        commentsCount: 0,
-      },
-      {
-        id: "t8",
-        tag: "Branding",
-        tagColor: "bg-pink-200 text-pink-900 border-2 border-black",
-        title: "Marketing materials",
-        description: "Create a branded materials such as business cards, flyers, brochures, and social media graphics...",
-        subtasks: [],
-        priority: "Low",
-        dueDate: "2025-08-06",
-        commentsCount: 1,
-      },
-    ],
-  },
-]
-
-
-export function BoardPage() {
+// ===== Component =====
+export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
   const [viewMode, setViewMode] = useState<"board" | "table" | "list">("board")
+
+  const columns: TaskColumnData[] = useMemo(() => {
+    const colMap: Record<Status, TaskColumnData> = {
+      "to-do": { id: statusMeta["to-do"].id, title: statusMeta["to-do"].title, status: "to-do", color: statusMeta["to-do"].color, tasks: [] },
+      "in-progress": { id: statusMeta["in-progress"].id, title: statusMeta["in-progress"].title, status: "in-progress", color: statusMeta["in-progress"].color, tasks: [] },
+      "need-review": { id: statusMeta["need-review"].id, title: statusMeta["need-review"].title, status: "need-review", color: statusMeta["need-review"].color, tasks: [] },
+      "done": { id: statusMeta["done"].id, title: statusMeta["done"].title, status: "done", color: statusMeta["done"].color, tasks: [] },
+    }
+
+    const parentById = new Map<number, UITask>()
+
+    // Parent tasks
+    tasks
+      .filter(t => t.parent_task === null)
+      .forEach((t) => {
+        const uiTask: UITask = {
+          id: String(t.id),
+          title: t.title,
+          description: t.description,
+          subtasks: [],
+          progress: 0,
+          priority: t.priority ?? "low",
+          dueDate: formatDate(t.deadline),
+          commentsCount: (t.notes ?? []).length,
+          tags: (t.tags ?? []).map(tag => ({
+            ...tag,
+            style: { backgroundColor: tag.color, color: "#fff" }, // hoặc màu text phù hợp
+          })),
+          notes: t.notes ?? [],
+          status: t.status,
+        }
+        parentById.set(t.id, uiTask)
+        colMap[t.status].tasks.push(uiTask)
+      })
+
+    // Subtasks
+    tasks
+      .filter(t => t.parent_task !== null)
+      .forEach((t) => {
+        const parent = parentById.get(t.parent_task as number)
+        if (!parent) return
+
+        parent.subtasks.push({
+          id: String(t.id),
+          title: t.title,
+          completed: t.status === "done",
+        })
+
+        const total = parent.subtasks.length
+        const done = parent.subtasks.filter(s => s.completed).length
+        parent.progress = total === 0 ? 0 : Math.round((done / total) * 100)
+      })
+
+    return Object.values(colMap)
+  }, [tasks])
 
   return (
     <div className="flex flex-col p-6">
@@ -262,9 +225,8 @@ export function BoardPage() {
         </div>
       </div>
 
-      {/* Hiển thị chế độ tương ứng */}
-      {viewMode === "board" && <TaskBoard columns={taskColumns} />}
-      {viewMode === "list" && <TaskListView columns={taskColumns} />}
+      {viewMode === "board" && <TaskBoard columns={columns} onTaskUpdated={onTaskUpdated} />}
+      {viewMode === "list" && <TaskListView columns={columns} />}
       {viewMode === "table" && (
         <div className="text-gray-500 italic p-4 border rounded-lg text-center">
           Table view chưa được phát triển.

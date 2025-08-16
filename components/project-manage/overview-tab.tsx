@@ -3,7 +3,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Clock, ListTodo, TrendingUp, Activity, Star } from "lucide-react"
 
-export function OverviewTab() {
+type OverviewTabProps = {
+  projectProgress: number;
+  totalTasks: { done: number; pending: number };
+};
+
+export function OverviewTab({ projectProgress, totalTasks }: OverviewTabProps) {
   return (
     <div className="relative">
       {/* Decorative stars */}
@@ -24,13 +29,13 @@ export function OverviewTab() {
             </div>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="text-4xl font-black text-gray-900 mb-3">65% Complete</div>
+            <div className="text-4xl font-black text-gray-900 mb-3">{projectProgress}% Complete</div>
 
             {/* Custom Progress Bar */}
             <div className="relative w-full h-4 bg-white rounded-full border border-gray-300 shadow-inner overflow-hidden mb-3">
               <div
                 className="h-full bg-blue-400 rounded-full transition-all duration-500 ease-out"
-                style={{ width: '65%' }}
+                style={{ width: `${projectProgress}%` }}
               ></div>
             </div>
 
@@ -49,13 +54,13 @@ export function OverviewTab() {
             </div>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="text-4xl font-black text-gray-900 mb-3">124</div>
+            <div className="text-4xl font-black text-gray-900 mb-3">{totalTasks.done + totalTasks.pending}</div>
             <div className="flex gap-2">
               <span className="bg-green-300 text-gray-900 px-3 py-1 rounded-full border border-gray-400 text-sm font-bold">
-                80 done
+                {totalTasks.done} done
               </span>
               <span className="bg-orange-300 text-gray-900 px-3 py-1 rounded-full border border-gray-400 text-sm font-bold">
-                44 pending
+                {totalTasks.pending} pending
               </span>
             </div>
           </CardContent>

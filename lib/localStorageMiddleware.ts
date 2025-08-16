@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import { loginSuccess, refreshSuccess, logout } from './slices/authSlice';
 import { authApi } from '../services/authService';
 import type { AppDispatch } from './store';
-import type { RefreshTokenResponse } from '../types/auth';
+import type { RefreshTokenResponse } from '../types/authType';
 
 type JwtPayload = { exp: number };
 

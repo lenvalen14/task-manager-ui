@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 import { useRegisterMutation } from "@/services/authService"
-import { RegisterRequest, RegisterResponse } from "@/types/auth"
+import { RegisterRequest, RegisterResponse } from "@/types/authType"
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState<RegisterRequest>({
