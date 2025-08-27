@@ -14,6 +14,7 @@ type TimeLog = {
 export const timeLogApi = createApi({
   reducerPath: "timeLogApi",
   baseQuery: baseQueryWithAuth,
+  tagTypes: ["TimeLogs"],
   endpoints: (builder) => ({
     startTimeLog: builder.mutation<TimeLog, { taskId: number }>({
       query: (body) => ({
@@ -21,6 +22,7 @@ export const timeLogApi = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: [{ type: "TimeLogs", id: "LIST" }],
     }),
     pauseTimeLog: builder.mutation<TimeLog, { timelogId: number }>({
       query: (body) => ({
@@ -28,6 +30,7 @@ export const timeLogApi = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: (r, e, arg) => [{ type: "TimeLogs", id: arg.timelogId }],
     }),
     stopTimeLog: builder.mutation<TimeLog, { timelogId: number }>({
       query: (body) => ({
@@ -35,6 +38,10 @@ export const timeLogApi = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: (r, e, arg) => [
+        { type: "TimeLogs", id: arg.timelogId },
+        { type: "TimeLogs", id: "LIST" },
+      ],
     }),
   }),
 })

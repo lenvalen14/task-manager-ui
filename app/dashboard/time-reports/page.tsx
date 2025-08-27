@@ -43,13 +43,7 @@ export default function TimeReportsPage() {
   }, [isRunning])
 
   useEffect(() => {
-    const list = Array.isArray((tasksData as any)?.data)
-      ? (tasksData as any).data
-      : Array.isArray(tasksData)
-      ? (tasksData as any)
-      : Array.isArray((tasksData as any)?.results)
-      ? (tasksData as any).results
-      : []
+    const list = Array.isArray(tasksData?.data) ? tasksData!.data : []
     if (selectedTaskId === null && list.length > 0) {
       setSelectedTaskId(Number(list[0].id))
     }
@@ -148,15 +142,7 @@ export default function TimeReportsPage() {
                       <SelectValue placeholder="Select a task" />
                     </SelectTrigger>
                     <SelectContent>
-                      {(
-                        Array.isArray((tasksData as any)?.data)
-                          ? (tasksData as any).data
-                          : Array.isArray(tasksData)
-                          ? (tasksData as any)
-                          : Array.isArray((tasksData as any)?.results)
-                          ? (tasksData as any).results
-                          : []
-                      ).map((t: any) => (
+                      {(Array.isArray(tasksData?.data) ? tasksData!.data : []).map((t) => (
                         <SelectItem key={t.id} value={String(t.id)}>{t.title ?? `Task #${t.id}`}</SelectItem>
                       ))}
                     </SelectContent>

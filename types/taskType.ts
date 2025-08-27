@@ -110,3 +110,11 @@ export interface UpdatteStatusSubTaskResponse {
     meta: any
     errors: any
 }
+
+export interface TaskListResponse {
+    code: number
+    message: string
+    data: Task[]
+    meta: any
+    errors: any
+}

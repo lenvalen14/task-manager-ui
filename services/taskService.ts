@@ -1,16 +1,24 @@
 import { createApi } from "@reduxjs/toolkit/query/react"
 import { baseQueryWithAuth } from "./baseQuery"
-import { Task, TaskCreateResponse, TaskCreateRequset, TaskUpdateRequset, TaskUpdateResponse, TaskCreateAllRequest, Status, UpdatteStatusSubTaskResponse } from "@/types/taskType";
+import { Task, TaskCreateResponse, TaskCreateRequset, TaskUpdateRequset, TaskUpdateResponse, TaskCreateAllRequest, Status, UpdatteStatusSubTaskResponse, TaskListResponse } from "@/types/taskType";
 
 export const taskApi = createApi({
     reducerPath: "taskApi",
     baseQuery: baseQueryWithAuth,
+    tagTypes: ["Tasks"],
     endpoints: (builder) => ({
-        getTasks: builder.query<any, void>({
+        getTasks: builder.query<TaskListResponse, void>({
             query: () => ({
                 url: "/tasks/",
                 method: "GET",
             }),
+            providesTags: (result) => {
+                const list = result?.data ?? []
+                return [
+                    { type: "Tasks" as const, id: "LIST" },
+                    ...list.map((t) => ({ type: "Tasks" as const, id: t.id })),
+                ]
+            },
         }),
         createTask: builder.mutation<TaskCreateResponse, TaskCreateRequset>({
             query: (body) => ({
@@ -18,13 +26,15 @@ export const taskApi = createApi({
                 method: "POST",
                 body,
             }),
+            invalidatesTags: [{ type: "Tasks", id: "LIST" }],
         }),
         createAllOfTask: builder.mutation<TaskCreateResponse, TaskCreateAllRequest>({
             query: (body) => ({
                 url: "/tasks/",
                 method: "POST",
                 body,
-            })
+            }),
+            invalidatesTags: [{ type: "Tasks", id: "LIST" }],
         }),
         updateTask: builder.mutation<TaskUpdateResponse, { id: number; body: TaskUpdateRequset }>({
             query: ({ id, body }) => ({
@@ -32,6 +42,7 @@ export const taskApi = createApi({
                 method: "PUT",
                 body,
             }),
+            invalidatesTags: (r, e, arg) => [{ type: "Tasks", id: arg.id }],
         }),
         updateStatusTask: builder.mutation<UpdatteStatusSubTaskResponse, { id: number; body: { status: string } }>({
             query: ({ id, body }) => ({
@@ -39,12 +50,17 @@ export const taskApi = createApi({
                 method: "PATCH",
                 body,
             }),
+            invalidatesTags: (r, e, arg) => [{ type: "Tasks", id: arg.id }],
         }),
         deleteTask: builder.mutation<void, number>({
             query: (id) => ({
                 url: `/tasks/${id}/`,
                 method: "DELETE",
             }),
+            invalidatesTags: (r, e, id) => [
+                { type: "Tasks", id },
+                { type: "Tasks", id: "LIST" },
+            ],
         })
     }),
 })
