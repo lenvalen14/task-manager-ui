@@ -6,6 +6,7 @@ import { taskApi } from "@/services/taskService"
 import { noteApi } from "@/services/noteService"
 import { tagApi } from "@/services/tagService"
 import { userApi } from "@/services/userService"
+import { timeLogApi } from "@/services/timeLogService"
 
 export const store = configureStore({
     reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
         [noteApi.reducerPath]: noteApi.reducer,
         [tagApi.reducerPath]: tagApi.reducer,
         [userApi.reducerPath]: userApi.reducer,
+        [timeLogApi.reducerPath]: timeLogApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
@@ -29,6 +31,7 @@ export const store = configureStore({
             noteApi.middleware,
             tagApi.middleware,
             userApi.middleware,
+            timeLogApi.middleware,
         ),
 })
 

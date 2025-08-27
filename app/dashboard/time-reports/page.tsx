@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Clock, BarChart, CalendarDays, Play, Pause, Square, Star, Heart, Sparkle } from "lucide-react"
 import Link from "next/link"
+import { useStartTimeLogMutation, usePauseTimeLogMutation, useStopTimeLogMutation } from "@/services/timeLogService"
+import { useGetTasksQuery } from "@/services/taskService"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 function formatTime(seconds: number): string {
   const hours = Math.floor(seconds / 3600)
@@ -17,6 +20,13 @@ function formatTime(seconds: number): string {
 export default function TimeReportsPage() {
   const [isRunning, setIsRunning] = useState(false)
   const [time, setTime] = useState(0)
+  const [currentLogId, setCurrentLogId] = useState<number | null>(null)
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null)
+
+  const [startTimeLog, { isLoading: starting }] = useStartTimeLogMutation()
+  const [pauseTimeLog, { isLoading: pausing }] = usePauseTimeLogMutation()
+  const [stopTimeLog, { isLoading: stopping }] = useStopTimeLogMutation()
+  const { data: tasksData } = useGetTasksQuery()
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
@@ -32,11 +42,60 @@ export default function TimeReportsPage() {
     }
   }, [isRunning])
 
-  const handleStart = () => setIsRunning(true)
-  const handlePause = () => setIsRunning(false)
-  const handleStop = () => {
-    setIsRunning(false)
-    setTime(0)
+  useEffect(() => {
+    const list = Array.isArray((tasksData as any)?.data)
+      ? (tasksData as any).data
+      : Array.isArray(tasksData)
+      ? (tasksData as any)
+      : Array.isArray((tasksData as any)?.results)
+      ? (tasksData as any).results
+      : []
+    if (selectedTaskId === null && list.length > 0) {
+      setSelectedTaskId(Number(list[0].id))
+    }
+  }, [tasksData, selectedTaskId])
+
+  const handleStart = async () => {
+    try {
+      if (!selectedTaskId) return
+      const res = await startTimeLog({ taskId: selectedTaskId }).unwrap()
+      const createdAny: any = res as any
+      const created = createdAny?.data ?? createdAny?.result ?? createdAny
+      const newId = Number(created?.id)
+      if (Number.isFinite(newId)) {
+        setCurrentLogId(newId)
+        try { localStorage.setItem("currentTimeLogId", String(newId)) } catch {}
+      }
+      setIsRunning(true)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  const handlePause = async () => {
+    try {
+      const stored = localStorage.getItem("currentTimeLogId")
+      const id = currentLogId ?? (stored !== null ? Number(stored) : NaN)
+      if (!Number.isFinite(id)) return
+      const res = await pauseTimeLog({ timelogId: Number(id) }).unwrap()
+      setIsRunning(false)
+      // keep duration in UI state if desired
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  const handleStop = async () => {
+    try {
+      const stored = localStorage.getItem("currentTimeLogId")
+      const id = currentLogId ?? (stored !== null ? Number(stored) : NaN)
+      if (!Number.isFinite(id)) return
+      const res = await stopTimeLog({ timelogId: Number(id) }).unwrap()
+      setIsRunning(false)
+      setTime(0)
+      setCurrentLogId(null)
+      try { localStorage.removeItem("currentTimeLogId") } catch {}
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   return (
@@ -78,11 +137,31 @@ export default function TimeReportsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6 p-6">
-              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border-2 border-black">
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border-2 border-black gap-4">
                 <span className="text-lg font-bold text-gray-900">Current Task:</span>
-                <span className="text-lg font-black text-blue-600 bg-blue-100 px-4 py-1 rounded-full">
-                  Wireframing
-                </span>
+                <div className="min-w-[240px]">
+                  <Select
+                    value={selectedTaskId !== null ? String(selectedTaskId) : undefined}
+                    onValueChange={(v) => setSelectedTaskId(Number(v))}
+                  >
+                    <SelectTrigger className="bg-white font-bold border-2 border-black">
+                      <SelectValue placeholder="Select a task" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(
+                        Array.isArray((tasksData as any)?.data)
+                          ? (tasksData as any).data
+                          : Array.isArray(tasksData)
+                          ? (tasksData as any)
+                          : Array.isArray((tasksData as any)?.results)
+                          ? (tasksData as any).results
+                          : []
+                      ).map((t: any) => (
+                        <SelectItem key={t.id} value={String(t.id)}>{t.title ?? `Task #${t.id}`}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="flex items-center justify-center gap-4 p-6 bg-green-50 rounded-xl border-2 border-black">
                 <Clock className={`w-10 h-10 text-green-600 ${isRunning ? 'animate-pulse' : ''}`} />
@@ -95,7 +174,7 @@ export default function TimeReportsPage() {
                       : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                     }`}
                   onClick={handleStart}
-                  disabled={isRunning}
+                  disabled={isRunning || starting}
                 >
                   <Play className="w-4 h-4 mr-2" /> Start
                 </Button>
@@ -106,18 +185,18 @@ export default function TimeReportsPage() {
                       : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                     }`}
                   onClick={handlePause}
-                  disabled={!isRunning}
+                  disabled={!isRunning || pausing}
                 >
                   <Pause className="w-4 h-4 mr-2" /> Pause
                 </Button>
                 <Button
                   variant="destructive"
-                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${time > 0
+                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${isRunning || time > 0
                       ? 'bg-red-400 hover:bg-red-500 text-white'
                       : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                     }`}
                   onClick={handleStop}
-                  disabled={time === 0}
+                  disabled={(!isRunning && time === 0) || stopping}
                 >
                   <Square className="w-4 h-4 mr-2" /> Stop
                 </Button>

@@ -6,6 +6,12 @@ export const taskApi = createApi({
     reducerPath: "taskApi",
     baseQuery: baseQueryWithAuth,
     endpoints: (builder) => ({
+        getTasks: builder.query<any, void>({
+            query: () => ({
+                url: "/tasks/",
+                method: "GET",
+            }),
+        }),
         createTask: builder.mutation<TaskCreateResponse, TaskCreateRequset>({
             query: (body) => ({
                 url: "/tasks/",
@@ -44,6 +50,7 @@ export const taskApi = createApi({
 })
 
 export const {
+    useGetTasksQuery,
     useCreateTaskMutation,
     useDeleteTaskMutation,
     useUpdateTaskMutation,

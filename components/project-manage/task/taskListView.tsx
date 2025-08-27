@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { TaskDetailDialog } from "@/components/project-manage/task/task-detail-dialog"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,7 +18,7 @@ import {
     Circle,
 } from "lucide-react"
 import clsx from "clsx"
-import type { Task, TaskColumnData } from "@/components/project-manage/task-board"
+import type { UITask, TaskColumnData } from "@/components/project-manage/task-board"
 import { renderPriority } from "@/components/project-manage/task-board"
 
 export function TaskListView({
@@ -28,13 +28,13 @@ export function TaskListView({
     className?: string
     columns: TaskColumnData[]
 }) {
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+    const [selectedTask, setSelectedTask] = useState<UITask | null>(null)
     const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(new Set())
     const [collapsedColumns, setCollapsedColumns] = useState<Record<string, boolean>>({})
 
-    const openDialog = (task: Task | null, columnId: string) => {
+    const openDialog = (task: UITask | null, columnId: string) => {
         setSelectedTask(task)
         setSelectedColumn(columnId)
         setIsDialogOpen(true)
@@ -115,27 +115,31 @@ export function TaskListView({
                                             </tr>
                                         ) : (
                                             column.tasks.map((task) => (
-                                                <>
+                                                <React.Fragment key={task.id}>
                                                     <tr
-                                                        key={task.id}
                                                         className="border-t hover:bg-gray-50 cursor-pointer"
                                                         onClick={() => toggleTaskSubtasks(task.id)}
                                                     >
                                                         <td className="px-4 py-2 font-medium text-gray-900">{task.title}</td>
                                                         <td className="px-4 py-2 font-medium text-gray-900">
-                                                            {task.tag && (
-                                                                <span
-                                                                    className={clsx(
-                                                                        "inline-block px-3 py-1 rounded-full text-sm font-bold shadow-sm",
-                                                                        task.tagColor ?? "bg-gray-200 text-gray-700"
-                                                                    )}
-                                                                >
-                                                                    {task.tag}
-                                                                </span>
-                                                            )}
+                                                            {task.tags?.length ? (
+                                                                (() => {
+                                                                    const firstTag = task.tags?.[0]
+                                                                    return (
+                                                                        <span
+                                                                            className={clsx(
+                                                                                "inline-block px-3 py-1 rounded-full text-sm font-bold shadow-sm",
+                                                                                firstTag?.color ?? "bg-gray-200 text-gray-700"
+                                                                            )}
+                                                                        >
+                                                                            {firstTag?.tag_name ?? ""}
+                                                                        </span>
+                                                                    )
+                                                                })()
+                                                            ) : null}
                                                         </td>
                                                         <td className="px-4 py-2 text-gray-700">{task.dueDate || "—"}</td>
-                                                        <td className="px-4 py-2">{renderPriority(task.priority as "Urgent" | "High" | "Medium" | "Low")}</td>
+                                                        <td className="px-4 py-2">{renderPriority(task.priority?.toLowerCase() as "urgent" | "high" | "medium" | "low" | undefined)}</td>
                                                         <td className="px-4 py-2 text-gray-700">{task.subtasks?.length ?? 0}</td>
                                                         <td className="px-4 py-2 text-gray-700 font-bold">{task.progress ?? 0}%</td>
                                                         <td className="px-4 py-2 text-right">
@@ -186,7 +190,7 @@ export function TaskListView({
                                                             </td>
                                                         </tr>
                                                     )}
-                                                </>
+                                                </React.Fragment>
                                             ))
                                         )}
                                     </tbody>

@@ -1,4 +1,3 @@
-import { useState, useEffect, useMemo } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,45 +9,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Star, Heart, Sparkle, Plus, Trash2 } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
-import { Note, Tag } from "@/types/taskType"
-import { useParams } from "next/navigation"
-
-// RTK Query services
-import {
-  useCreateTaskMutation,
-  useDeleteTaskMutation,
-  useUpdateTaskMutation,
-  useCreateAllOfTaskMutation,
-  useUpdateStatusTaskMutation,
-} from "@/services/taskService"
-import { useCreateNoteMutation, useDeleteNoteMutation } from "@/services/noteService"
-import { useCreateTagMutation, useDeleteTagMutation } from "@/services/tagService"
-import type { TaskCreateAllRequest, TaskCreateRequset, TaskUpdateRequset } from "@/types/taskType"
-
-// shadcn toast (nếu bạn dùng sonner thì đổi import/usage tương ứng)
+// shadcn toast
 import { useToast } from "@/components/ui/use-toast"
 import { UITask } from "../task-board"
-
-export type SubTask = {
-  id: string // id thật từ server hoặc id tạm "temp-xxxx"
-  title: string
-  completed: boolean
-}
-
-export type Task = {
-  id: string
-  tag: string
-  tagColor: string
-  title: string
-  description: string
-  subtasks: SubTask[]
-  notes: Note[]
-  progress?: number
-  status?: string
-  priority?: string
-  dueDate?: Date
-  tags?: Tag[]
-}
+import { lightenHex, useTaskDetail } from "./useTaskDetail"
 
 type TaskDetailDialogProps = {
   open: boolean
@@ -60,19 +24,6 @@ type TaskDetailDialogProps = {
   onTaskSaved?: () => void
 }
 
-const lightenHex = (hex: string, percent: number = 0.5) => {
-  if (!hex) return "#e5e7eb" // fallback gray
-  let r = parseInt(hex.slice(1, 3), 16)
-  let g = parseInt(hex.slice(3, 5), 16)
-  let b = parseInt(hex.slice(5, 7), 16)
-
-  r = Math.round(r + (255 - r) * percent)
-  g = Math.round(g + (255 - g) * percent)
-  b = Math.round(b + (255 - b) * percent)
-
-  return `rgb(${r}, ${g}, ${b})`
-}
-
 export function TaskDetailDialog({
   open,
   onOpenChange,
@@ -82,300 +33,69 @@ export function TaskDetailDialog({
   onTaskUpdated,
   onTaskSaved,
 }: TaskDetailDialogProps) {
-  const params = useParams()
-  const projectId = Number(params?.id)
   const { toast } = useToast()
+  const {
+    title, setTitle,
+    description, setDescription,
+    status, setStatus,
+    priority, setPriority,
+    dueDate, setDueDate,
+    localSubtasks, setLocalSubtasks,
+    localNotes,
+    localTags,
+    tagInput, setTagInput,
+    tagColorInput, setTagColorInput,
+    newSubtask, setNewSubtask,
+    newNote, setNewNote,
+    addSubtaskLocal,
+    deleteSubtaskLocal,
+    toggleSubtaskLocal,
+    addNoteLocal,
+    deleteNoteLocal,
+    addTagLocal,
+    deleteTagLocal,
+    saveChanges,
+  } = useTaskDetail({
+    open,
+    mode,
+    task,
+    onClose: () => onOpenChange(false),
+    onSaved: () => onTaskSaved?.(),
+  })
 
-  // ------- API hooks -------
-  const [createTask] = useCreateTaskMutation()
-  const [deleteTask] = useDeleteTaskMutation()
-  const [updateTask] = useUpdateTaskMutation()
-  const [createAllOfTask] = useCreateAllOfTaskMutation()
-  const [updatedSubtasksStatus] = useUpdateStatusTaskMutation()
-
-  const [createNote] = useCreateNoteMutation()
-  const [deleteNote] = useDeleteNoteMutation()
-
-  const [createTag] = useCreateTagMutation()
-  const [deleteTag] = useDeleteTagMutation()
-
-  // ------- Local editable states (draft) -------
-  const [originalTask, setOriginalTask] = useState<UITask | null>(null)
-
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [status, setStatus] = useState<"to-do" | "in-progress" | "need-review" | "done">("to-do")
-  const [priority, setPriority] = useState<"low" | "medium" | "high" | "urgent">("medium")
-  const [date, setDate] = useState<Date | undefined>(undefined)
-
-  // chỉ dùng cho input thêm tag mới
-  const [tagInput, setTagInput] = useState("")
-  const [tagColorInput, setTagColorInput] = useState("#ff0000")
-
-  // các mảng có thể thêm/xóa/chỉnh sửa cục bộ
-  const [localSubtasks, setLocalSubtasks] = useState<SubTask[]>([])
-  const [localNotes, setLocalNotes] = useState<Note[]>([])
-  const [localTags, setLocalTags] = useState<Tag[]>([])
-
-  // input tiện lợi
-  const [newSubtask, setNewSubtask] = useState("")
-  const [newNote, setNewNote] = useState("")
-
-  // ------- Helpers -------
-  const isTempId = (id: string | number) => {
-    if (typeof id === "string") return id.startsWith("temp-")
-    return typeof id === "number" && id < 0
-  }
-
-  const makeTempStringId = () => `temp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-  const makeTempNumberId = () => -Date.now()
-
-  // ------- Load task -> draft -------
-  useEffect(() => {
-    if (!open) return
-    if (mode === "edit" && task) {
-      setOriginalTask(task)
-      setTitle(task.title || "")
-      setDescription(task.description || "")
-      setStatus((task.status as any) || "to-do")
-      setPriority((task.priority as any) || "medium")
-      setDate(task.dueDate ? new Date(task.dueDate) : undefined)
-      setLocalSubtasks(task.subtasks || [])
-      setLocalNotes(task.notes || [])
-      setLocalTags(task.tags || [])
-      setTagInput("")
-      setTagColorInput("#ff0000")
-      setNewSubtask("")
-      setNewNote("")
-    } else if (mode === "create") {
-      setOriginalTask(null)
-      setTitle("")
-      setDescription("")
-      setStatus("to-do")
-      setPriority("medium")
-      setDate(undefined)
-      setLocalSubtasks([])
-      setLocalNotes([])
-      setLocalTags([])
-      setTagInput("")
-      setTagColorInput("#ff0000")
-      setNewSubtask("")
-      setNewNote("")
-    }
-  }, [task, open, mode])
-
-  // ------- Add/remove/toggle in DRAFT ONLY -------
-  // Subtasks
   const handleAddSubtaskLocal = () => {
-    const trimmed = newSubtask.trim()
-    if (!trimmed) return
-    const temp: SubTask = { id: makeTempStringId(), title: trimmed, completed: false }
-    setLocalSubtasks(prev => [...prev, temp])
+    addSubtaskLocal(newSubtask)
     setNewSubtask("")
   }
-  const handleDeleteSubtaskLocal = (id: string) => {
-    setLocalSubtasks(prev => prev.filter(st => st.id !== id))
-  }
-  const handleToggleSubtaskLocal = (id: string, checked: boolean) => {
-    setLocalSubtasks(prev => prev.map(st => (st.id === id ? { ...st, completed: checked } : st)))
-  }
+  const handleDeleteSubtaskLocal = (id: string) => deleteSubtaskLocal(id)
+  const handleToggleSubtaskLocal = (id: string, checked: boolean) => toggleSubtaskLocal(id, checked)
 
-  // Notes
   const handleAddNoteLocal = () => {
-    const trimmed = newNote.trim()
-    if (!trimmed) return
-    const temp: Note = {
-      id: makeTempNumberId(),
-      created_by: "current_user",
-      task: originalTask ? Number(originalTask.id) : 0,
-      description: trimmed,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    }
-    setLocalNotes(prev => [...prev, temp])
+    addNoteLocal(newNote)
     setNewNote("")
   }
-  const handleDeleteNoteLocal = (id: number) => {
-    setLocalNotes(prev => prev.filter(n => n.id !== id))
-  }
 
-  // Tags
   const handleAddTagLocal = () => {
-    const name = tagInput.trim()
-    if (!name) return
-    const temp: Tag = {
-      id: makeTempNumberId(),
-      tag_name: name,
-      color: tagColorInput || "#ff0000",
-    }
-    setLocalTags(prev => [...prev, temp])
+    addTagLocal(tagInput, tagColorInput)
     setTagInput("")
     setTagColorInput("#ff0000")
   }
-  const handleDeleteTagLocal = (id: number) => {
-    setLocalTags(prev => prev.filter(t => t.id !== id))
-  }
 
-  // ------- Diff logic for EDIT mode -------
-  const diffs = useMemo(() => {
-    if (!originalTask) {
-      return {
-        subtasks: { added: localSubtasks, deleted: [] as SubTask[], updated: [] as SubTask[] },
-        notes: { added: localNotes, deleted: [] as Note[] },
-        tags: { added: localTags, deleted: [] as Tag[] },
-        infoChanged: true,
-      }
-    }
-    const orig = originalTask
+  const handleDeleteNoteLocal = (id: number) => deleteNoteLocal(id)
+  const handleDeleteTagLocal = (id: number) => deleteTagLocal(id)
 
-    // Subtasks
-    const addedSubtasks = localSubtasks.filter(st => !orig.subtasks.some(o => o.id === st.id))
-    const deletedSubtasks = orig.subtasks.filter(o => !localSubtasks.some(st => st.id === o.id))
-    const updatedSubtasks = localSubtasks.filter(st => {
-      const match = orig.subtasks.find(o => o.id === st.id)
-      if (!match) return false
-      return match.title !== st.title || match.completed !== st.completed
-    })
-
-    // Notes (chỉ tạo/xóa; không sửa nội dung ở UI hiện tại)
-    const addedNotes = localNotes.filter(n => !orig.notes.some(o => o.id === n.id))
-    const deletedNotes = orig.notes.filter(o => !localNotes.some(n => n.id === o.id))
-
-    // Tags (chỉ tạo/xóa; không sửa tag_name/color ở UI hiện tại)
-    const origTags = orig.tags || [];
-    const addedTags = localTags.filter(t => !origTags.some(o => o.id === t.id));
-    const deletedTags = origTags.filter(o => !localTags.some(t => t.id === o.id));
-
-
-    // Info changed
-    const infoChanged =
-      (orig.title || "") !== title ||
-      (orig.description || "") !== description ||
-      (orig.status || "to-do") !== status ||
-      (orig.priority || "medium") !== priority ||
-      ((orig.dueDate && new Date(orig.dueDate).toISOString()) || null) !==
-      (date ? date.toISOString() : null)
-
-
-    return {
-      subtasks: { added: addedSubtasks, deleted: deletedSubtasks, updated: updatedSubtasks },
-      notes: { added: addedNotes, deleted: deletedNotes },
-      tags: { added: addedTags, deleted: deletedTags },
-      infoChanged,
-    }
-  }, [originalTask, localSubtasks, localNotes, localTags, title, description, status, priority, date])
-
-  // ------- Save Changes -------
   const handleSaveChanges = async () => {
     try {
-      if (mode === "create") {
-        // build payload for createAllOfTask
-        const payload: TaskCreateAllRequest = {
-          title,
-          description,
-          deadline: date ? date.toISOString() : undefined,
-          project: projectId,
-          parent_task: null,
-          status,
-          priority,
-          tags: localTags.map(t => ({ tag_name: t.tag_name, color: t.color })),
-          subtasks_input: localSubtasks.map(st => ({
-            title: st.title,
-            description: "",
-            deadline: undefined,
-            status: st.completed ? "done" : "to-do",
-            priority: "low",
-          })),
-          notes: localNotes.map(n => ({ description: n.description })),
-        }
-
-        await createAllOfTask(payload).unwrap()
-        toast({ description: "Task created successfully!" })
-        onOpenChange(false)
-        onTaskSaved?.()
-        return
-      }
-
-      // --- EDIT MODE ---
-      if (!originalTask) return
-      const requests: Promise<any>[] = []
-
-      if (diffs.infoChanged) {
-        requests.push(
-          updateTask({
-            id: Number(originalTask.id),
-            body: {
-              title,
-              description,
-              status,
-              priority,
-              deadline: date ? date.toISOString().split("T")[0] : null,
-            } as TaskUpdateRequset
-          }).unwrap()
-        )
-      }
-
-      if (diffs.subtasks.added.length) {
-        requests.push(...diffs.subtasks.added.map(st =>
-          createTask({
-            title: st.title,
-            description: "",
-            deadline: null,
-            project: projectId,
-            parent_task: Number(originalTask.id),
-            status: st.completed ? "done" : "to-do",
-          } as any).unwrap()
-        ))
-      }
-
-      if (diffs.subtasks.deleted.length) {
-        requests.push(...diffs.subtasks.deleted.map(st => deleteTask(Number(st.id)).unwrap()))
-      }
-
-      if (diffs.subtasks.updated.length) {
-        requests.push(...diffs.subtasks.updated.map(st =>
-          updatedSubtasksStatus({
-            id: Number(st.id),
-            body: {
-              status: st.completed ? "done" : "to-do"
-            }
-          }).unwrap()
-        ))
-      }
-
-      // Notes
-      if (diffs.notes.added.length) {
-        requests.push(...diffs.notes.added.map(n =>
-          createNote({ task: Number(originalTask.id), description: n.description }).unwrap()
-        ))
-      }
-      if (diffs.notes.deleted.length) {
-        requests.push(...diffs.notes.deleted.map(n => deleteNote(n.id).unwrap()))
-      }
-
-      // Tags
-      if (diffs.tags.added.length) {
-        requests.push(...diffs.tags.added.map(t =>
-          createTag({ task: Number(originalTask.id), tag_name: t.tag_name, color: t.color }).unwrap()
-        ))
-      }
-      if (diffs.tags.deleted.length) {
-        requests.push(...diffs.tags.deleted.map(t => deleteTag(Number(t.id)).unwrap()))
-      }
-
-      await Promise.all(requests)
-      toast({ description: "Task updated successfully!" })
-      onOpenChange(false)
-      onTaskSaved?.()   // <-- gọi callback khi save xong
-
+      await saveChanges()
+      toast({ description: mode === "create" ? "Task created successfully!" : "Task updated successfully!" })
     } catch (err) {
       console.error("Error saving changes:", err)
       toast({ variant: "destructive", description: "Failed to save changes." })
     }
   }
+
   // ------- Cancel -------
   const handleCancel = () => {
-    // Không gọi API, chỉ đóng dialog
     onOpenChange(false)
   }
 
@@ -459,11 +179,11 @@ export function TaskDetailDialog({
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start text-left font-normal border-2 border-black rounded-xl bg-gray-50">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? date.toDateString() : <span>Pick a date</span>}
+                  {dueDate ? dueDate.toDateString() : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus />
               </PopoverContent>
             </Popover>
           </div>
@@ -514,7 +234,7 @@ export function TaskDetailDialog({
               {localNotes.map((note) => (
                 <div key={note.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border-2 border-black group">
                   <span className="text-sm font-medium text-gray-900">{note.description}</span>
-                  <Button size="sm" variant="ghost" onClick={() => handleDeleteNoteLocal((note.id))} className="hover:bg-red-100 hover:text-red-600">
+                  <Button size="sm" variant="ghost" onClick={() => deleteNoteLocal(note.id)} className="hover:bg-red-100 hover:text-red-600">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -547,7 +267,7 @@ export function TaskDetailDialog({
                   }}
                 >
                   <span className="text-white font-medium">{t.tag_name}</span>
-                  <Button size="sm" variant="ghost" onClick={() => handleDeleteTagLocal(Number(t.id))} className="hover:bg-red-100 hover:text-red-600">
+                  <Button size="sm" variant="ghost" onClick={() => deleteTagLocal(Number(t.id))} className="hover:bg-red-100 hover:text-red-600">
                     <Trash2 className="w-3 h-3" />
                   </Button>
                 </div>
