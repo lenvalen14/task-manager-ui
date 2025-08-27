@@ -1,4 +1,16 @@
-import { configureStore } from "@reduxjs/toolkit"
+import { configureStore, combineReducers } from "@reduxjs/toolkit"
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist"
+import storage from "redux-persist/lib/storage"
+
 import authReducer from "./slices/authSlice"
 import { authApi } from "@/services/authService"
 import { projectApi } from "@/services/projectService"
@@ -8,32 +20,44 @@ import { tagApi } from "@/services/tagService"
 import { userApi } from "@/services/userService"
 import { timeLogApi } from "@/services/timeLogService"
 
-export const store = configureStore({
-    reducer: {
-        user: authReducer,
-        [authApi.reducerPath]: authApi.reducer,
-        [projectApi.reducerPath]: projectApi.reducer,
-        [taskApi.reducerPath]: taskApi.reducer,
-        [noteApi.reducerPath]: noteApi.reducer,
-        [tagApi.reducerPath]: tagApi.reducer,
-        [userApi.reducerPath]: userApi.reducer,
-        [timeLogApi.reducerPath]: timeLogApi.reducer,
-    },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: {
-                ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
-            },
-        }).concat(
-            authApi.middleware,
-            projectApi.middleware,
-            taskApi.middleware,
-            noteApi.middleware,
-            tagApi.middleware,
-            userApi.middleware,
-            timeLogApi.middleware,
-        ),
+const rootReducer = combineReducers({
+  user: authReducer,
+  [authApi.reducerPath]: authApi.reducer,
+  [projectApi.reducerPath]: projectApi.reducer,
+  [taskApi.reducerPath]: taskApi.reducer,
+  [noteApi.reducerPath]: noteApi.reducer,
+  [tagApi.reducerPath]: tagApi.reducer,
+  [userApi.reducerPath]: userApi.reducer,
+  [timeLogApi.reducerPath]: timeLogApi.reducer,
 })
+
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["user"],
+}
+
+const persistedReducer = persistReducer(persistConfig, rootReducer)
+
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }).concat(
+      authApi.middleware,
+      projectApi.middleware,
+      taskApi.middleware,
+      noteApi.middleware,
+      tagApi.middleware,
+      userApi.middleware,
+      timeLogApi.middleware
+    ),
+})
+
+export const persistor = persistStore(store)
 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
