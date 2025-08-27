@@ -29,10 +29,12 @@ export default function LoginPage() {
     const username = formData.username.trim();
     const password = formData.password.trim();
 
-    if (username.length < 4) {
-      toast.error("Username must be at least 4 characters.");
-      return;
-    }
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // if (emailRegex.test(username)) {
+    //   toast.error("Username cannot be an email address.");
+    //   return;
+    // }
     if (password.length < 8) {
       toast.error("Password must be at least 8 characters.");
       return;
@@ -59,11 +61,11 @@ export default function LoginPage() {
         toast.success("Đăng nhập thành công!")
         router.push("../../dashboard")
       } else {
-        console.warn("⚠️ Login thất bại:", response)
+        console.warn("Login thất bại:", response)
         throw new Error(response.message || "Đăng nhập thất bại")
       }
     } catch (error: any) {
-      console.error("❌ Lỗi khi login:", error)
+      console.error("Lỗi khi login:", error)
       const message = error?.data?.message || error?.message || "Đăng nhập thất bại"
       dispatch(loginFailure(message))
       toast.error(message)

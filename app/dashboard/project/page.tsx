@@ -108,7 +108,7 @@ export default function AllProjectsPage() {
             <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" asChild>
                 <Link href="/dashboard">

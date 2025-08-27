@@ -12,13 +12,18 @@ import TabNotifications from "@/components/settings/TabNotifications";
 import TabSystem from "@/components/settings/TabSystem";
 import { useGetUserByIdQuery } from "@/services/userService";
 import UploadAvatarDialog from "@/components/settings/UploadAvatarDialog";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 export default function ProfileSettingsPage() {
   const [activeTab, setActiveTab] = useState("my-details");
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
 
-  const userId = Number(localStorage.getItem("userId"));
-  const { data, isLoading, isError, refetch } = useGetUserByIdQuery(userId);
+  const userId = useSelector((state: RootState) => state.user.sub);
+
+  const { data, isLoading, isError, refetch } = useGetUserByIdQuery(userId as number, {
+    skip: !userId,
+  });
 
   const tabs = [
     { value: "my-details", label: "Details", icon: User, color: "bg-blue-300" },

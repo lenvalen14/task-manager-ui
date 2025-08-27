@@ -9,7 +9,7 @@ import { userApi } from "@/services/userService"
 
 export const store = configureStore({
     reducer: {
-        auth: authReducer,
+        user: authReducer,
         [authApi.reducerPath]: authApi.reducer,
         [projectApi.reducerPath]: projectApi.reducer,
         [taskApi.reducerPath]: taskApi.reducer,

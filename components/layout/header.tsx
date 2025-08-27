@@ -12,18 +12,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Bell, Settings, Search, LogOut, User } from "lucide-react"
+import { Bell, Settings, Search, LogOut } from "lucide-react"
+import { useDispatch, useSelector } from "react-redux"
+import { logout } from "@/lib/slices/authSlice"
+import { RootState } from "@/lib/store"
+import { useRouter } from "next/navigation"  
 
 export function Header() {
-  const user = {
-    name: "Alison Hoper",
-    email: "alison@example.com",
-    avatar: "/placeholder.svg?height=36&width=36"
-  }
+  const dispatch = useDispatch()
+  const user = useSelector((state: RootState) => state.user)
 
+  const router = useRouter() 
   const handleLogout = () => {
-    // Add your logout logic here
-    console.log("Logging out...")
+    dispatch(logout());
+    router.push("/auth/login");
   }
 
   return (
@@ -67,13 +69,13 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 hover:bg-gray-100 h-9 px-2">
               <Avatar className="w-7 h-7">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src="/placeholder.svg?height=36&width=36" alt={user.user_name || "User"} />
                 <AvatarFallback className="bg-gray-200 text-gray-700 text-xs">
-                  {user.name.split(' ').map(n => n[0]).join('')}
+                  {user.user_name ? user.user_name[0].toUpperCase() : "?"}
                 </AvatarFallback>
               </Avatar>
               <span className="text-sm font-medium hidden sm:block text-gray-700">
-                {user.name}
+                {user.user_name || "Guest"}
               </span>
             </Button>
           </DropdownMenuTrigger>
@@ -82,7 +84,7 @@ export function Header() {
             className="w-48 bg-white border border-gray-200 shadow-sm"
           >
             <DropdownMenuLabel className="text-gray-900 text-sm">
-              My Account
+              {user.email || "No email"}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="text-gray-700 hover:bg-gray-50 text-sm">

@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { LoginData, RefreshTokenResponse } from "../../types/authType"
+import { RootState } from "../store"
 
 interface UserState {
     sub: number | null
@@ -126,4 +127,5 @@ export const {
     refreshSuccess,
     refreshFailure,
 } = userSlice.actions
+export const selectUser = (state: RootState) => state.user;
 export default userSlice.reducer

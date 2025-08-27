@@ -1,25 +1,25 @@
-"use client" // Make this a client component
+"use client"
 
 import Link from "next/link"
+import React from "react"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { EllipsisVertical, Plus, LayoutDashboard, Bell, Settings, Clock } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  EllipsisVertical,
+  Plus,
+  LayoutDashboard,
+  Bell,
+  Settings,
+  Clock,
+} from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
-import React from "react"
-
-type Project = {
-  id: string
-  name: string
-  active: boolean
-}
-
-const projects: Project[] = [
-  { id: "1", name: "Piper Enterprise", active: false },
-  { id: "2", name: "Web platform", active: false },
-  { id: "3", name: "Mobile Loop", active: false },
-  { id: "4", name: "Wiro Mobile App", active: false },
-]
+import { useGetAllProjectsQuery } from "@/services/projectService"
 
 const mainNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -31,8 +31,13 @@ const mainNavigation = [
 export function Sidebar() {
   const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = React.useState(false)
 
+  // gọi API lấy projects
+  const { data: projectsData, isLoading } = useGetAllProjectsQuery()
+  const projects = projectsData?.data?.slice(0, 5) || []
+
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 p-4 flex flex-col shrink-0 shadow-lg">
+    <aside className="w-64 h-screen bg-white border-r border-gray-200 p-4 flex flex-col shrink-0 shadow-lg">
+      {/* Logo */}
       <div className="flex items-center justify-center mb-8 px-4">
         <img
           src="/logo.svg"
@@ -41,38 +46,78 @@ export function Sidebar() {
         />
       </div>
 
+      {/* Projects */}
       <div className="mb-6">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Projects</h2>
-        <ScrollArea className="h-[180px]">
-          <nav className="grid gap-1">
-            {projects.map((project) => (
-              <Link
-                key={project.id}
-                href={`/dashboard/project/${project.id}`}
-                className={`flex items-center justify-between p-2 rounded-lg text-sm transition-colors ${project.active ? "bg-blue-100 text-blue-700 font-medium" : "hover:bg-gray-100 text-gray-700"
-                  }`}
-              >
-                <div className="flex items-center gap-2">{project.name}</div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="w-6 h-6 text-gray-500 hover:text-gray-700">
-                      <EllipsisVertical className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="shadow-lg rounded-lg">
-                    <DropdownMenuItem className="text-gray-700 hover:bg-gray-50">View Details</DropdownMenuItem>
-                    <DropdownMenuItem className="text-gray-700 hover:bg-gray-50">Edit Project</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600 hover:bg-red-50">Delete Project</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </Link>
+        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          Projects
+        </h2>
+
+        {isLoading ? (
+          // Skeleton loading
+          <div className="grid gap-2">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-8 w-full bg-gray-100 animate-pulse rounded-md"
+              ></div>
             ))}
-          </nav>
-        </ScrollArea>
+          </div>
+        ) : projects.length === 0 ? (
+          // Trường hợp chưa có project nào
+          <div className="flex flex-col items-center text-gray-500 text-sm">
+            <p className="mb-2">No projects yet</p>
+            <Button
+              onClick={() => setIsAddProjectDialogOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add New Project
+            </Button>
+          </div>
+        ) : (
+          // Hiển thị project list
+          <ScrollArea className="h-[180px]">
+            <nav className="grid gap-1">
+              {projects.map((project) => (
+                <Link
+                  key={project.id}
+                  href={`/dashboard/project/${project.id}`}
+                  className="flex items-center justify-between p-2 rounded-lg text-sm hover:bg-gray-100 text-gray-700 transition-colors"
+                >
+                  <div className="flex items-center gap-2">{project.name}</div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="w-6 h-6 text-gray-500 hover:text-gray-700"
+                      >
+                        <EllipsisVertical className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="shadow-lg rounded-lg"
+                    >
+                      <DropdownMenuItem>View Details</DropdownMenuItem>
+                      <DropdownMenuItem>Edit Project</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600">
+                        Delete Project
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </Link>
+              ))}
+            </nav>
+          </ScrollArea>
+        )}
       </div>
 
+      {/* Navigation */}
       <div className="mb-6">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Navigation</h2>
+        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          Navigation
+        </h2>
         <nav className="grid gap-1">
           {mainNavigation.map((item) => (
             <Link
@@ -87,8 +132,11 @@ export function Sidebar() {
         </nav>
       </div>
 
+      {/* Time logged */}
       <div className="mb-6 mt-auto pt-4 border-t border-gray-200">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Time Logged</h2>
+        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+          Time Logged
+        </h2>
         <div className="text-2xl font-bold mb-1 text-gray-900">23.7 hours</div>
         <div className="flex items-center text-sm text-green-600">
           <svg
@@ -110,15 +158,21 @@ export function Sidebar() {
         </div>
       </div>
 
-      <Button
-        onClick={() => setIsAddProjectDialogOpen(true)}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md rounded-lg"
-      >
-        <Plus className="w-4 h-4 mr-2" />
-        Add Project
-      </Button>
+      {/* Nút Add Project chung (chỉ hiện khi có project) */}
+      {projects.length > 0 && (
+        <Button
+          onClick={() => setIsAddProjectDialogOpen(true)}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md rounded-lg"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Project
+        </Button>
+      )}
 
-      <AddProjectDialog open={isAddProjectDialogOpen} onOpenChange={setIsAddProjectDialogOpen} />
+      <AddProjectDialog
+        open={isAddProjectDialogOpen}
+        onOpenChange={setIsAddProjectDialogOpen}
+      />
     </aside>
   )
 }

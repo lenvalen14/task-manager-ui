@@ -30,11 +30,11 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    console.log("📤 Dữ liệu form gửi đi:", formData)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (formData.username.trim().length < 4) {
-      toast.error("Username must be at least 4 characters.")
-      return
+    if (emailRegex.test(formData.username.trim())) {
+      toast.error("Username cannot be an email address.");
+      return;
     }
     if (formData.password.trim().length < 8) {
       toast.error("Password must be at least 8 characters.")
@@ -55,9 +55,6 @@ export default function RegisterPage() {
         throw new Error(response.message || "Registration failed")
       }
     } catch (error: any) {
-      // console.error("❌ Lỗi khi đăng ký:", error);
-
-      // Nếu có lỗi chi tiết cho từng field
       if (error?.data?.data && typeof error.data.data === "object") {
         const fieldErrors = error.data.data;
         Object.entries(fieldErrors).forEach(([field, messages]) => {
