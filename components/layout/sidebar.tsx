@@ -32,7 +32,7 @@ export function Sidebar() {
   const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = React.useState(false)
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 p-4 flex flex-col shrink-0 shadow-lg">
+    <aside className="w-64 h-screen bg-white border-r border-gray-200 p-4 flex flex-col shrink-0 shadow-lg fixed left-0 top-0 z-10">
       <div className="flex items-center justify-center mb-8 px-4">
         <img
           src="/logo.svg"
