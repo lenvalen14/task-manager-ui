@@ -7,12 +7,14 @@ import { TaskListView } from "@/components/project-manage/task/taskListView"
 import { List, LayoutGrid, Table, Flag } from "lucide-react"
 import clsx from "clsx"
 import { Task, Priority, Status, Tag, Note } from "@/types/taskType"
+import { TaskAttachment } from "@/types/taskAttachmentType"
 
 // ===== UI Types (export để TaskBoardView dùng chung) =====
 export type SubTask = {
   id: string
   title: string
   completed: boolean
+  status: Status
 }
 
 export type UITask = {
@@ -27,6 +29,7 @@ export type UITask = {
   tags: Tag[]
   notes: Note[]
   status: Status
+  attachments?: TaskAttachment[]
 }
 
 export type TaskColumnData = {
@@ -114,6 +117,7 @@ type BoardPageProps = {
 
 // ===== Component =====
 export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
+  console.log(tasks);
   const [viewMode, setViewMode] = useState<"board" | "table" | "list">("board")
 
   const columns: TaskColumnData[] = useMemo(() => {
@@ -145,6 +149,7 @@ export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
           })),
           notes: t.notes ?? [],
           status: t.status,
+          attachments: t.attachments,
         }
         parentById.set(t.id, uiTask)
         colMap[t.status].tasks.push(uiTask)
@@ -161,6 +166,7 @@ export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
           id: String(t.id),
           title: t.title,
           completed: t.status === "done",
+          status: t.status
         })
 
         const total = parent.subtasks.length

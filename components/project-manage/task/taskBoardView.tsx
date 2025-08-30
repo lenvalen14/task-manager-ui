@@ -22,6 +22,16 @@ import {
 
 import { useDeleteTaskMutation } from "@/services/taskService"
 
+const downloadFile = async (url: string, fileName: string) => {
+    const res = await fetch(url)
+    const blob = await res.blob()
+    const link = document.createElement("a")
+    link.href = window.URL.createObjectURL(blob)
+    link.download = fileName
+    link.click()
+    window.URL.revokeObjectURL(link.href)
+}
+
 const lightenHex = (hex: string, percent: number = 0.5) => {
     if (!hex) return "#e5e7eb" // fallback gray
     let r = parseInt(hex.slice(1, 3), 16)
@@ -47,6 +57,9 @@ export function TaskBoard({
     const [selectedTask, setSelectedTask] = useState<UITask | null>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
+
+    console.log(selectedTask);
+
 
     const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation()
 
@@ -203,6 +216,43 @@ export function TaskBoard({
                                                                 <div className="text-sm text-gray-800 whitespace-pre-wrap">
                                                                     {n.description}
                                                                 </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+
+                                            {/* Files */}
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <button
+                                                        className="flex items-center gap-1 text-gray-600 text-sm hover:text-gray-800"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        📎
+                                                        {task.attachments?.length ?? 0} files
+                                                    </button>
+                                                </PopoverTrigger>
+                                                <PopoverContent
+                                                    align="start"
+                                                    side="top"
+                                                    className="w-80 p-2"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <div className="max-h-60 overflow-y-auto space-y-2">
+                                                        {task.attachments?.length === 0 && (
+                                                            <div className="text-sm text-gray-500 italic px-1">
+                                                                No attachments yet.
+                                                            </div>
+                                                        )}
+                                                        {task.attachments?.map((a) => (
+                                                            <div key={a.id} className="border rounded-md p-2 bg-gray-50">
+                                                                <button
+                                                                    onClick={() => downloadFile(a.file_url!, a.file_name!)}
+                                                                    className="text-blue-600 underline text-sm"
+                                                                >
+                                                                    {a.file_name}
+                                                                </button>
                                                             </div>
                                                         ))}
                                                     </div>

@@ -12,7 +12,10 @@ import { Progress } from "@/components/ui/progress"
 // shadcn toast
 import { useToast } from "@/components/ui/use-toast"
 import { UITask } from "../task-board"
+import { useState } from "react"
 import { lightenHex, useTaskDetail } from "./useTaskDetail"
+import { TaskColumn } from "../task-column"
+import { Status } from "@/types/taskType"
 
 type TaskDetailDialogProps = {
   open: boolean
@@ -24,13 +27,24 @@ type TaskDetailDialogProps = {
   onTaskSaved?: () => void
 }
 
+function getFileNameFromUrl(url: string): string {
+  try {
+    // Tách phần sau dấu "/"
+    const parts = url.split("/");
+    // Lấy phần cuối cùng
+    const lastPart = parts[parts.length - 1];
+    return lastPart || "";
+  } catch {
+    return "";
+  }
+}
+
 export function TaskDetailDialog({
   open,
   onOpenChange,
   task,
   columnId,
   mode = "edit",
-  onTaskUpdated,
   onTaskSaved,
 }: TaskDetailDialogProps) {
   const { toast } = useToast()
@@ -55,6 +69,11 @@ export function TaskDetailDialog({
     addTagLocal,
     deleteTagLocal,
     saveChanges,
+    updateSubtaskStatusLocal,
+
+    localAttachments,
+    addAttachmentLocal,
+    deleteAttachmentLocal
   } = useTaskDetail({
     open,
     mode,
@@ -63,10 +82,22 @@ export function TaskDetailDialog({
     onSaved: () => onTaskSaved?.(),
   })
 
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
+
+  const handleAddFile = async () => {
+    if (!pendingFile) return
+    await addAttachmentLocal(pendingFile)
+    setPendingFile(null)
+  }
+
+  const handleDeleteFile = async (id: number) => {
+    await deleteAttachmentLocal(id)
+  }
   const handleAddSubtaskLocal = () => {
     addSubtaskLocal(newSubtask)
     setNewSubtask("")
   }
+
   const handleDeleteSubtaskLocal = (id: string) => deleteSubtaskLocal(id)
   const handleToggleSubtaskLocal = (id: string, checked: boolean) => toggleSubtaskLocal(id, checked)
 
@@ -80,9 +111,6 @@ export function TaskDetailDialog({
     setTagInput("")
     setTagColorInput("#ff0000")
   }
-
-  const handleDeleteNoteLocal = (id: number) => deleteNoteLocal(id)
-  const handleDeleteTagLocal = (id: number) => deleteTagLocal(id)
 
   const handleSaveChanges = async () => {
     try {
@@ -200,14 +228,25 @@ export function TaskDetailDialog({
             <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
               {localSubtasks.map((subtask) => (
                 <div key={subtask.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border-2 border-black group">
-                  <Checkbox
-                    checked={subtask.completed}
-                    onCheckedChange={(v) => handleToggleSubtaskLocal(subtask.id, Boolean(v))}
-                    className="w-5 h-5 border-2 border-black rounded-md"
-                  />
-                  <label className={`flex-1 text-sm font-medium ${subtask.completed ? "line-through text-gray-500" : "text-gray-900"}`}>
+                  <Checkbox checked={subtask.completed} onCheckedChange={(v) => handleToggleSubtaskLocal(subtask.id, Boolean(v))} className="w-5 h-5 border-2 border-black rounded-md" />
+                  <span className={`flex-1 text-sm font-medium ${subtask.completed ? "line-through text-gray-500" : "text-gray-900"}`}>
                     {subtask.title}
-                  </label>
+                  </span>
+                  {/* Dropdown cho trạng thái subtask */}
+                  <Select
+                    value={subtask.status || "to-do"}
+                    onValueChange={(v) => updateSubtaskStatusLocal(subtask.id, v as Status)}
+                  >
+                    <SelectTrigger className="w-[120px]">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="to-do">To Do</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="need-review">Review</SelectItem>
+                      <SelectItem value="done">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Button size="sm" variant="ghost" onClick={() => handleDeleteSubtaskLocal(subtask.id)} className="hover:bg-red-100 hover:text-red-600">
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -215,14 +254,30 @@ export function TaskDetailDialog({
               ))}
             </div>
             <div className="flex gap-2">
-              <Input
-                placeholder="Add a subtask..."
-                value={newSubtask}
-                onChange={(e) => setNewSubtask(e.target.value)}
-                className="border-2 border-black rounded-xl bg-gray-50"
-              />
+              <Input placeholder="Add a subtask..." value={newSubtask} onChange={(e) => setNewSubtask(e.target.value)} className="border-2 border-black rounded-xl bg-gray-50" />
               <Button onClick={handleAddSubtaskLocal} className="bg-green-400 hover:bg-green-500 text-white rounded-xl font-bold border-2 border-black">
                 <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Files */}
+          <div className="space-y-4">
+            <Label className="font-bold text-gray-900">Files</Label>
+            <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
+              {localAttachments.map((file) => (
+                <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border-2 border-black group">
+                  <a href={file.file_url ?? undefined} download className="text-sm font-medium text-blue-600 underline">{file.file_name}</a>
+                  <Button size="sm" variant="ghost" onClick={() => handleDeleteFile(file.id)} className="hover:bg-red-100 hover:text-red-600">
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input type="file" onChange={(e) => setPendingFile(e.target.files?.[0] || null)} className="border-2 border-black rounded-xl bg-gray-50" />
+              <Button onClick={handleAddFile} disabled={!pendingFile} className="bg-purple-400 hover:bg-purple-500 text-white rounded-xl font-bold border-2 border-black">
+                Add File
               </Button>
             </div>
           </div>

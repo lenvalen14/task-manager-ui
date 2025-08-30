@@ -10,13 +10,16 @@ import {
 } from "@/services/taskService"
 import { useCreateNoteMutation, useDeleteNoteMutation } from "@/services/noteService"
 import { useCreateTagMutation, useDeleteTagMutation } from "@/services/tagService"
-import type { Note, Tag, TaskCreateAllRequest, TaskUpdateRequset } from "@/types/taskType"
+import { useCreateTaskAttachmentMutation, useDeleteTaskAttachmentMutation } from "@/services/taskAttachmentService"
+import type { TaskAttachment } from "@/types/taskAttachmentType"
+import type { Note, Status, Tag, TaskCreateAllRequest, TaskUpdateRequset } from "@/types/taskType"
 import type { UITask } from "../task-board"
 
 export type SubTask = {
   id: string
   title: string
   completed: boolean
+  status: Status
 }
 
 export type UseTaskDetailOptions = {
@@ -53,7 +56,7 @@ const normalizeIncomingDate = (value: unknown): string | undefined => {
       const d = new Date(value)
       if (!isNaN(d.getTime())) return toDateString(d)
     }
-  } catch {}
+  } catch { }
   return undefined
 }
 
@@ -73,6 +76,8 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
   const [deleteNote] = useDeleteNoteMutation()
   const [createTag] = useCreateTagMutation()
   const [deleteTag] = useDeleteTagMutation()
+  const [createAttachment] = useCreateTaskAttachmentMutation()
+  const [deleteAttachment] = useDeleteTaskAttachmentMutation()
 
   const [originalTask, setOriginalTask] = useState<UITask | null>(null)
   const [title, setTitle] = useState("")
@@ -82,6 +87,7 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
   const [dueDateStr, setDueDateStr] = useState<string | undefined>(undefined)
 
   const [localSubtasks, setLocalSubtasks] = useState<SubTask[]>([])
+  const [localSubtasksAllStatus, setLocalSubtasksAllStatus] = useState<SubTask[]>([])
   const [localNotes, setLocalNotes] = useState<Note[]>([])
   const [localTags, setLocalTags] = useState<Tag[]>([])
 
@@ -89,6 +95,9 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
   const [tagColorInput, setTagColorInput] = useState("#ff0000")
   const [newSubtask, setNewSubtask] = useState("")
   const [newNote, setNewNote] = useState("")
+
+  const [localAttachments, setLocalAttachments] = useState<TaskAttachment[]>([])
+  const [newFiles, setNewFiles] = useState<File[]>([])
 
   // Initialize/reset when dialog opens or task changes
   useEffect(() => {
@@ -103,6 +112,7 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
       setLocalSubtasks(task.subtasks || [])
       setLocalNotes(task.notes || [])
       setLocalTags(task.tags || [])
+      setLocalAttachments((task as any).attachments || [])
     } else {
       setOriginalTask(null)
       setTitle("")
@@ -113,11 +123,13 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
       setLocalSubtasks([])
       setLocalNotes([])
       setLocalTags([])
+      setLocalAttachments([])
     }
     setTagInput("")
     setTagColorInput("#ff0000")
     setNewSubtask("")
     setNewNote("")
+    setNewFiles([])
   }, [open, mode, task])
 
   // Diffs
@@ -140,8 +152,13 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
     const updatedSubtasks = localSubtasks.filter(st => {
       const match = origSubtasks.find((o: SubTask) => o.id === st.id)
       if (!match) return false
-      return match.title !== st.title || match.completed !== st.completed
+      return (
+        match.title !== st.title ||
+        match.completed !== st.completed ||
+        match.status !== st.status // 👈 thêm dòng này
+      )
     })
+
 
     const addedNotes = localNotes.filter(n => !origNotes.some((o: Note) => o.id === n.id))
     const deletedNotes = origNotes.filter((o: Note) => !localNotes.some(n => n.id === o.id))
@@ -169,7 +186,7 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
   const addSubtaskLocal = (titleInput: string) => {
     const trimmed = titleInput.trim()
     if (!trimmed) return
-    const temp: SubTask = { id: makeTempStringId(), title: trimmed, completed: false }
+    const temp: SubTask = { id: makeTempStringId(), title: trimmed, completed: false, status: "to-do" }
     setLocalSubtasks(prev => [...prev, temp])
   }
   const deleteSubtaskLocal = (id: string) => {
@@ -177,6 +194,12 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
   }
   const toggleSubtaskLocal = (id: string, checked: boolean) => {
     setLocalSubtasks(prev => prev.map(st => (st.id === id ? { ...st, completed: checked } : st)))
+  }
+
+  const updateSubtaskStatusLocal = (id: string, status: Status) => {
+    setLocalSubtasks(prev =>
+      prev.map(st => (st.id === id ? { ...st, status } : st))
+    )
   }
 
   const addNoteLocal = (desc: string) => {
@@ -206,6 +229,24 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
     setLocalTags(prev => prev.filter(t => t.id !== id))
   }
 
+  const addAttachmentLocal = (file: File) => {
+    const temp: TaskAttachment = {
+      id: Date.now(), // fake id
+      file_url: URL.createObjectURL(file) + "/" + file.name,
+      file_name: file.name
+    }
+
+    setLocalAttachments(prev => [...prev, temp])
+    setNewFiles(prev => [...prev, file])  // giữ file gốc để upload
+  }
+
+
+  const deleteAttachmentLocal = (id: number) => {
+    setLocalAttachments(prev => prev.filter(a => a.id !== id))
+    setNewFiles(prev => prev.filter(f => f.name !== localAttachments.find(a => a.id === id)?.file_url))
+  }
+
+
   const saveChanges = async () => {
     if (mode === "create") {
       const payload: TaskCreateAllRequest = {
@@ -226,7 +267,18 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
         })),
         notes: localNotes.map(n => ({ description: n.description })),
       }
-      await createAllOfTask(payload).unwrap()
+      const newTask = await createAllOfTask(payload).unwrap()
+
+      if (newFiles.length) {
+        console.log(newFiles
+        );
+        await Promise.all(
+          newFiles.map(file =>
+            createAttachment({ taskId: newTask.data.id, file, fileName: file.name }).unwrap()
+          )
+        )
+      }
+
       onClose()
       onSaved?.()
       return
@@ -274,7 +326,7 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
         ...diffs.subtasks.updated.map((st: SubTask) =>
           updatedSubtasksStatus({
             id: Number(st.id),
-            body: { status: st.completed ? "done" : "to-do" },
+            body: { status: st.status },
           }).unwrap()
         )
       )
@@ -296,6 +348,22 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
     }
     if (diffs.tags.deleted.length) {
       requests.push(...diffs.tags.deleted.map(t => deleteTag(Number(t.id)).unwrap()))
+    }
+
+    const deletedAttachments = (originalTask.attachments || []).filter(
+      (a: TaskAttachment) => !localAttachments.some(l => l.id === a.id)
+    )
+
+    if (deletedAttachments.length) {
+      requests.push(...deletedAttachments.map(a => deleteAttachment(a.id).unwrap()))
+    }
+
+    if (newFiles.length) {
+      requests.push(
+        ...newFiles.map(file =>
+          createAttachment({ taskId: Number(originalTask.id), file, fileName: file.name }).unwrap()
+        )
+      )
     }
 
     await Promise.all(requests)
@@ -344,6 +412,15 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
     deleteNoteLocal,
     addTagLocal,
     deleteTagLocal,
+    updateSubtaskStatusLocal,
+
+    // attachments
+    localAttachments,
+    setLocalAttachments,
+    addAttachmentLocal,
+    deleteAttachmentLocal,
+    newFiles,
+    setNewFiles,
 
     // save
     saveChanges,
@@ -360,5 +437,3 @@ export const lightenHex = (hex: string, percent: number = 0.5) => {
   b = Math.round(b + (255 - b) * percent)
   return `rgb(${r}, ${g}, ${b})`
 }
-
-

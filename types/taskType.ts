@@ -1,3 +1,5 @@
+import { TaskAttachment } from "./taskAttachmentType"
+
 export type Priority = "low" | "medium" | "high" | "urgent"
 export type Status = "to-do" | "in-progress" | "need-review" | "done"
 
@@ -15,6 +17,7 @@ export type Task = {
     parent_task: number | null
     tags?: Tag[]
     notes?: Note[]
+    attachments?: TaskAttachment[]
 }
 
 export type TaskCreateResponse = {

@@ -8,7 +8,7 @@ export const baseQueryWithAuth = fetchBaseQuery({
             headers.set("Authorization", `Bearer ${accessToken}`)
         }
 
-        const skipEndpoints = ['updateUser', 'uploadAvatar',]
+        const skipEndpoints = ['updateUser', 'uploadAvatar', 'createTaskAttachment',]
         if (!skipEndpoints.includes(endpoint)) {
             headers.set("Content-Type", "application/json")
         }
