@@ -16,11 +16,13 @@ import { Bell, Settings, Search, LogOut } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { logout } from "@/lib/slices/authSlice"
 import { RootState } from "@/lib/store"
-import { useRouter } from "next/navigation"  
+import { useRouter } from "next/navigation"
+import { useNotifications } from "@/lib/contexts/NotificationContext"  
 
 export function Header() {
   const dispatch = useDispatch()
   const user = useSelector((state: RootState) => state.user)
+  const { unreadCount } = useNotifications()
 
   const router = useRouter() 
   const handleLogout = () => {
@@ -55,12 +57,17 @@ export function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+          className="h-9 w-9 text-gray-500 hover:text-gray-700 hover:bg-gray-100 relative"
           asChild
         >
           <Link href="/dashboard/notifications">
             <Bell className="w-4 h-4" />
-            <span className="sr-only">Notifications</span>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+            <span className="sr-only">Notifications ({unreadCount} unread)</span>
           </Link>
         </Button>
 
