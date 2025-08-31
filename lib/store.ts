@@ -20,6 +20,7 @@ import { tagApi } from "@/services/tagService"
 import { userApi } from "@/services/userService"
 import { timeLogApi } from "@/services/timeLogService"
 import { taskAttachmentApi } from "@/services/taskAttachmentService"
+import { notificationApi } from "@/services/notificationService"
 
 const rootReducer = combineReducers({
   user: authReducer,
@@ -31,6 +32,7 @@ const rootReducer = combineReducers({
   [userApi.reducerPath]: userApi.reducer,
   [timeLogApi.reducerPath]: timeLogApi.reducer,
   [taskAttachmentApi.reducerPath]: taskAttachmentApi.reducer,
+  [notificationApi.reducerPath]: notificationApi.reducer,
 })
 
 const persistConfig = {
@@ -57,6 +59,7 @@ export const store = configureStore({
       userApi.middleware,
       timeLogApi.middleware,
       taskAttachmentApi.middleware,
+      notificationApi.middleware
     ),
 })
 

@@ -5,6 +5,7 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { Toaster as SonnerToaster } from "@/components/ui/sonner"
 import { ReduxProvider } from "@/components/providers/redux-provider"
+import { NotificationProvider } from "@/components/providers/NotificationProvider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             expand={true}
           />
           {children}
+          <NotificationProvider />
         </ReduxProvider>
       </body>
     </html>
