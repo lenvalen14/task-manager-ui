@@ -19,7 +19,11 @@ import {
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
-import { useGetAllProjectsQuery } from "@/services/projectService"
+import { EditProjectDialog } from "@/components/project-manage/project/edit-project-dialog"
+import { useGetAllProjectsQuery, useDeleteProjectMutation } from "@/services/projectService"
+import { useGetUserStatsQuery } from "@/services/statsService"
+import { Project } from "@/types/projectType"
+import { useToast } from "@/components/ui/use-toast" // import custom toast
 
 const mainNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -30,10 +34,46 @@ const mainNavigation = [
 
 export function Sidebar() {
   const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = React.useState(false)
+  const [selectedProject, setSelectedProject] = React.useState<Project | null>(null)
+  const [isEditProjectDialogOpen, setIsEditProjectDialogOpen] = React.useState(false)
 
-  // gọi API lấy projects
-  const { data: projectsData, isLoading } = useGetAllProjectsQuery()
+  const { toast } = useToast() // hook toast
+
+  // Lấy danh sách project
+  const { data: projectsData, isLoading, refetch: refetchProjects } = useGetAllProjectsQuery()
   const projects = projectsData?.data?.slice(0, 5) || []
+
+  // Lấy thống kê người dùng
+  const { data: statsResponse } = useGetUserStatsQuery()
+  const stats = statsResponse?.data
+
+  // Mutation delete project
+  const [deleteProject] = useDeleteProjectMutation()
+
+  const handleEditClick = (project: Project) => {
+    setSelectedProject(project)
+    setIsEditProjectDialogOpen(true)
+  }
+
+  const handleDeleteClick = async (projectId: number) => {
+    const confirmed = window.confirm("Are you sure you want to delete this project?")
+    if (!confirmed) return
+
+    try {
+      await deleteProject(projectId).unwrap()
+      toast({
+        title: "Project deleted",
+        description: "The project was deleted successfully",
+      })
+      refetchProjects()
+    } catch (error) {
+      console.error("Failed to delete project:", error)
+      toast({
+        title: "Error",
+        description: "Failed to delete project",
+      })
+    }
+  }
 
   return (
     <aside className="w-64 h-screen bg-white border-r border-gray-200 p-4 flex flex-col shrink-0 shadow-lg">
@@ -53,7 +93,6 @@ export function Sidebar() {
         </h2>
 
         {isLoading ? (
-          // Skeleton loading
           <div className="grid gap-2">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
@@ -63,7 +102,6 @@ export function Sidebar() {
             ))}
           </div>
         ) : projects.length === 0 ? (
-          // Trường hợp chưa có project nào
           <div className="flex flex-col items-center text-gray-500 text-sm">
             <p className="mb-2">No projects yet</p>
             <Button
@@ -75,16 +113,20 @@ export function Sidebar() {
             </Button>
           </div>
         ) : (
-          // Hiển thị project list
           <ScrollArea className="h-[180px]">
             <nav className="grid gap-1">
               {projects.map((project) => (
-                <Link
+                <div
                   key={project.id}
-                  href={`/dashboard/project/${project.id}`}
                   className="flex items-center justify-between p-2 rounded-lg text-sm hover:bg-gray-100 text-gray-700 transition-colors"
                 >
-                  <div className="flex items-center gap-2">{project.name}</div>
+                  <Link
+                    href={`/dashboard/project/${project.id}`}
+                    className="flex-1 flex items-center gap-2"
+                  >
+                    {project.name}
+                  </Link>
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -99,14 +141,18 @@ export function Sidebar() {
                       align="end"
                       className="shadow-lg rounded-lg"
                     >
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Edit Project</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem onClick={() => handleEditClick(project)}>
+                        Edit Project
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-red-600"
+                        onClick={() => handleDeleteClick(project.id)}
+                      >
                         Delete Project
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </Link>
+                </div>
               ))}
             </nav>
           </ScrollArea>
@@ -133,32 +179,36 @@ export function Sidebar() {
       </div>
 
       {/* Time logged */}
-      <div className="mb-6 mt-auto pt-4 border-t border-gray-200">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-          Time Logged
-        </h2>
-        <div className="text-2xl font-bold mb-1 text-gray-900">23.7 hours</div>
-        <div className="flex items-center text-sm text-green-600">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-trending-up mr-1"
-          >
-            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-            <polyline points="16 7 22 7 22 13" />
-          </svg>
-          2.5% from last week
+      {stats && (
+        <div className="mb-6 mt-auto pt-4 border-t border-gray-200">
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            Time Logged
+          </h2>
+          <div className="text-2xl font-bold mb-1 text-gray-900">
+            {stats.total_time_logged}
+          </div>
+          <div className="flex items-center text-sm text-green-600">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-trending-up mr-1"
+            >
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+              <polyline points="16 7 22 7 22 13" />
+            </svg>
+            +5% this month
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Nút Add Project chung (chỉ hiện khi có project) */}
+      {/* Nút Add Project chung */}
       {projects.length > 0 && (
         <Button
           onClick={() => setIsAddProjectDialogOpen(true)}
@@ -169,10 +219,27 @@ export function Sidebar() {
         </Button>
       )}
 
+      {/* Dialog thêm project */}
       <AddProjectDialog
         open={isAddProjectDialogOpen}
         onOpenChange={setIsAddProjectDialogOpen}
       />
+
+      {/* Dialog chỉnh sửa project */}
+      {selectedProject && (
+        <EditProjectDialog
+          open={isEditProjectDialogOpen}
+          onOpenChange={setIsEditProjectDialogOpen}
+          project={selectedProject}
+          onSuccess={() => {
+            refetchProjects()
+            toast({
+              title: "Project updated",
+              description: "The project was updated successfully",
+            })
+          }}
+        />
+      )}
     </aside>
   )
 }

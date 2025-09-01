@@ -1,64 +1,44 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus, ArrowRight, ListTodo, Clock, CheckCircle, TrendingUp, Sparkles, Star, Heart, Zap } from "lucide-react"
+import {
+  Plus,
+  ArrowRight,
+  ListTodo,
+  Clock,
+  CheckCircle,
+  TrendingUp,
+  Sparkles,
+  Star,
+  Heart,
+  Zap,
+} from "lucide-react"
 import Link from "next/link"
 import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
 import { useGetAllProjectsQuery } from "@/services/projectService"
+import { useGetUserStatsQuery } from "@/services/statsService"
 import React from "react"
 
-// Dữ liệu giả định cho biểu đồ và thống kê
-const dashboardStats = [
-  {
-    title: "Tasks Completed",
-    value: "85",
-    change: "+12% from last week",
-    icon: CheckCircle,
-    bgColor: "bg-green-300",
-    borderColor: "border-green-500",
-    hoverColor: "hover:bg-green-400",
-  },
-  {
-    title: "Tasks Due Soon",
-    value: "7",
-    change: "3 overdue",
-    icon: ListTodo,
-    bgColor: "bg-yellow-300",
-    borderColor: "border-yellow-500",
-    hoverColor: "hover:bg-yellow-400",
-  },
-  {
-    title: "Total Time Logged",
-    value: "150.5h",
-    change: "+5% this month",
-    icon: Clock,
-    bgColor: "bg-blue-300",
-    borderColor: "border-blue-500",
-    hoverColor: "hover:bg-blue-400",
-  },
-  {
-    title: "Overall Progress",
-    value: "55%",
-    change: "Across all projects",
-    icon: TrendingUp,
-    bgColor: "bg-purple-300",
-    borderColor: "border-purple-500",
-    hoverColor: "hover:bg-purple-400",
-  },
-]
-
 export default function DashboardPage() {
-  const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = React.useState(false)
+  const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] =
+    React.useState(false)
 
-  const { data, isLoading, error, refetch } = useGetAllProjectsQuery();
+  const { data: projectsData, refetch } = useGetAllProjectsQuery()
+  const { data: statsResponse, isLoading, error } = useGetUserStatsQuery()
+  const stats = statsResponse?.data
 
   return (
     <>
       <div className="flex-1 min-h-screen overflow-auto bg-gradient-to-br from-yellow-100 via-pink-50 to-blue-100 w-full">
         {/* Hero Section */}
         <div className="relative px-6 pt-8 pb-8 md:px-12 md:pt-12 md:pb-10">
-          {/* Decorative elements */}
           <div className="absolute top-4 right-8">
             <Star className="w-8 h-8 text-yellow-400 fill-yellow-400 animate-bounce" />
           </div>
@@ -69,7 +49,10 @@ export default function DashboardPage() {
             <Zap className="w-5 h-5 text-blue-400 fill-blue-400 animate-pulse delay-700" />
           </div>
           <div className="absolute top-6 left-8">
-            <Sparkles className="w-6 h-6 text-purple-400 animate-spin" style={{ animationDuration: '3s' }} />
+            <Sparkles
+              className="w-6 h-6 text-purple-400 animate-spin"
+              style={{ animationDuration: "3s" }}
+            />
           </div>
 
           <div className="flex items-center gap-4 mb-3">
@@ -88,24 +71,85 @@ export default function DashboardPage() {
         <div className="px-6 pb-12 md:px-12">
           {/* Stats Grid */}
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 mb-12 mt-8">
-            {dashboardStats.map((stat, index) => (
-              <Card
-                key={index}
-                className={`group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl border-3 border-black ${stat.bgColor} ${stat.hoverColor} hover:scale-110 cursor-pointer transform hover:-rotate-1`}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-                  <CardTitle className="text-sm font-black text-gray-900 uppercase tracking-wide">{stat.title}</CardTitle>
-                  <div className={`p-3 rounded-xl bg-white border-2 border-black shadow-md group-hover:scale-110 transition-transform duration-200`}>
-                    <stat.icon className="h-6 w-6 text-gray-900" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-4xl font-black text-gray-900 mb-2">{stat.value}</div>
-                  <p className="text-sm text-gray-800 font-bold bg-white px-2 py-1 rounded-full border-2 border-black shadow-sm inline-block">{stat.change}</p>
-                </CardContent>
-              </Card>
-            ))}
+            {/* Tasks Completed */}
+            <Card className="group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl border-3 border-black bg-green-300 hover:bg-green-400 hover:scale-110 cursor-pointer transform hover:-rotate-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-black text-gray-900 uppercase tracking-wide">
+                  Tasks Completed
+                </CardTitle>
+                <div className="p-3 rounded-xl bg-white border-2 border-black shadow-md group-hover:scale-110 transition-transform duration-200">
+                  <CheckCircle className="h-6 w-6 text-gray-900" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-black text-gray-900 mb-2">
+                  {stats?.tasks_completed ?? 0}
+                </div>
+                <p className="text-sm text-gray-800 font-bold bg-white px-2 py-1 rounded-full border-2 border-black shadow-sm inline-block">
+                  of {stats?.tasks_total ?? 0} tasks
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Tasks Due Soon */}
+            <Card className="group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl border-3 border-black bg-yellow-300 hover:bg-yellow-400 hover:scale-110 cursor-pointer transform hover:-rotate-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-black text-gray-900 uppercase tracking-wide">
+                  Tasks Due Soon
+                </CardTitle>
+                <div className="p-3 rounded-xl bg-white border-2 border-black shadow-md group-hover:scale-110 transition-transform duration-200">
+                  <ListTodo className="h-6 w-6 text-gray-900" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-black text-gray-900 mb-2">
+                  {stats?.tasks_due_soon ?? 0}
+                </div>
+                <p className="text-sm text-gray-800 font-bold bg-white px-2 py-1 rounded-full border-2 border-black shadow-sm inline-block">
+                  due tomorrow
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Total Time Logged */}
+            <Card className="group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl border-3 border-black bg-blue-300 hover:bg-blue-400 hover:scale-110 cursor-pointer transform hover:-rotate-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-black text-gray-900 uppercase tracking-wide">
+                  Total Time Logged
+                </CardTitle>
+                <div className="p-3 rounded-xl bg-white border-2 border-black shadow-md group-hover:scale-110 transition-transform duration-200">
+                  <Clock className="h-6 w-6 text-gray-900" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-black text-gray-900 mb-2">
+                  {stats?.total_time_logged ?? "00:00:00"}
+                </div>
+                <p className="text-sm text-gray-800 font-bold bg-white px-2 py-1 rounded-full border-2 border-black shadow-sm inline-block">
+                  tracked
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Overall Progress */}
+            <Card className="group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl border-3 border-black bg-purple-300 hover:bg-purple-400 hover:scale-110 cursor-pointer transform hover:-rotate-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+                <CardTitle className="text-sm font-black text-gray-900 uppercase tracking-wide">
+                  Overall Progress
+                </CardTitle>
+                <div className="p-3 rounded-xl bg-white border-2 border-black shadow-md group-hover:scale-110 transition-transform duration-200">
+                  <TrendingUp className="h-6 w-6 text-gray-900" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-black text-gray-900 mb-2">
+                  {stats?.overall_progress ?? 0}%
+                </div>
+                <p className="text-sm text-gray-800 font-bold bg-white px-2 py-1 rounded-full border-2 border-black shadow-sm inline-block">
+                  across all tasks
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Recent Projects Section */}
@@ -127,7 +171,7 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {[...(data?.data || [])]
+              {[...(projectsData?.data || [])]
                 .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                 .slice(0, 3)
                 .map((project: any, index: number) => {
@@ -202,13 +246,13 @@ export default function DashboardPage() {
             </Button>
           </div>
         </div>
-      </div >
+      </div>
       <AddProjectDialog
         open={isAddProjectDialogOpen}
         onOpenChange={(open) => {
-          setIsAddProjectDialogOpen(open);
+          setIsAddProjectDialogOpen(open)
           if (!open) {
-            refetch();
+            refetch()
           }
         }}
       />

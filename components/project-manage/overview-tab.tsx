@@ -6,9 +6,10 @@ import { Clock, ListTodo, TrendingUp, Activity, Star } from "lucide-react"
 type OverviewTabProps = {
   projectProgress: number;
   totalTasks: { done: number; pending: number };
+  timeSpent: String
 };
 
-export function OverviewTab({ projectProgress, totalTasks }: OverviewTabProps) {
+export function OverviewTab({ projectProgress, totalTasks, timeSpent }: OverviewTabProps) {
   return (
     <div className="relative">
       {/* Decorative stars */}
@@ -75,7 +76,7 @@ export function OverviewTab({ projectProgress, totalTasks }: OverviewTabProps) {
             </div>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="text-4xl font-black text-gray-900 mb-3">23.7 hours</div>
+            <div className="text-4xl font-black text-gray-900 mb-3">{timeSpent}</div>
             <div className="bg-white px-3 py-1 rounded-full border border-gray-400 inline-flex items-center gap-2">
               <span className="text-green-600 font-bold text-lg">↗</span>
               <span className="text-sm font-bold text-green-600">2.5% from last week</span>

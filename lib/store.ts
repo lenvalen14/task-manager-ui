@@ -9,7 +9,7 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist"
-import storage from "redux-persist/lib/storage"
+import storage from "./storage" // ✅ import custom storage
 
 import authReducer from "./slices/authSlice"
 import { authApi } from "@/services/authService"
@@ -22,6 +22,7 @@ import { timeLogApi } from "@/services/timeLogService"
 import { taskAttachmentApi } from "@/services/taskAttachmentService"
 import { notificationApi } from "@/services/notificationService"
 import { passwordApi } from "@/services/passwordService"
+import { userStatsApi } from "@/services/statsService"
 
 const rootReducer = combineReducers({
   user: authReducer,
@@ -35,12 +36,13 @@ const rootReducer = combineReducers({
   [taskAttachmentApi.reducerPath]: taskAttachmentApi.reducer,
   [notificationApi.reducerPath]: notificationApi.reducer,
   [passwordApi.reducerPath]: passwordApi.reducer,
+  [userStatsApi.reducerPath]: userStatsApi.reducer,
 })
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["user"],
+  whitelist: ["user"], // chỉ persist auth
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
@@ -62,7 +64,8 @@ export const store = configureStore({
       timeLogApi.middleware,
       taskAttachmentApi.middleware,
       notificationApi.middleware,
-      passwordApi.middleware
+      passwordApi.middleware,
+      userStatsApi.middleware,
     ),
 })
 

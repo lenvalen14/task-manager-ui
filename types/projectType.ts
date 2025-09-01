@@ -1,4 +1,5 @@
 import { Task } from "./taskType"
+import { TimeSummaryData } from "./timeLogType"
 
 export type Project = {
     id: number
@@ -11,6 +12,7 @@ export type Project = {
         username: string
     }
     tasks: Task[]
+    project_time_summary?: TimeSummaryData
 }
 
 export type GetAllProjectsResponse = {

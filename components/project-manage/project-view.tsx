@@ -107,7 +107,7 @@ export function ProjectView() {
 
       {/* Tabs Navigation */}
       <div className="sticky top-0 z-40 px-8 bg-white border-b-4 border-pink-200 shadow-md">
-        <Tabs defaultValue="tasks" className="flex flex-col">
+        <Tabs defaultValue="overview" className="flex flex-col">
           <TabsList className="w-full max-w-2xl h-16 bg-transparent gap-2 justify-start p-2">
             {[{ value: "overview", label: "Overview", color: "bg-blue-300" },
             { value: "tasks", label: "Tasks", color: "bg-pink-300" },
@@ -132,6 +132,7 @@ export function ProjectView() {
                     done: tasksCompleted,
                     pending: totalTasks - tasksCompleted,
                   }}
+                  timeSpent={project.project_time_summary?.formatted_time || "00:00:00"}
                 />
               </div>
             </TabsContent>
