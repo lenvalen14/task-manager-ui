@@ -11,10 +11,29 @@ type TimeLog = {
   status: "RUNNING" | "PAUSED" | "STOPPED"
 }
 
+type TaskReportArgs = {
+  taskId: number,
+  includeRunning?: boolean
+}
+
+export interface TaskTimeReport {
+  total_seconds: number
+  total_minutes: number
+  total_hours: number
+  formatted_time: string
+  logs_count: number
+}
+
+interface APIResponse<T>  {
+  code: number
+  message: string
+  data: T
+}
+
 export const timeLogApi = createApi({
   reducerPath: "timeLogApi",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["TimeLogs"],
+  tagTypes: ["TimeLogs", "TaskReport"],
   endpoints: (builder) => ({
     startTimeLog: builder.mutation<TimeLog, { taskId: number }>({
       query: (body) => ({
@@ -43,6 +62,19 @@ export const timeLogApi = createApi({
         { type: "TimeLogs", id: "LIST" },
       ],
     }),
+    getTaskTimeReport: builder.query<APIResponse<TaskTimeReport>, TaskReportArgs>({
+      query: ({ taskId, includeRunning }) => ({
+       
+        url: "/timelogs/tasks/", 
+        params: {
+          task_id: taskId,
+          include_running: includeRunning,
+        },
+      }),
+      providesTags: (result, error, arg) => [
+        { type: "TaskReport", id: arg.taskId },
+      ],
+    }),
   }),
 })
 
@@ -50,6 +82,7 @@ export const {
   useStartTimeLogMutation,
   usePauseTimeLogMutation,
   useStopTimeLogMutation,
+  useGetTaskTimeReportQuery,
 } = timeLogApi
 
 

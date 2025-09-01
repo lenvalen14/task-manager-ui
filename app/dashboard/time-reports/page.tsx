@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Header } from "@/components/layout/header"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Clock, BarChart, CalendarDays, Play, Pause, Square, Star, Heart, Sparkle } from "lucide-react"
@@ -9,6 +8,7 @@ import Link from "next/link"
 import { useStartTimeLogMutation, usePauseTimeLogMutation, useStopTimeLogMutation } from "@/services/timeLogService"
 import { useGetTasksQuery } from "@/services/taskService"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { TaskReportDialog } from "@/components/timelog/TimeLogDialog"
 
 function formatTime(seconds: number): string {
   const hours = Math.floor(seconds / 3600)
@@ -22,6 +22,7 @@ export default function TimeReportsPage() {
   const [time, setTime] = useState(0)
   const [currentLogId, setCurrentLogId] = useState<number | null>(null)
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null)
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
   const [startTimeLog, { isLoading: starting }] = useStartTimeLogMutation()
   const [pauseTimeLog, { isLoading: pausing }] = usePauseTimeLogMutation()
@@ -30,13 +31,11 @@ export default function TimeReportsPage() {
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
-
     if (isRunning) {
       interval = setInterval(() => {
         setTime((prevTime) => prevTime + 1)
       }, 1000)
     }
-
     return () => {
       if (interval) clearInterval(interval)
     }
@@ -50,8 +49,8 @@ export default function TimeReportsPage() {
   }, [tasksData, selectedTaskId])
 
   const handleStart = async () => {
+    if (!selectedTaskId) return
     try {
-      if (!selectedTaskId) return
       const res = await startTimeLog({ taskId: selectedTaskId }).unwrap()
       const createdAny: any = res as any
       const created = createdAny?.data ?? createdAny?.result ?? createdAny
@@ -65,24 +64,25 @@ export default function TimeReportsPage() {
       console.error(e)
     }
   }
+
   const handlePause = async () => {
+    const stored = localStorage.getItem("currentTimeLogId")
+    const id = currentLogId ?? (stored !== null ? Number(stored) : NaN)
+    if (!Number.isFinite(id)) return
     try {
-      const stored = localStorage.getItem("currentTimeLogId")
-      const id = currentLogId ?? (stored !== null ? Number(stored) : NaN)
-      if (!Number.isFinite(id)) return
-      const res = await pauseTimeLog({ timelogId: Number(id) }).unwrap()
+      await pauseTimeLog({ timelogId: Number(id) }).unwrap()
       setIsRunning(false)
-      // keep duration in UI state if desired
     } catch (e) {
       console.error(e)
     }
   }
+
   const handleStop = async () => {
+    const stored = localStorage.getItem("currentTimeLogId")
+    const id = currentLogId ?? (stored !== null ? Number(stored) : NaN)
+    if (!Number.isFinite(id)) return
     try {
-      const stored = localStorage.getItem("currentTimeLogId")
-      const id = currentLogId ?? (stored !== null ? Number(stored) : NaN)
-      if (!Number.isFinite(id)) return
-      const res = await stopTimeLog({ timelogId: Number(id) }).unwrap()
+      await stopTimeLog({ timelogId: Number(id) }).unwrap()
       setIsRunning(false)
       setTime(0)
       setCurrentLogId(null)
@@ -122,7 +122,7 @@ export default function TimeReportsPage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Time Tracking */}
+          {/* Time Tracking Card */}
           <Card className="border-3 border-black rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 bg-white overflow-hidden">
             <CardHeader className="border-b-2 border-gray-200 bg-gray-50">
               <CardTitle className="text-2xl font-black text-gray-900">Time Tracking</CardTitle>
@@ -142,7 +142,7 @@ export default function TimeReportsPage() {
                       <SelectValue placeholder="Select a task" />
                     </SelectTrigger>
                     <SelectContent>
-                      {(Array.isArray(tasksData?.data) ? tasksData!.data : []).map((t) => (
+                      {(Array.isArray(tasksData?.data) ? tasksData!.data : []).map((t: any) => (
                         <SelectItem key={t.id} value={String(t.id)}>{t.title ?? `Task #${t.id}`}</SelectItem>
                       ))}
                     </SelectContent>
@@ -155,10 +155,7 @@ export default function TimeReportsPage() {
               </div>
               <div className="flex gap-3">
                 <Button
-                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${!isRunning
-                      ? 'bg-green-400 hover:bg-green-500 text-white'
-                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    }`}
+                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${!isRunning ? 'bg-green-400 hover:bg-green-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
                   onClick={handleStart}
                   disabled={isRunning || starting}
                 >
@@ -166,10 +163,7 @@ export default function TimeReportsPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${isRunning
-                      ? 'bg-white hover:bg-gray-50 text-gray-900'
-                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    }`}
+                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${isRunning ? 'bg-white hover:bg-gray-50 text-gray-900' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
                   onClick={handlePause}
                   disabled={!isRunning || pausing}
                 >
@@ -177,10 +171,7 @@ export default function TimeReportsPage() {
                 </Button>
                 <Button
                   variant="destructive"
-                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${isRunning || time > 0
-                      ? 'bg-red-400 hover:bg-red-500 text-white'
-                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    }`}
+                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${isRunning || time > 0 ? 'bg-red-400 hover:bg-red-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
                   onClick={handleStop}
                   disabled={(!isRunning && time === 0) || stopping}
                 >
@@ -190,14 +181,15 @@ export default function TimeReportsPage() {
               <Button
                 variant="secondary"
                 className="bg-yellow-300 hover:bg-yellow-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-                asChild
+                onClick={() => setIsReportModalOpen(true)}
+                disabled={!selectedTaskId}
               >
-                <Link href="#">View Time Logs</Link>
+                View Time Logs
               </Button>
             </CardContent>
           </Card>
 
-          {/* Reports */}
+          {/* Reports Card */}
           <Card className="border-3 border-black rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 bg-white overflow-hidden">
             <CardHeader className="border-b-2 border-gray-200 bg-gray-50">
               <CardTitle className="text-2xl font-black text-gray-900">Performance Reports</CardTitle>
@@ -238,6 +230,12 @@ export default function TimeReportsPage() {
           </Card>
         </div>
       </div>
+
+      <TaskReportDialog
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        taskId={selectedTaskId}
+      />
     </>
   )
 }

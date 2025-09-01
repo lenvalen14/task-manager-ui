@@ -1,10 +1,17 @@
 "use client"
 
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import React from "react"
+import Link from "next/link"
+import Image from "next/image"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/lib/store"
+
+export const selectUser = (state: RootState) => state.user
 
 export function HeaderSection() {
+  const user = useSelector(selectUser)
+  const isAuthenticated = !!user?.access_token
+
   return (
     <header className="bg-gradient-to-r from-white to-gray-50 border-b-2 border-black shadow-lg">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -23,38 +30,34 @@ export function HeaderSection() {
 
         {/* Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <Link href="/features" className="text-black font-semibold hover:text-blue-600 transition-all duration-200 relative group">
-            Features
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-200"></span>
-          </Link>
-          <Link href="/pricing" className="text-black font-semibold hover:text-blue-600 transition-all duration-200 relative group">
-            Pricing
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-200"></span>
-          </Link>
-          <Link href="/about" className="text-black font-semibold hover:text-blue-600 transition-all duration-200 relative group">
-            About
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-200"></span>
-          </Link>
-          <Link href="/contact" className="text-black font-semibold hover:text-blue-600 transition-all duration-200 relative group">
-            Contact
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-200"></span>
-          </Link>
+          <Link href="/features" className="nav-link">Features</Link>
+          <Link href="/pricing" className="nav-link">Pricing</Link>
+          <Link href="/about" className="nav-link">About</Link>
+          <Link href="/contact" className="nav-link">Contact</Link>
         </nav>
 
-        {/* Auth Buttons */}
+        {/* Auth / Dashboard Buttons */}
         <div className="flex items-center space-x-6">
-          <Link href="/auth/login" className="text-black font-semibold hover:text-blue-600 transition-all duration-200 relative group">
-            Sign In
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-200"></span>
-          </Link>
-          <Link 
-            href="/auth/register" 
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-bold px-8 py-3 rounded-xl border-2 border-black shadow-lg transform hover:scale-105 hover:shadow-xl"
-          >
-            Sign Up
-          </Link>
+          {isAuthenticated ? (
+            <Link
+              href="/dashboard"
+              className="btn-dashboard"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link href="/auth/login" className="nav-link">Sign In</Link>
+              <Link
+                href="/auth/register"
+                className="btn-signup"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
-  );
+  )
 }

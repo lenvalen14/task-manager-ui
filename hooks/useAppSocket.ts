@@ -6,21 +6,18 @@ import type { Notification, NotificationType } from "@/types/notification"
 
 const RECONNECT_DELAY = 5000
 
-export function useAppSocket(token: string | null) {
+export function useAppSocket(token?: string | null) {
   const socketRef = useRef<WebSocket | null>(null)
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const reconnectTimeout = useRef<NodeJS.Timeout | null>(null)
   const dispatch = useAppDispatch()
   const { showNotificationToast } = useNotificationToast()
 
   useEffect(() => {
-    if (!token) {
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
-      socketRef.current?.close()
-      socketRef.current = null
-      return
-    }
+    if (!token) return
 
-    const connect = () => {
+    let isMounted = true
+
+    function connect() {
       const wsUrl = `ws://localhost:8000/ws/notifications/?token=${token}`
       const socket = new WebSocket(wsUrl)
       socketRef.current = socket
@@ -56,27 +53,29 @@ export function useAppSocket(token: string | null) {
         }
       }
 
-      socket.onclose = () => {
-        console.log(`WS Disconnected. Retrying in ${RECONNECT_DELAY / 1000}s...`)
-        if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
-        reconnectTimeoutRef.current = setTimeout(() => {
-          if (socketRef.current?.readyState !== WebSocket.OPEN) {
-            connect()
-          }
-        }, RECONNECT_DELAY)
+      socket.onerror = (error) => {
+        console.error("WebSocket error:", error)
       }
 
-      socket.onerror = (err) => {
-        console.error("WebSocket error:", err)
-        socket.close()
+      socket.onclose = () => {
+        console.log("WS Disconnected. Retrying in 5s...")
+        if (isMounted) {
+          reconnectTimeout.current = setTimeout(connect, RECONNECT_DELAY)
+        }
       }
     }
 
     connect()
 
     return () => {
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current)
-      socketRef.current?.close()
+      isMounted = false
+      if (socketRef.current) {
+        socketRef.current.close()
+        socketRef.current = null
+      }
+      if (reconnectTimeout.current) {
+        clearTimeout(reconnectTimeout.current)
+      }
     }
   }, [token, dispatch, showNotificationToast])
 }
