@@ -19,6 +19,7 @@ export interface VerifyPasswordOtpResponse {
 
 export interface ResetPasswordRequest {
     email: string
+    old_password: string
     new_password: string
     confirm_password: string
 }
@@ -30,7 +31,6 @@ export interface ResetPasswordResponse {
 
 export interface ChangePasswordRequest {
     email: string
-    old_password: string
     new_password: string
     confirm_password: string
 }

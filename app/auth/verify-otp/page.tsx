@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { ShieldCheck } from "lucide-react"
+import { ArrowLeft, Sparkles, Heart, Star, X, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 import { useVerifyPasswordOtpMutation } from "@/services/passwordService"
 import { toast } from "sonner"
@@ -76,19 +76,51 @@ export default function VerifyOtpPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-yellow-50 via-orange-50 to-rose-50 p-4">
-      <Card className="w-full max-w-md shadow-2xl rounded-3xl border-2 border-black bg-white/95 backdrop-blur-sm">
-        <CardHeader className="pb-4 text-center">
-          <ShieldCheck className="mx-auto mb-2 w-12 h-12 text-green-600" />
-          <CardTitle className="text-2xl font-bold text-black mb-2">Verify OTP</CardTitle>
-          <div className="text-gray-700 text-base">
-            Enter the 6-digit code sent to <span className="font-semibold">{email}</span>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
+      <Card className="w-full max-w-md shadow-2xl rounded-2xl border-2 border-black bg-white/95 backdrop-blur-sm">
+        <CardHeader className="text-center pb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" size="icon" asChild className="text-gray-600 hover:text-gray-800 bg-gray-100 rounded-full p-2">
+                <Link href="/auth/forgot-password">
+                  <ArrowLeft className="w-5 h-5" />
+                  <span className="sr-only">Back</span>
+                </Link>
+              </Button>
+              <CardTitle className="text-3xl font-bold text-black">Verify OTP</CardTitle>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 bg-blue-400 rounded-sm flex items-center justify-center">
+                <Sparkles className="w-3 h-3 text-white" />
+              </div>
+              <div className="w-4 h-4 bg-pink-400 rounded-sm flex items-center justify-center">
+                <Heart className="w-3 h-3 text-white" />
+              </div>
+              <div className="w-4 h-4 bg-yellow-400 rounded-sm flex items-center justify-center">
+                <Star className="w-3 h-3 text-white" />
+              </div>
+              <button className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
+                <X className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
           </div>
+
+          <div className="bg-gradient-to-r from-yellow-200 to-orange-200 rounded-xl p-4 border-2 border-black mb-6">
+            <div className="flex items-center justify-center space-x-2">
+              <ShieldCheck className="w-5 h-5 text-green-600" />
+              <span className="text-black font-semibold">Enter the 6-digit code sent to {email}</span>
+            </div>
+          </div>
+
+          <CardDescription className="text-gray-600 text-lg">
+            Please enter your OTP to continue.
+          </CardDescription>
         </CardHeader>
+
         <CardContent>
           <form onSubmit={handleSubmit} className="grid gap-6">
-            <div className="grid gap-2">
-              <Label className="text-black font-bold text-base text-center mb-2">OTP Code</Label>
+            <div className="grid gap-3">
+              <Label className="text-black font-bold text-lg text-center">OTP Code</Label>
               <div className="flex justify-between gap-2">
                 {otp.map((digit, i) => (
                   <input
@@ -101,7 +133,7 @@ export default function VerifyOtpPage() {
                     onChange={e => handleChange(e.target.value, i)}
                     onKeyDown={e => handleKeyDown(e, i)}
                     onPaste={handlePaste}
-                    className="w-12 h-14 text-center border-2 border-black rounded-xl text-lg font-bold text-black bg-white shadow focus:border-orange-500 focus:ring-2 focus:ring-orange-500"
+                    className="w-12 h-14 text-center border-2 border-black rounded-xl text-lg font-bold text-black bg-white shadow focus:border-pink-500 focus:ring-2 focus:ring-pink-500"
                   />
                 ))}
               </div>
@@ -109,13 +141,13 @@ export default function VerifyOtpPage() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-xl border-2 border-black transform hover:scale-105"
+              className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-xl border-2 border-black transform hover:scale-105"
             >
               {isLoading ? "Verifying..." : "Verify OTP"}
             </Button>
-            <div className="mt-4 text-center text-gray-600 text-sm">
+            <div className="mt-6 text-center text-gray-600 text-sm">
               Didn’t receive the code?{" "}
-              <Link href={`/auth/forgot-password`} className="text-orange-600 hover:text-orange-700 font-semibold underline">
+              <Link href="/auth/forgot-password" className="text-pink-600 hover:text-pink-700 font-semibold underline">
                 Resend OTP
               </Link>
             </div>

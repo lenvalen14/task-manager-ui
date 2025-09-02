@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import { useChangePasswordMutation } from "@/services/passwordService"
+import { useResetPasswordMutation } from "@/services/passwordService"
 import { useSelector } from "react-redux"
 import { selectUser } from "@/lib/slices/authSlice"
 
@@ -18,7 +18,7 @@ export default function TabPassword() {
     confirm_password: "",
   })
 
-  const [changePassword, { isLoading }] = useChangePasswordMutation()
+  const [changePassword, { isLoading }] = useResetPasswordMutation()
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -33,7 +33,7 @@ export default function TabPassword() {
 
     try {
       const res = await changePassword({
-        email: user?.email || "", // lấy email từ redux store
+        email: user?.email || "",
         old_password: form.old_password,
         new_password: form.new_password,
         confirm_password: form.confirm_password,

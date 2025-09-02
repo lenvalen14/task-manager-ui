@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { ArrowLeft, Shield } from "lucide-react"
 import { toast } from "sonner"
-import { useResetPasswordMutation } from "@/services/passwordService"
+import { useChangePasswordMutation } from "@/services/passwordService"
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -18,7 +18,7 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
-  const [resetPassword, { isLoading }] = useResetPasswordMutation()
+  const [resetPassword, { isLoading }] = useChangePasswordMutation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
