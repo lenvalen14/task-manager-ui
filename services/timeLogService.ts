@@ -1,5 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react"
-import { baseQueryWithAuth } from "./baseQuery"
+import { baseQueryWithReauth } from "./baseQuery"
 
 type TimeLog = {
   id: number
@@ -24,7 +24,7 @@ export interface TaskTimeReport {
   logs_count: number
 }
 
-interface APIResponse<T>  {
+interface APIResponse<T> {
   code: number
   message: string
   data: T
@@ -32,7 +32,7 @@ interface APIResponse<T>  {
 
 export const timeLogApi = createApi({
   reducerPath: "timeLogApi",
-  baseQuery: baseQueryWithAuth,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["TimeLogs", "TaskReport"],
   endpoints: (builder) => ({
     startTimeLog: builder.mutation<TimeLog, { taskId: number }>({
@@ -64,8 +64,8 @@ export const timeLogApi = createApi({
     }),
     getTaskTimeReport: builder.query<APIResponse<TaskTimeReport>, TaskReportArgs>({
       query: ({ taskId, includeRunning }) => ({
-       
-        url: "/timelogs/tasks/", 
+
+        url: "/timelogs/tasks/",
         params: {
           task_id: taskId,
           include_running: includeRunning,

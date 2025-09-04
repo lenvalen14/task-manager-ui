@@ -1,10 +1,10 @@
 import { createApi } from "@reduxjs/toolkit/query/react"
-import { baseQueryWithAuth } from "./baseQuery"
+import { baseQueryWithReauth } from "./baseQuery"
 import { Project, GetAllProjectsResponse, CreateProjectResponse, GetProjectsResponse } from "@/types/projectType";
 
 export const projectApi = createApi({
     reducerPath: "projectApi",
-    baseQuery: baseQueryWithAuth,
+    baseQuery: baseQueryWithReauth,
     endpoints: (builder) => ({
         getAllProjects: builder.query<GetAllProjectsResponse, void>({
             query: () => ({

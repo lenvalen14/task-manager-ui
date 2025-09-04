@@ -1,5 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react"
-import { baseQueryWithAuth } from "./baseQuery"
+import { baseQueryWithReauth } from "./baseQuery"
 
 import {
   RequestPasswordOtpRequest,
@@ -14,7 +14,7 @@ import {
 
 export const passwordApi = createApi({
   reducerPath: "passwordApi",
-  baseQuery: baseQueryWithAuth,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["Password"],
   endpoints: (builder) => ({
     requestPasswordOtp: builder.mutation<RequestPasswordOtpResponse, RequestPasswordOtpRequest>({

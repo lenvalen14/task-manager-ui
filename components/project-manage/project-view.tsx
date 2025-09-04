@@ -111,7 +111,8 @@ export function ProjectView() {
           <TabsList className="w-full max-w-2xl h-16 bg-transparent gap-2 justify-start p-2">
             {[{ value: "overview", label: "Overview", color: "bg-blue-300" },
             { value: "tasks", label: "Tasks", color: "bg-pink-300" },
-            { value: "notes", label: "Notes", color: "bg-green-300" }].map((tab) => (
+              // { value: "notes", label: "Notes", color: "bg-green-300" },
+            ].map((tab) => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
@@ -146,11 +147,11 @@ export function ProjectView() {
               </div>
             </TabsContent>
 
-            <TabsContent value="notes" className="flex-1">
+            {/* <TabsContent value="notes" className="flex-1">
               <div className="bg-white rounded-2xl p-6 mx-2">
                 <NotesTab />
               </div>
-            </TabsContent>
+            </TabsContent> */}
           </div>
         </Tabs>
       </div>

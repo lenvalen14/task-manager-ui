@@ -1,5 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react"
-import { baseQueryWithAuth } from "./baseQuery"
+import { baseQueryWithReauth } from "./baseQuery"
 import {
     TaskAttachmentCreateRequest,
     TaskAttachmentCreateResponse,
@@ -8,7 +8,7 @@ import {
 
 export const taskAttachmentApi = createApi({
     reducerPath: "taskAttachmentApi",
-    baseQuery: baseQueryWithAuth,
+    baseQuery: baseQueryWithReauth,
     tagTypes: ["TaskAttachments"],
     endpoints: (builder) => ({
         // Tạo mới (upload file đính kèm)

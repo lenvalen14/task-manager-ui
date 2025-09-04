@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react"
-import { baseQueryWithAuth } from "./baseQuery"
+import { baseQueryWithReauth } from "./baseQuery"
 import {
-    APIResponse,
+  APIResponse,
   Notification,
   NotificationListResponse,
   UnreadCountResponse,
@@ -9,7 +9,7 @@ import {
 
 export const notificationApi = createApi({
   reducerPath: "notificationApi",
-  baseQuery: baseQueryWithAuth,
+  baseQuery: baseQueryWithReauth,
   tagTypes: ["Notifications"],
 
   endpoints: (builder) => ({
@@ -21,12 +21,12 @@ export const notificationApi = createApi({
       providesTags: (result) =>
         result
           ? [
-              ...result.data.map(({ id }) => ({
-                type: "Notifications" as const,
-                id,
-              })),
-              { type: "Notifications", id: "LIST" },
-            ]
+            ...result.data.map(({ id }) => ({
+              type: "Notifications" as const,
+              id,
+            })),
+            { type: "Notifications", id: "LIST" },
+          ]
           : [{ type: "Notifications", id: "LIST" }],
     }),
 

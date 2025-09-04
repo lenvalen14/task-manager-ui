@@ -1,11 +1,11 @@
 // services/userStatsApi.ts
 import { createApi } from "@reduxjs/toolkit/query/react"
-import { baseQueryWithAuth } from "./baseQuery"
+import { baseQueryWithReauth } from "./baseQuery"
 import { UserStats, ApiResponse } from "@/types/statsType"
 
 export const userStatsApi = createApi({
     reducerPath: "userStatsApi",
-    baseQuery: baseQueryWithAuth,
+    baseQuery: baseQueryWithReauth,
     tagTypes: ["UserStats"],
     endpoints: (builder) => ({
         getUserStats: builder.query<ApiResponse<UserStats>, void>({
