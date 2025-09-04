@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { useGetUserByIdQuery } from "@/services/userService"
 
 export function Header() {
   const dispatch = useAppDispatch()
@@ -26,6 +27,9 @@ export function Header() {
   const router = useRouter()
 
   const { data: unreadCountData } = useGetUnreadCountQuery()
+  const { data: userData } = useGetUserByIdQuery(user?.sub as number, {
+    skip: !user?.sub,
+  })
   const unreadCount = unreadCountData?.data.unread_count ?? 0
 
   console.log("Unread Count:", unreadCount)
@@ -75,6 +79,7 @@ export function Header() {
         </Button>
 
         {/* User Dropdown */}
+        {/* User Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -82,6 +87,9 @@ export function Header() {
               className="flex h-9 items-center gap-2 rounded-md px-2 hover:bg-gray-100"
             >
               <Avatar className="h-7 w-7">
+                {/* Nếu có avatar_url thì hiển thị ảnh */}
+                <AvatarImage src={userData?.data.avatar_url || ""} alt={user?.user_name || "User"} />
+                {/* Nếu không có hoặc lỗi load thì fallback ra chữ cái */}
                 <AvatarFallback className="bg-gray-200 text-xs text-gray-700">
                   {avatarFallbackChar}
                 </AvatarFallback>
@@ -91,6 +99,7 @@ export function Header() {
               </span>
             </Button>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
             align="end"
             className="w-48 border-gray-200 bg-white shadow-sm"
@@ -118,6 +127,7 @@ export function Header() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
       </div>
     </header>
   )

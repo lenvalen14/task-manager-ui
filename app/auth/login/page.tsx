@@ -45,6 +45,8 @@ export default function LoginPage() {
     try {
       const response: LoginResponse = await login(formData).unwrap()
 
+      console.log(response.data);
+
       if (response.code === 200 && response.data?.data) {
         const { user_id, email, username, access_token, refresh_token } = response.data.data
 
