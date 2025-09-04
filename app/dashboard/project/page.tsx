@@ -158,33 +158,21 @@ export default function AllProjectsPage() {
         {isLoading && <p>Loading projects...</p>}
         {isError && <p>Failed to load projects</p>}
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {[...(data?.data || [])]
-            .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-            .map((project: any, index: number) => {
-              // Random màu 
-              const colors = ["bg-red-500", "bg-green-500", "bg-blue-500", "bg-yellow-500", "bg-purple-500", "bg-pink-500"];
-              const color = project.color || colors[Math.floor(Math.random() * colors.length)];
-
-              // Xử lý progress và tasks
-              let totalTasks = project.tasks?.length || 0;
-              let completedTasks = 0;
-              let progress = 0;
-
-              if (totalTasks > 0) {
-                completedTasks = project.tasks.filter((task: any) => task.status === "done").length;
-                progress = Math.round((completedTasks / totalTasks) * 100);
-              }
-
+          {filteredProjects
+            .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+            .map((project, index) => {
               return (
                 <Card
                   key={project.id}
-                  className={`group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl border-3 border-black bg-white hover:scale-105 transform hover:-rotate-1`}
+                  className="group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl border-3 border-black bg-white hover:scale-105 transform hover:-rotate-1"
                   style={{ animationDelay: `${index * 150}ms` }}
                 >
                   <CardHeader className="relative pb-4">
                     <div className="flex items-center gap-4 mb-4">
-                      <div className={`w-12 h-12 rounded-2xl ${color} flex items-center justify-center text-white text-lg font-black shadow-lg border-2 border-black transform rotate-3 group-hover:rotate-0 transition-transform duration-300`}>
-                        {project.name.split(" ").map((word: string) => word[0]).join("").slice(0, 2)}
+                      <div
+                        className={`w-12 h-12 rounded-2xl ${project.color} flex items-center justify-center text-white text-lg font-black shadow-lg border-2 border-black transform rotate-3 group-hover:rotate-0 transition-transform duration-300`}
+                      >
+                        {project.name.split(" ").map((word) => word[0]).join("").slice(0, 2)}
                       </div>
                       <CardTitle className="text-xl font-black text-gray-900">{project.name}</CardTitle>
                     </div>
@@ -192,19 +180,19 @@ export default function AllProjectsPage() {
                       <div className="relative mb-3">
                         <div className="w-full h-4 bg-gray-200 rounded-full shadow-inner overflow-hidden">
                           <div
-                            className={`h-full ${color} rounded-full transition-all duration-500 ease-out`}
-                            style={{ width: `${progress}%` }}
+                            className={`h-full ${project.color} rounded-full transition-all duration-500 ease-out`}
+                            style={{ width: `${project.progress}%` }}
                           ></div>
                         </div>
                       </div>
                       <span className="text-lg font-black text-gray-900 bg-yellow-200 px-3 py-1 rounded-full border-2 border-black shadow-sm">
-                        {progress}% Complete
+                        {project.progress}% Complete
                       </span>
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="flex justify-between items-center pt-0">
                     <div className="text-sm font-bold text-gray-700">
-                      <span className="text-gray-900 font-black text-lg">{completedTasks}</span> / {totalTasks} Tasks
+                      <span className="text-gray-900 font-black text-lg">{project.tasksCompleted}</span> / {project.totalTasks} Tasks
                     </div>
                     <Button
                       variant="outline"
@@ -216,9 +204,10 @@ export default function AllProjectsPage() {
                     </Button>
                   </CardContent>
                 </Card>
-              );
+              )
             })}
         </div>
+
       </div>
 
       {/* Add Project Dialog */}

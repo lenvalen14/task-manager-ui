@@ -1,13 +1,24 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  Card, CardContent, CardHeader, CardTitle, CardDescription
+} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Clock, BarChart, CalendarDays, Play, Pause, Square, Star, Heart, Sparkle } from "lucide-react"
+import {
+  ArrowLeft, Clock, BarChart, CalendarDays,
+  Play, Pause, Square, Star, Heart, Sparkle
+} from "lucide-react"
 import Link from "next/link"
-import { useStartTimeLogMutation, usePauseTimeLogMutation, useStopTimeLogMutation } from "@/services/timeLogService"
+import {
+  useStartTimeLogMutation,
+  usePauseTimeLogMutation,
+  useStopTimeLogMutation
+} from "@/services/timeLogService"
 import { useGetTasksQuery } from "@/services/taskService"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from "@/components/ui/select"
 import { TaskReportDialog } from "@/components/timelog/TimeLogDialog"
 
 function formatTime(seconds: number): string {
@@ -18,8 +29,9 @@ function formatTime(seconds: number): string {
 }
 
 export default function TimeReportsPage() {
-  const [isRunning, setIsRunning] = useState(false)
-  const [time, setTime] = useState(0)
+  const [isRunning, setIsRunning] = useState(false) // đang chạy hay không
+  const [time, setTime] = useState(0) // tổng số giây đã đếm
+  const [offset, setOffset] = useState(0) // số giây đã tích lũy trước khi resume
   const [currentLogId, setCurrentLogId] = useState<number | null>(null)
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null)
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
@@ -29,11 +41,39 @@ export default function TimeReportsPage() {
   const [stopTimeLog, { isLoading: stopping }] = useStopTimeLogMutation()
   const { data: tasksData } = useGetTasksQuery()
 
+  // khi render lại → check localStorage để khôi phục state
+  useEffect(() => {
+    const storedStart = localStorage.getItem("currentTimeLogStart")
+    const storedLogId = localStorage.getItem("currentTimeLogId")
+    const storedOffset = localStorage.getItem("currentTimeLogOffset")
+
+    if (storedOffset) setOffset(Number(storedOffset))
+
+    if (storedStart) {
+      const startDate = new Date(storedStart)
+      const elapsed = Math.floor((Date.now() - startDate.getTime()) / 1000)
+      setTime(elapsed)
+      setIsRunning(true)
+    }
+
+    if (storedLogId) {
+      setCurrentLogId(Number(storedLogId))
+    }
+  }, [])
+
+  // interval cập nhật time
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null
     if (isRunning) {
       interval = setInterval(() => {
-        setTime((prevTime) => prevTime + 1)
+        const storedStart = localStorage.getItem("currentTimeLogStart")
+        const storedOffset = localStorage.getItem("currentTimeLogOffset")
+        if (storedStart) {
+          const startDate = new Date(storedStart)
+          const elapsed = Math.floor((Date.now() - startDate.getTime()) / 1000)
+          const base = storedOffset ? Number(storedOffset) : 0
+          setTime(base + elapsed)
+        }
       }, 1000)
     }
     return () => {
@@ -41,6 +81,7 @@ export default function TimeReportsPage() {
     }
   }, [isRunning])
 
+  // tự chọn task đầu tiên nếu chưa chọn
   useEffect(() => {
     const list = Array.isArray(tasksData?.data) ? tasksData!.data : []
     if (selectedTaskId === null && list.length > 0) {
@@ -51,20 +92,30 @@ export default function TimeReportsPage() {
   const handleStart = async () => {
     if (!selectedTaskId) return
     try {
-      const res = await startTimeLog({ taskId: selectedTaskId }).unwrap()
-      const createdAny: any = res as any
-      const created = createdAny?.data ?? createdAny?.result ?? createdAny
-      const newId = Number(created?.id)
-      if (Number.isFinite(newId)) {
-        setCurrentLogId(newId)
-        try { localStorage.setItem("currentTimeLogId", String(newId)) } catch {}
+      // Nếu chưa có log → gọi API tạo mới
+      if (!currentLogId) {
+        const res = await startTimeLog({ taskId: selectedTaskId }).unwrap()
+        const createdAny: any = res as any
+        const created = createdAny?.data ?? createdAny?.result ?? createdAny
+        const newId = Number(created?.id)
+        if (Number.isFinite(newId)) {
+          setCurrentLogId(newId)
+          localStorage.setItem("currentTimeLogId", String(newId))
+        }
       }
+
+      // Ghi nhận startTime mới
+      const now = new Date().toISOString()
+      localStorage.setItem("currentTimeLogStart", now)
+      localStorage.setItem("currentTimeLogOffset", String(offset))
+
       setIsRunning(true)
     } catch (e) {
       console.error(e)
     }
   }
 
+  //  Pause = lưu offset + dừng interval
   const handlePause = async () => {
     const stored = localStorage.getItem("currentTimeLogId")
     const id = currentLogId ?? (stored !== null ? Number(stored) : NaN)
@@ -72,11 +123,19 @@ export default function TimeReportsPage() {
     try {
       await pauseTimeLog({ timelogId: Number(id) }).unwrap()
       setIsRunning(false)
+
+      // Lưu offset = time hiện tại
+      setOffset(time)
+      localStorage.setItem("currentTimeLogOffset", String(time))
+
+      // Xóa dấu start
+      localStorage.removeItem("currentTimeLogStart")
     } catch (e) {
       console.error(e)
     }
   }
 
+  // ⏹ Stop = reset hết
   const handleStop = async () => {
     const stored = localStorage.getItem("currentTimeLogId")
     const id = currentLogId ?? (stored !== null ? Number(stored) : NaN)
@@ -85,8 +144,13 @@ export default function TimeReportsPage() {
       await stopTimeLog({ timelogId: Number(id) }).unwrap()
       setIsRunning(false)
       setTime(0)
+      setOffset(0)
       setCurrentLogId(null)
-      try { localStorage.removeItem("currentTimeLogId") } catch {}
+
+      // Dọn localStorage
+      localStorage.removeItem("currentTimeLogId")
+      localStorage.removeItem("currentTimeLogStart")
+      localStorage.removeItem("currentTimeLogOffset")
     } catch (e) {
       console.error(e)
     }
@@ -107,14 +171,21 @@ export default function TimeReportsPage() {
         </div>
 
         <div className="flex items-center gap-6 mb-8">
-          <Button variant="ghost" size="icon" asChild className="text-gray-600 hover:text-gray-800 hover:bg-pink-50 rounded-full transition-all duration-200">
+          <Button
+            variant="ghost"
+            size="icon"
+            asChild
+            className="text-gray-600 hover:text-gray-800 hover:bg-pink-50 rounded-full transition-all duration-200"
+          >
             <Link href="/dashboard">
               <ArrowLeft className="w-5 h-5" />
               <span className="sr-only">Back to Dashboard</span>
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2">Time & Reports</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2">
+              Time & Reports
+            </h1>
             <p className="text-lg font-bold text-gray-700 bg-yellow-200 px-4 py-2 rounded-xl border-2 border-black shadow-md inline-block transform -rotate-1">
               Track your productivity and performance ✨
             </p>
@@ -125,14 +196,18 @@ export default function TimeReportsPage() {
           {/* Time Tracking Card */}
           <Card className="border-3 border-black rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 bg-white overflow-hidden">
             <CardHeader className="border-b-2 border-gray-200 bg-gray-50">
-              <CardTitle className="text-2xl font-black text-gray-900">Time Tracking</CardTitle>
+              <CardTitle className="text-2xl font-black text-gray-900">
+                Time Tracking
+              </CardTitle>
               <CardDescription className="text-base font-bold text-gray-600">
                 Log and manage your time spent on tasks
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6 p-6">
               <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border-2 border-black gap-4">
-                <span className="text-lg font-bold text-gray-900">Current Task:</span>
+                <span className="text-lg font-bold text-gray-900">
+                  Current Task:
+                </span>
                 <div className="min-w-[240px]">
                   <Select
                     value={selectedTaskId !== null ? String(selectedTaskId) : undefined}
@@ -143,19 +218,26 @@ export default function TimeReportsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {(Array.isArray(tasksData?.data) ? tasksData!.data : []).map((t: any) => (
-                        <SelectItem key={t.id} value={String(t.id)}>{t.title ?? `Task #${t.id}`}</SelectItem>
+                        <SelectItem key={t.id} value={String(t.id)}>
+                          {t.title ?? `Task #${t.id}`}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-4 p-6 bg-green-50 rounded-xl border-2 border-black">
-                <Clock className={`w-10 h-10 text-green-600 ${isRunning ? 'animate-pulse' : ''}`} />
-                <span className="text-5xl font-black text-gray-900 tabular-nums">{formatTime(time)}</span>
+                <Clock className={`w-10 h-10 text-green-600 ${isRunning ? "animate-pulse" : ""}`} />
+                <span className="text-5xl font-black text-gray-900 tabular-nums">
+                  {formatTime(time)}
+                </span>
               </div>
               <div className="flex gap-3">
                 <Button
-                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${!isRunning ? 'bg-green-400 hover:bg-green-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${!isRunning
+                    ? "bg-green-400 hover:bg-green-500 text-white"
+                    : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    }`}
                   onClick={handleStart}
                   disabled={isRunning || starting}
                 >
@@ -163,7 +245,10 @@ export default function TimeReportsPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${isRunning ? 'bg-white hover:bg-gray-50 text-gray-900' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${isRunning
+                    ? "bg-white hover:bg-gray-50 text-gray-900"
+                    : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    }`}
                   onClick={handlePause}
                   disabled={!isRunning || pausing}
                 >
@@ -171,7 +256,10 @@ export default function TimeReportsPage() {
                 </Button>
                 <Button
                   variant="destructive"
-                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${isRunning || time > 0 ? 'bg-red-400 hover:bg-red-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+                  className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${isRunning || time > 0
+                    ? "bg-red-400 hover:bg-red-500 text-white"
+                    : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    }`}
                   onClick={handleStop}
                   disabled={(!isRunning && time === 0) || stopping}
                 >
@@ -192,7 +280,9 @@ export default function TimeReportsPage() {
           {/* Reports Card */}
           <Card className="border-3 border-black rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 bg-white overflow-hidden">
             <CardHeader className="border-b-2 border-gray-200 bg-gray-50">
-              <CardTitle className="text-2xl font-black text-gray-900">Performance Reports</CardTitle>
+              <CardTitle className="text-2xl font-black text-gray-900">
+                Performance Reports
+              </CardTitle>
               <CardDescription className="text-base font-bold text-gray-600">
                 Analyze your productivity and task completion
               </CardDescription>
@@ -200,13 +290,17 @@ export default function TimeReportsPage() {
             <CardContent className="grid gap-6 p-6">
               <div className="p-4 bg-pink-50 rounded-xl border-2 border-black">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-lg font-bold text-gray-900">Tasks Completed</span>
+                  <span className="text-lg font-bold text-gray-900">
+                    Tasks Completed
+                  </span>
                   <span className="text-lg font-black text-pink-600 bg-pink-100 px-4 py-1 rounded-full">
                     12 this week
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-gray-900">Average Completion</span>
+                  <span className="text-lg font-bold text-gray-900">
+                    Average Completion
+                  </span>
                   <span className="text-lg font-black text-pink-600 bg-pink-100 px-4 py-1 rounded-full">
                     3.5 hours
                   </span>
