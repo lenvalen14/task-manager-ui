@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react"
 import { baseQueryWithReauth } from "./baseQuery"
-
+import { TaskReportResponse } from "../types/timeLogType"
 type TimeLog = {
   id: number
   task: number
@@ -75,6 +75,13 @@ export const timeLogApi = createApi({
         { type: "TaskReport", id: arg.taskId },
       ],
     }),
+    getTaskReports: builder.query<TaskReportResponse, { include_running?: boolean }>({
+      query: ({ include_running = false }) => ({
+        url: `/tasks/list_time-report/`,
+        params: { include_running },
+      }),
+      providesTags: ["TaskReport"],
+    }),
   }),
 })
 
@@ -83,6 +90,7 @@ export const {
   usePauseTimeLogMutation,
   useStopTimeLogMutation,
   useGetTaskTimeReportQuery,
+  useGetTaskReportsQuery,
 } = timeLogApi
 
 

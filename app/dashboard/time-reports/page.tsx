@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button"
 import {
   ArrowLeft, Clock, BarChart, CalendarDays,
-  Play, Pause, Square, Star, Heart, Sparkle
+  Play, Pause, Square, Star, Heart, Sparkle, History
 } from "lucide-react"
 import Link from "next/link"
 import {
@@ -20,6 +20,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select"
 import { TaskReportDialog } from "@/components/timelog/TimeLogDialog"
+import { TaskHistoryList } from "@/components/timelog/HistoricalTimeLogDialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 function formatTime(seconds: number): string {
   const hours = Math.floor(seconds / 3600)
@@ -35,6 +37,7 @@ export default function TimeReportsPage() {
   const [currentLogId, setCurrentLogId] = useState<number | null>(null)
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null)
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false)
 
   const [startTimeLog, { isLoading: starting }] = useStartTimeLogMutation()
   const [pauseTimeLog, { isLoading: pausing }] = usePauseTimeLogMutation()
@@ -192,7 +195,7 @@ export default function TimeReportsPage() {
           </div>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2 md:grid-cols-2">
           {/* Time Tracking Card */}
           <Card className="border-3 border-black rounded-xl shadow-xl hover:shadow-2xl transition-all duration-200 bg-white overflow-hidden">
             <CardHeader className="border-b-2 border-gray-200 bg-gray-50">
@@ -316,6 +319,7 @@ export default function TimeReportsPage() {
               <Button
                 variant="secondary"
                 className="bg-purple-300 hover:bg-purple-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+                onClick={() => setIsHistoryDialogOpen(true)}
               >
                 <CalendarDays className="w-4 h-4 mr-2" />
                 View Historical Data
@@ -330,6 +334,21 @@ export default function TimeReportsPage() {
         onClose={() => setIsReportModalOpen(false)}
         taskId={selectedTaskId}
       />
+
+      {/* Task History Dialog */}
+      <Dialog open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen}>
+        <DialogContent className="max-w-2xl border-3 border-black rounded-xl shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black text-gray-900 flex items-center gap-2">
+              <History className="w-6 h-6 text-orange-500" />
+              Task History Report
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 max-h-[500px] overflow-y-auto">
+            <TaskHistoryList />
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
