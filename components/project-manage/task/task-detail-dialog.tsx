@@ -228,8 +228,11 @@ export function TaskDetailDialog({
             <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
               {localSubtasks.map((subtask) => (
                 <div key={subtask.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border-2 border-black group">
-                  <Checkbox checked={subtask.completed} onCheckedChange={(v) => handleToggleSubtaskLocal(subtask.id, Boolean(v))} className="w-5 h-5 border-2 border-black rounded-md" />
-                  <span className={`flex-1 text-sm font-medium ${subtask.completed ? "line-through text-gray-500" : "text-gray-900"}`}>
+                  <Checkbox
+                    checked={subtask.status === "done"}
+                    disabled
+                    className="w-5 h-5 border-2 border-black rounded-md"
+                  />                  <span className={`flex-1 text-sm font-medium ${subtask.completed ? "line-through text-gray-500" : "text-gray-900"}`}>
                     {subtask.title}
                   </span>
                   {/* Dropdown cho trạng thái subtask */}
