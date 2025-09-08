@@ -18,7 +18,7 @@ import { useCreateProjectMutation } from "@/services/projectService"
 type AddProjectDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess?: () => void // optional callback để refetch
+  onSuccess?: () => void
 }
 
 export function AddProjectDialog({ open, onOpenChange, onSuccess }: AddProjectDialogProps) {
@@ -30,7 +30,7 @@ export function AddProjectDialog({ open, onOpenChange, onSuccess }: AddProjectDi
     e.preventDefault()
     try {
       const res = await createProject({ name, description }).unwrap()
-      console.log("Created project:", res.data) // res.data là object Project
+      console.log("Created project:", res.data)
       if (onSuccess) onSuccess()
       onOpenChange(false)
       setName("")

@@ -1,10 +1,7 @@
 import type React from "react"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
-import { Inter } from "next/font/google"
 import { Metadata } from "next"
-
-const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Personal Task Manager",

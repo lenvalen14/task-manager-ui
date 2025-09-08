@@ -77,8 +77,7 @@ export function Header() {
             )}
           </Link>
         </Button>
-
-        {/* User Dropdown */}
+        
         {/* User Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

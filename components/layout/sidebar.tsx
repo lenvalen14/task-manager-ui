@@ -37,7 +37,7 @@ export function Sidebar() {
   const [selectedProject, setSelectedProject] = React.useState<Project | null>(null)
   const [isEditProjectDialogOpen, setIsEditProjectDialogOpen] = React.useState(false)
 
-  const { toast } = useToast() // hook toast
+  const { toast } = useToast()
 
   // Lấy danh sách project
   const { data: projectsData, isLoading, refetch: refetchProjects } = useGetAllProjectsQuery()
