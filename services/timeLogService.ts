@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react"
 import { baseQueryWithReauth } from "./baseQuery"
-import { TaskReportResponse } from "../types/timeLogType"
+import { ChartDataPoint, TaskReportResponse } from "../types/timeLogType"
 type TimeLog = {
   id: number
   task: number
@@ -82,6 +82,26 @@ export const timeLogApi = createApi({
       }),
       providesTags: ["TaskReport"],
     }),
+    getDailySummary: builder.query<APIResponse<ChartDataPoint[]>, { startDate?: string; endDate?: string } | void>({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        if (params?.startDate) {
+          searchParams.append('start_date', params.startDate);
+        }
+        if (params?.endDate) {
+          searchParams.append('end_date', params.endDate);
+        }
+        
+        const queryString = searchParams.toString();
+        
+        return {
+          url: `/stats/daily-timelog-summary/${queryString ? `?${queryString}` : ''}`,
+          method: 'GET',
+        };
+      },
+      providesTags: (result) => 
+        result ? [...result.data.map(() => ({ type: 'TimeLogs' as const, id: 'LIST' }))] : [{ type: 'TimeLogs', id: 'LIST' }],
+    }),
   }),
 })
 
@@ -91,6 +111,7 @@ export const {
   useStopTimeLogMutation,
   useGetTaskTimeReportQuery,
   useGetTaskReportsQuery,
+  useGetDailySummaryQuery,
 } = timeLogApi
 
 

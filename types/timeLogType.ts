@@ -19,3 +19,8 @@ export interface TaskReportResponse {
   meta: any
   errors: any
 }
+
+export interface ChartDataPoint {
+  date: string
+  total_duration_hours: number
+}
