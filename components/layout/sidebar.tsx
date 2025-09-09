@@ -24,6 +24,7 @@ import { useGetAllProjectsQuery, useDeleteProjectMutation } from "@/services/pro
 import { useGetUserStatsQuery } from "@/services/statsService"
 import { Project } from "@/types/projectType"
 import { useToast } from "@/components/ui/use-toast" // import custom toast
+import { DeleteConfirmationDialog } from "../ui/delete-confirmation-dialog"
 
 const mainNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -36,6 +37,8 @@ export function Sidebar() {
   const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = React.useState(false)
   const [selectedProject, setSelectedProject] = React.useState<Project | null>(null)
   const [isEditProjectDialogOpen, setIsEditProjectDialogOpen] = React.useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+  const [projectToDelete, setProjectToDelete] = React.useState<Project | null>(null)
 
   const { toast } = useToast()
 
@@ -47,32 +50,38 @@ export function Sidebar() {
   const { data: statsResponse } = useGetUserStatsQuery()
   const stats = statsResponse?.data
 
-  // Mutation delete project
-  const [deleteProject] = useDeleteProjectMutation()
-
   const handleEditClick = (project: Project) => {
     setSelectedProject(project)
     setIsEditProjectDialogOpen(true)
   }
 
-  const handleDeleteClick = async (projectId: number) => {
-    const confirmed = window.confirm("Are you sure you want to delete this project?")
-    if (!confirmed) return
+  const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation()
 
-    try {
-      await deleteProject(projectId).unwrap()
-      toast({
-        title: "Project deleted",
-        description: "The project was deleted successfully",
-      })
-      refetchProjects()
-    } catch (error) {
-      console.error("Failed to delete project:", error)
-      toast({
-        title: "Error",
-        description: "Failed to delete project",
-      })
-    }
+  const promptForDelete = (project: Project) => {
+      setProjectToDelete(project)
+      setIsDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async () => {
+      if (!projectToDelete) return
+
+      try {
+          await deleteProject(projectToDelete.id).unwrap()
+          toast({
+              title: "Đã xóa dự án",
+              description: "Dự án đã được xóa thành công.",
+          })
+          refetchProjects()
+          setIsDeleteDialogOpen(false) // Đóng dialog sau khi thành công
+      } catch (error) {
+          console.error("Failed to delete project:", error)
+          toast({
+              title: "Lỗi",
+              description: "Không thể xóa dự án. Vui lòng thử lại.",
+          })
+      } finally {
+          setProjectToDelete(null) // Reset state
+      }
   }
 
   return (
@@ -146,7 +155,7 @@ export function Sidebar() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-red-600"
-                        onClick={() => handleDeleteClick(project.id)}
+                        onClick={() => promptForDelete(project)}
                       >
                         Delete Project
                       </DropdownMenuItem>
@@ -240,6 +249,14 @@ export function Sidebar() {
           }}
         />
       )}
+
+      <DeleteConfirmationDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+            onConfirm={confirmDelete}
+            itemName={projectToDelete?.name || "dự án này"}
+            isDeleting={isDeleting}
+        />
     </aside>
   )
 }
