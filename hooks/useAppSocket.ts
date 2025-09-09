@@ -11,6 +11,7 @@ export function useAppSocket(token?: string | null) {
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null)
   const dispatch = useAppDispatch()
   const { showNotificationToast } = useNotificationToast()
+  const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
 
   useEffect(() => {
     if (!token) return
@@ -18,8 +19,8 @@ export function useAppSocket(token?: string | null) {
     let isMounted = true
 
     function connect() {
-      const wsUrl = `ws://localhost:8000/ws/notifications/?token=${token}`
-      const socket = new WebSocket(wsUrl)
+      const url = `${WS_URL}?token=${token}`;
+      const socket = new WebSocket(url)
       socketRef.current = socket
 
       socket.onopen = () => {
