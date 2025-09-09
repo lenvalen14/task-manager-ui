@@ -232,7 +232,7 @@ export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
       </div>
 
       {viewMode === "board" && <TaskBoard columns={columns} onTaskUpdated={onTaskUpdated} />}
-      {viewMode === "list" && <TaskListView columns={columns} />}
+      {viewMode === "list" && <TaskListView columns={columns} onTaskUpdated={onTaskUpdated} />}
       {viewMode === "table" && (
         <div className="text-gray-500 italic p-4 border rounded-lg text-center">
           Table view chưa được phát triển.

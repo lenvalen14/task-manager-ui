@@ -23,6 +23,36 @@ import { TaskReportDialog } from "@/components/timelog/TimeLogDialog"
 import { TaskHistoryList } from "@/components/timelog/HistoricalTimeLogDialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
+
+const COLORS = ["#82ca9d", "#8884d8", "#ffc658", "#ff7f7f", "#8dd1e1"]
+
+
+// Fake data demo
+const productivityData = {
+  day: [
+    { label: "Mon", value: 5 },
+    { label: "Tue", value: 8 },
+    { label: "Wed", value: 6 },
+    { label: "Thu", value: 10 },
+    { label: "Fri", value: 7 },
+    { label: "Sat", value: 4 },
+    { label: "Sun", value: 9 },
+  ],
+  week: [
+    { label: "Week 1", value: 42 },
+    { label: "Week 2", value: 38 },
+    { label: "Week 3", value: 55 },
+    { label: "Week 4", value: 47 },
+  ],
+  month: [
+    { label: "Jan", value: 180 },
+    { label: "Feb", value: 150 },
+    { label: "Mar", value: 200 },
+    { label: "Apr", value: 170 },
+  ],
+}
+
 function formatTime(seconds: number): string {
   const hours = Math.floor(seconds / 3600)
   const minutes = Math.floor((seconds % 3600) / 60)
@@ -38,6 +68,8 @@ export default function TimeReportsPage() {
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null)
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false)
+  const [isDetailedDialogOpen, setIsDetailedDialogOpen] = useState(false)
+  const [filter, setFilter] = useState<"day" | "week" | "month">("day")
 
   const [startTimeLog, { isLoading: starting }] = useStartTimeLogMutation()
   const [pauseTimeLog, { isLoading: pausing }] = usePauseTimeLogMutation()
@@ -312,10 +344,12 @@ export default function TimeReportsPage() {
               <Button
                 variant="secondary"
                 className="bg-blue-300 hover:bg-blue-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+                onClick={() => setIsDetailedDialogOpen(true)}
               >
                 <BarChart className="w-4 h-4 mr-2" />
                 Generate Detailed Report
               </Button>
+
               <Button
                 variant="secondary"
                 className="bg-purple-300 hover:bg-purple-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
@@ -349,6 +383,45 @@ export default function TimeReportsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={isDetailedDialogOpen} onOpenChange={setIsDetailedDialogOpen}>
+        <DialogContent className="max-w-3xl border-2 border-black rounded-xl shadow-xl">
+          <DialogHeader className="flex flex-row items-center justify-between">
+            <DialogTitle className="text-2xl font-black text-gray-900">
+              Productivity Report
+            </DialogTitle>
+            <Select value={filter} onValueChange={(val) => setFilter(val as any)}>
+              <SelectTrigger className="w-[150px] border-2 border-black rounded-lg">
+                <SelectValue placeholder="Select filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="day">By Day</SelectItem>
+                <SelectItem value="week">By Week</SelectItem>
+                <SelectItem value="month">By Month</SelectItem>
+              </SelectContent>
+            </Select>
+          </DialogHeader>
+
+          {/* Biểu đồ đường */}
+          <div className="h-[300px] mt-4 border-2 border-black rounded-lg p-2 bg-white">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={productivityData[filter]}>
+                <XAxis dataKey="label" />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#2563eb"
+                  strokeWidth={3}
+                  dot={{ r: 5, fill: "#2563eb" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </>
   )
 }
