@@ -21,6 +21,9 @@ import {
 } from "@/components/ui/popover"
 
 import { useDeleteTaskMutation } from "@/services/taskService"
+import { toast } from "sonner"
+import React from "react"
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 
 const downloadFile = async (url: string, fileName: string) => {
     const res = await fetch(url)
@@ -57,6 +60,8 @@ export function TaskBoard({
     const [selectedTask, setSelectedTask] = useState<UITask | null>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+    const [taskToDelete, setTaskToDelete] = useState<UITask | null>(null)
 
     console.log(selectedTask);
 
@@ -75,16 +80,24 @@ export function TaskBoard({
         setIsDialogOpen(true)
     }
 
-    const handleDelete = async (taskId: string | number) => {
-        if (!confirm("Bạn có chắc chắn muốn xóa task này?")) return
+    const promptForDelete = (task: UITask) => {
+        setTaskToDelete(task)
+        setIsDeleteDialogOpen(true)
+    }
+
+    const confirmDelete = async () => {
+        if (!taskToDelete) return
 
         try {
-            await deleteTask(Number(taskId)).unwrap()
-            alert("Xóa task thành công!")
-            if (onTaskUpdated) onTaskUpdated() // gọi API lại hoặc refetch dữ liệu
+            await deleteTask(Number(taskToDelete.id)).unwrap()
+            toast("Đã xóa task thành công!")
+            onTaskUpdated?.()
+            setIsDeleteDialogOpen(false)
         } catch (error) {
             console.error(error)
-            alert("Xóa task thất bại")
+            toast("Xóa task thất bại, vui lòng thử lại.")
+        } finally {
+            setTaskToDelete(null)
         }
     }
 
@@ -282,7 +295,7 @@ export function TaskBoard({
                                                     Edit
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem
-                                                    onClick={() => handleDelete(task.id)}
+                                                    onClick={() => promptForDelete(task)}
                                                     className="text-red-600"
                                                 >
                                                     Delete
@@ -315,6 +328,14 @@ export function TaskBoard({
                     onTaskUpdated?.()
                     setIsDialogOpen(false)
                 }}
+            />
+
+            <DeleteConfirmationDialog
+                open={isDeleteDialogOpen}
+                onOpenChange={setIsDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                itemName={taskToDelete?.title || "this task"}
+                isDeleting={isDeleting}
             />
 
         </div>
