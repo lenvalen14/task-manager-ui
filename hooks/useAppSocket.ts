@@ -54,8 +54,8 @@ export function useAppSocket(token?: string | null) {
         }
       }
 
-      socket.onerror = (error) => {
-        console.error("WebSocket error:", error)
+      socket.onerror = () => {
+        console.warn("⚠️ WebSocket connection failed")
       }
 
       socket.onclose = () => {

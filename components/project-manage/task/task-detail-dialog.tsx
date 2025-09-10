@@ -15,7 +15,7 @@ import { UITask } from "../task-board"
 import { useState } from "react"
 import { lightenHex, useTaskDetail } from "./useTaskDetail"
 import { TaskColumn } from "../task-column"
-import { Status } from "@/types/taskType"
+import { Status, Tag } from "@/types/taskType"
 
 type TaskDetailDialogProps = {
   open: boolean
@@ -25,18 +25,7 @@ type TaskDetailDialogProps = {
   mode?: "create" | "edit"
   onTaskUpdated?: () => void
   onTaskSaved?: () => void
-}
-
-function getFileNameFromUrl(url: string): string {
-  try {
-    // Tách phần sau dấu "/"
-    const parts = url.split("/");
-    // Lấy phần cuối cùng
-    const lastPart = parts[parts.length - 1];
-    return lastPart || "";
-  } catch {
-    return "";
-  }
+  projectTags?: Tag[]
 }
 
 export function TaskDetailDialog({
@@ -45,6 +34,7 @@ export function TaskDetailDialog({
   task,
   columnId,
   mode = "edit",
+  projectTags,
   onTaskSaved,
 }: TaskDetailDialogProps) {
   const { toast } = useToast()
@@ -314,26 +304,59 @@ export function TaskDetailDialog({
           {/* Tags */}
           <div className="space-y-2">
             <Label className="font-bold text-gray-900">Tags</Label>
+
+            {/* Selected tags */}
             <div className="flex flex-wrap gap-2">
-              {localTags.map((t) => (
+              {localTags.map((t, idx) => (
                 <div
-                  key={Number(t.id)}
+                  key={idx} // dùng index hoặc tạo id local
                   className="flex items-center gap-2 px-2 py-1 rounded-md"
                   style={{
                     backgroundColor: lightenHex(t.color, 0.5),
-                    color: "#000", // chữ đen dễ đọc trên nền pastel
+                    color: "#000",
                   }}
                 >
-                  <span className="text-white font-medium">{t.tag_name}</span>
-                  <Button size="sm" variant="ghost" onClick={() => deleteTagLocal(Number(t.id))} className="hover:bg-red-100 hover:text-red-600">
+                  <span className="font-medium">{t.tag_name}</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => deleteTagLocal(Number(t.id))}
+                    className="hover:bg-red-100 hover:text-red-600"
+                  >
                     <Trash2 className="w-3 h-3" />
                   </Button>
                 </div>
               ))}
             </div>
+
+            {/* Dropdown chọn từ tag có sẵn */}
             <div className="flex gap-2 mt-2">
+              <Select
+                onValueChange={(value) => {
+                  const selectedTag = projectTags?.find((t) => String(t.id) === value)
+                  if (selectedTag) {
+                    // 🚀 Thêm tag mới dựa trên name + color, không mang id cũ
+                    addTagLocal(selectedTag.tag_name, selectedTag.color)
+                  }
+                }}
+              >
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Select existing tag" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projectTags
+                    ?.filter(tag => !localTags.some(t => t.tag_name === tag.tag_name)) // bỏ tag đã có
+                    .map((tag) => (
+                      <SelectItem key={Number(tag.id)} value={String(tag.id)}>
+                        {tag.tag_name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+
+              {/* Ô nhập nếu muốn thêm mới */}
               <Input
-                placeholder="Add a tag..."
+                placeholder="Add new tag..."
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 className="border-2 border-black rounded-xl bg-gray-50"
@@ -344,11 +367,15 @@ export function TaskDetailDialog({
                 onChange={(e) => setTagColorInput(e.target.value)}
                 className="w-12 h-10 p-1 border-2 border-black rounded-lg cursor-pointer"
               />
-              <Button onClick={handleAddTagLocal} className="bg-purple-400 hover:bg-purple-500 text-white rounded-xl font-bold border-2 border-black">
+              <Button
+                onClick={handleAddTagLocal}
+                className="bg-purple-400 hover:bg-purple-500 text-white rounded-xl font-bold border-2 border-black"
+              >
                 <Plus className="w-4 h-4" />
               </Button>
             </div>
           </div>
+
         </div>
 
         {/* Footer */}
@@ -363,6 +390,6 @@ export function TaskDetailDialog({
           </div>
         </div>
       </DialogContent>
-    </Dialog>
+    </Dialog >
   )
 }
