@@ -58,30 +58,30 @@ export function Sidebar() {
   const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation()
 
   const promptForDelete = (project: Project) => {
-      setProjectToDelete(project)
-      setIsDeleteDialogOpen(true)
+    setProjectToDelete(project)
+    setIsDeleteDialogOpen(true)
   }
 
   const confirmDelete = async () => {
-      if (!projectToDelete) return
+    if (!projectToDelete) return
 
-      try {
-          await deleteProject(projectToDelete.id).unwrap()
-          toast({
-              title: "Đã xóa dự án",
-              description: "Dự án đã được xóa thành công.",
-          })
-          refetchProjects()
-          setIsDeleteDialogOpen(false) // Đóng dialog sau khi thành công
-      } catch (error) {
-          console.error("Failed to delete project:", error)
-          toast({
-              title: "Lỗi",
-              description: "Không thể xóa dự án. Vui lòng thử lại.",
-          })
-      } finally {
-          setProjectToDelete(null) // Reset state
-      }
+    try {
+      await deleteProject(projectToDelete.id).unwrap()
+      toast({
+        title: "Đã xóa dự án",
+        description: "Dự án đã được xóa thành công.",
+      })
+      refetchProjects()
+      setIsDeleteDialogOpen(false) // Đóng dialog sau khi thành công
+    } catch (error) {
+      console.error("Failed to delete project:", error)
+      toast({
+        title: "Lỗi",
+        description: "Không thể xóa dự án. Vui lòng thử lại.",
+      })
+    } finally {
+      setProjectToDelete(null) // Reset state
+    }
   }
 
   return (
@@ -231,7 +231,12 @@ export function Sidebar() {
       {/* Dialog thêm project */}
       <AddProjectDialog
         open={isAddProjectDialogOpen}
-        onOpenChange={setIsAddProjectDialogOpen}
+        onOpenChange={(open) => {
+          setIsAddProjectDialogOpen(open)
+          if (!open) {
+            refetchProjects()
+          }
+        }}
       />
 
       {/* Dialog chỉnh sửa project */}
@@ -251,12 +256,12 @@ export function Sidebar() {
       )}
 
       <DeleteConfirmationDialog
-            open={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-            onConfirm={confirmDelete}
-            itemName={projectToDelete?.name || "dự án này"}
-            isDeleting={isDeleting}
-        />
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        itemName={projectToDelete?.name || "dự án này"}
+        isDeleting={isDeleting}
+      />
     </aside>
   )
 }

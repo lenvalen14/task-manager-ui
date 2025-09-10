@@ -30,7 +30,7 @@ export function AddProjectDialog({ open, onOpenChange, onSuccess }: AddProjectDi
     e.preventDefault()
     try {
       const res = await createProject({ name, description }).unwrap()
-      console.log("Created project:", res.data)
+      // console.log("Created project:", res.data)
       if (onSuccess) onSuccess()
       onOpenChange(false)
       setName("")
