@@ -321,6 +321,42 @@ export function TaskBoard({
                                                                     </PopoverContent>
                                                                 </Popover>
                                                             </div>
+                                                            {/* Files */}
+                                                            <Popover>
+                                                                <PopoverTrigger asChild>
+                                                                    <button
+                                                                        className="flex items-center gap-1 text-gray-600 text-sm hover:text-gray-800"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        📎
+                                                                        {task.attachments?.length ?? 0} files
+                                                                    </button>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent
+                                                                    align="start"
+                                                                    side="top"
+                                                                    className="w-80 p-2"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    <div className="max-h-60 overflow-y-auto space-y-2">
+                                                                        {task.attachments?.length === 0 && (
+                                                                            <div className="text-sm text-gray-500 italic px-1">
+                                                                                No attachments yet.
+                                                                            </div>
+                                                                        )}
+                                                                        {task.attachments?.map((a) => (
+                                                                            <div key={a.id} className="border rounded-md p-2 bg-gray-50">
+                                                                                <button
+                                                                                    onClick={() => downloadFile(a.file_url!, a.file_name!)}
+                                                                                    className="text-blue-600 underline text-sm"
+                                                                                >
+                                                                                    {a.file_name}
+                                                                                </button>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </PopoverContent>
+                                                            </Popover>
 
                                                             {/* Menu */}
                                                             <DropdownMenu>
