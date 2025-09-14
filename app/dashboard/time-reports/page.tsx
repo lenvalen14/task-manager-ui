@@ -101,22 +101,28 @@ export default function TimeReportsPage() {
         }
     }, [tasksData, selectedTaskId])
 
-    // --- Event Handlers ---
-
     const handleStart = async () => {
         if (!selectedTaskId) return
         try {
-            let logId = currentLogId;
-            if (!logId) {
-                const res = await startTimeLog({ taskId: selectedTaskId }).unwrap()
-                const created: any = res.start_time ?? res
-                logId = Number(created?.id)
+            const res = await startTimeLog({ taskId: selectedTaskId }).unwrap()
+            
+            const newLogObject = res.data;
+
+            if (newLogObject && typeof newLogObject.id === 'number') {
+                const logId = newLogObject.id;
+
                 setCurrentLogId(logId)
                 localStorage.setItem("currentTimeLogId", String(logId))
+                localStorage.setItem("currentTimeLogTaskId", String(selectedTaskId))
+                localStorage.setItem("currentTimeLogStart", new Date().toISOString())
+                localStorage.setItem("currentTimeLogOffset", String(offset))
+                setIsRunning(true)
+
+            } else {
+                console.error("Failed to get a valid time log ID from the API response.", res)
+                alert("Error: Could not start the timer. Invalid response from server.");
             }
-            localStorage.setItem("currentTimeLogStart", new Date().toISOString())
-            localStorage.setItem("currentTimeLogOffset", String(offset))
-            setIsRunning(true)
+
         } catch (e) {
             console.error("Failed to start time log:", e)
         }

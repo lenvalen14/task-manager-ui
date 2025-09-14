@@ -35,7 +35,7 @@ export const timeLogApi = createApi({
   baseQuery: baseQueryWithReauth,
   tagTypes: ["TimeLogs", "TaskReport"],
   endpoints: (builder) => ({
-    startTimeLog: builder.mutation<TimeLog, { taskId: number }>({
+    startTimeLog: builder.mutation<APIResponse<TimeLog>, { taskId: number }>({
       query: (body) => ({
         url: "/timelogs/start/",
         method: "POST",
