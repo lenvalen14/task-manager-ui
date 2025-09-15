@@ -6,9 +6,8 @@ import { useAppDispatch } from "@/hooks/redux"
 import { notificationApi } from "@/services/notificationService"
 import type { Notification, NotificationType } from "@/types/notification"
 
-const RECONNECT_DELAY = 5000
+const RECONNECT_DELAY = 10000
 
-// Map WS type -> NotificationType (FE)
 function mapWsTypeToNotificationType(wsType: string): NotificationType {
   switch (wsType) {
     case "task_due_soon_notification":
@@ -55,23 +54,19 @@ export function useAppSocket(token?: string | null) {
       socketRef.current = socket
 
       socket.onopen = () => {
-        console.log("🔌 Connected to notification WS")
+        console.log("Connected to notification WS")
       }
 
       socket.onmessage = (event) => {
-        console.log("📩 WS Message raw:", event.data)
         try {
           const raw = JSON.parse(event.data)
 
           if (raw.type === "connection_established") {
-            console.log("✅ WS Connected:", raw.message)
             return
           }
 
           const newNotification = mapWsToNotification(raw)
-          console.log("📦 Parsed notification:", newNotification)
-
-          console.log("🔥 Trigger toast:", newNotification)
+    
           showNotificationToast({
             type: newNotification.notification_type ?? "deadline",
             message: newNotification.message,
@@ -98,16 +93,16 @@ export function useAppSocket(token?: string | null) {
             )
           )
         } catch (err) {
-          console.error("❌ Invalid notification:", event.data, err)
+          console.error("Invalid notification:", event.data, err)
         }
       }
 
       socket.onerror = () => {
-        console.warn("⚠️ WebSocket connection failed")
+        console.warn("WebSocket connection failed")
       }
 
       socket.onclose = () => {
-        console.log("🔌 WS Disconnected. Retrying in 5s...")
+        console.log("WS Disconnected. Retrying in 5s...")
         if (isMounted) {
           reconnectTimeout.current = setTimeout(connect, RECONNECT_DELAY)
         }
