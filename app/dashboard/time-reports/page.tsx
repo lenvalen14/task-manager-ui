@@ -230,9 +230,9 @@ export default function TimeReportsPage() {
           <Dialog open={isDetailedDialogOpen} onOpenChange={setIsDetailedDialogOpen}>
               <DialogContent className="max-w-5xl border-2 border-black rounded-xl shadow-xl p-6">
                   <DialogHeader>
-                      <DialogTitle className="text-2xl font-black text-gray-900">Báo cáo năng suất 30 ngày qua</DialogTitle>
+                      <DialogTitle className="text-2xl font-black text-gray-900">Báo cáo năng suất 15 ngày qua</DialogTitle>
                   </DialogHeader>
-                  <div className="h-[450px] mt-4 p-4 bg-gray-50">
+                  <div className="bg-gray-50">
                       <ProductivityChart data={summaryResponse?.data} isLoading={isSummaryLoading} />
                   </div>
               </DialogContent>
