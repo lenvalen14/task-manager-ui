@@ -30,7 +30,6 @@ import React from "react"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 import { Tag } from "@/types/taskType"
 
-// DnD
 import {
     DragDropContext,
     Droppable,
@@ -71,9 +70,9 @@ export function TaskBoard({
     onTaskUpdated?: () => void
 }) {
     const [selectedTask, setSelectedTask] = useState<UITask | null>(null)
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [isDialogOpen, setIsEditDialogOpen] = useState(false)
     const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [taskToDelete, setTaskToDelete] = useState<UITask | null>(null)
     const [projectTags, setProjectTags] = useState<Tag[]>([])
     const [localCols, setLocalCols] = useState<TaskColumnData[]>([])
@@ -103,16 +102,16 @@ export function TaskBoard({
     const handleAddTask = (columnId?: string) => {
         setSelectedTask(null)
         setSelectedColumn(columnId || null)
-        setIsDialogOpen(true)
+        setIsEditDialogOpen(true)
     }
 
     const handleEdit = (task: UITask, columnId: string) => {
         setSelectedTask(task)
         setSelectedColumn(columnId)
-        setIsDialogOpen(true)
+        setIsEditDialogOpen(true)
     }
 
-    const promptForDelete = (task: UITask) => {
+    const handleForDelete = (task: UITask) => {
         setTaskToDelete(task)
         setIsDeleteDialogOpen(true)
     }
@@ -229,7 +228,7 @@ export function TaskBoard({
                                                         onClick={() => {
                                                             setSelectedTask(task)
                                                             setSelectedColumn(column.id)
-                                                            setIsDialogOpen(true)
+                                                            setIsEditDialogOpen(true)
                                                         }}
                                                         className="bg-white rounded-xl border-2 border-black shadow-lg p-4 hover:shadow-xl transition-all duration-190 transform hover:scale-95 cursor-pointer"
                                                         style={{
@@ -375,7 +374,10 @@ export function TaskBoard({
                                                                         Edit
                                                                     </DropdownMenuItem>
                                                                     <DropdownMenuItem
-                                                                        onClick={() => promptForDelete(task)}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handleForDelete(task)
+                                                                        }}
                                                                         className="text-red-600"
                                                                     >
                                                                         Delete
@@ -407,14 +409,14 @@ export function TaskBoard({
 
             <TaskDetailDialog
                 open={isDialogOpen}
-                onOpenChange={setIsDialogOpen}
+                onOpenChange={setIsEditDialogOpen}
                 task={selectedTask ?? undefined}
                 columnId={selectedColumn}
                 mode={selectedTask ? "edit" : "create"}
                 projectTags={projectTags}
                 onTaskSaved={() => {
                     onTaskUpdated?.()
-                    setIsDialogOpen(false)
+                    setIsEditDialogOpen(false)
                 }}
             />
 

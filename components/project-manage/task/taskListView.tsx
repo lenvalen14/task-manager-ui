@@ -24,6 +24,13 @@ import {
     PopoverTrigger,
     PopoverContent,
 } from "@/components/ui/popover"
+import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
+import { toast } from "sonner"
+import {
+    useDeleteTaskMutation,
+    useUpdateStatusTaskMutation,
+} from "@/services/taskService"
+
 
 import { TaskDetailDialog } from "@/components/project-manage/task/task-detail-dialog"
 import type { UITask, TaskColumnData } from "@/components/project-manage/task-board"
@@ -71,8 +78,12 @@ export function TaskListView({
     const [selectedTask, setSelectedTask] = useState<UITask | null>(null)
     const [selectedColumn, setSelectedColumn] = useState<string | null>(null)
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+    const [taskToDelete, setTaskToDelete] = useState<UITask | null>(null)
     const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string | number>>(new Set())
     const [collapsedColumns, setCollapsedColumns] = useState<Record<string, boolean>>({})
+    const [updateStatusTask] = useUpdateStatusTaskMutation()
+    const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation()
 
     const openDialog = (task: UITask | null, columnId: string) => {
         setSelectedTask(task)
@@ -86,6 +97,26 @@ export function TaskListView({
             next.has(taskId) ? next.delete(taskId) : next.add(taskId)
             return next
         })
+    }
+
+    const handleForDelete = (task: UITask) => {
+        setTaskToDelete(task)
+        setIsDeleteDialogOpen(true)
+    }
+
+    const confirmDelete = async () => {
+        if (!taskToDelete) return
+        try {
+            await deleteTask(Number(taskToDelete.id)).unwrap()
+            toast("Đã xóa task thành công!")
+            onTaskUpdated?.()
+            setIsDeleteDialogOpen(false)
+        } catch (error) {
+            console.error(error)
+            toast("Xóa task thất bại, vui lòng thử lại.")
+        } finally {
+            setTaskToDelete(null)
+        }
     }
 
     const toggleColumnCollapse = (columnId: string) => {
@@ -303,7 +334,10 @@ export function TaskListView({
                                                                     <DropdownMenuContent align="end" className="w-32" onClick={(e) => e.stopPropagation()}>
                                                                         <DropdownMenuItem onClick={() => openDialog(task, column.id)}>Edit</DropdownMenuItem>
                                                                         <DropdownMenuItem
-                                                                            onClick={() => alert(`Delete task: ${task.id}`)}
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleForDelete(task)
+                                                                            }}
                                                                             className="text-red-600"
                                                                         >
                                                                             Delete
@@ -355,6 +389,14 @@ export function TaskListView({
                     onTaskUpdated?.()
                     setIsDialogOpen(false)
                 }}
+            />
+
+            <DeleteConfirmationDialog
+                open={isDeleteDialogOpen}
+                onOpenChange={setIsDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                itemName={taskToDelete?.title || "this task"}
+                isDeleting={isDeleting}
             />
         </div>
     )

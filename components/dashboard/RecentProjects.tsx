@@ -5,7 +5,6 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { ProjectCard } from "./ProjectCard"
 
-// Định nghĩa kiểu dữ liệu (TypeScript) cho một Project
 interface Project {
   id: string | number
   name: string
@@ -14,7 +13,6 @@ interface Project {
   tasks: { status: string }[]
 }
 
-// Định nghĩa các props mà component này nhận vào
 interface RecentProjectsProps {
   projects: Project[] | undefined
   onDeleteProject: (id: string | number) => void

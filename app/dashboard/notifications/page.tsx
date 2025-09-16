@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Bell, CheckCircle, Clock, Flag, ArrowLeft, XCircle, Star, Check } from "lucide-react"
+import { Bell, CheckCircle, Clock, ArrowLeft, XCircle, Star, Check } from "lucide-react"
 import Link from "next/link"
 import {
   useGetNotificationsQuery,
@@ -79,7 +79,7 @@ export default function NotificationsPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="mt-4">
           <Button
             onClick={handleMarkAllAsRead}

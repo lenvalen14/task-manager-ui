@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
@@ -13,12 +14,12 @@ import { useGetUserStatsQuery } from "@/services/statsService"
 import { DashboardHero } from "@/components/dashboard/DashboardHero"
 import { StatsGrid } from "@/components/dashboard/StatsGrid"
 import { RecentProjects } from "@/components/dashboard/RecentProjects"
+import { toast } from "sonner"
 
 export default function DashboardPage() {
-  const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] =
-    React.useState(false)
+  const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = useState(false)
 
-  const [deletingProjectId, setDeletingProjectId] = React.useState<
+  const [deletingProjectId, setDeletingProjectId] = useState<
     string | number | null
   >(null)
 
@@ -27,8 +28,6 @@ export default function DashboardPage() {
     useGetUserStatsQuery()
   const [deleteProject] = useDeleteProjectMutation()
 
-
-
   const stats = statsResponse?.data
   const projects = projectsData?.data
 
@@ -36,9 +35,11 @@ export default function DashboardPage() {
     setDeletingProjectId(id)
     try {
       await deleteProject(Number(id)).unwrap()
+      toast.success("Project deleted successfully ✅")
       refetch()
     } catch (error) {
       console.error("Failed to delete project:", error)
+      toast.error("Failed to delete project ❌")
     } finally {
       setDeletingProjectId(null)
     }

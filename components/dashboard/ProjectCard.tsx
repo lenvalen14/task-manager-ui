@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { DeleteConfirmationDialog } from "@/components/ui/delete-confirmation-dialog"
 
-// Định nghĩa kiểu dữ liệu (TypeScript) để code an toàn hơn
 interface Task {
   status: string
 }
@@ -67,7 +66,7 @@ export function ProjectCard({
   const progress =
     totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
 
-    // Hàm xử lý khi người dùng xác nhận xóa
+  // Hàm xử lý khi người dùng xác nhận xóa
   const handleDeleteConfirm = () => {
     onDelete(project.id)
   }

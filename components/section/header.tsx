@@ -30,10 +30,10 @@ export function HeaderSection() {
 
         {/* Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          <Link href="/features" className="nav-link">Features</Link>
-          <Link href="/pricing" className="nav-link">Pricing</Link>
-          <Link href="/about" className="nav-link">About</Link>
-          <Link href="/contact" className="nav-link">Contact</Link>
+          <Link href="/public/features" className="nav-link">Features</Link>
+          <Link href="/public/pricing" className="nav-link">Pricing</Link>
+          <Link href="/public/about" className="nav-link">About</Link>
+          <Link href="/public/contact" className="nav-link">Contact</Link>
         </nav>
 
         {/* Auth / Dashboard Buttons */}

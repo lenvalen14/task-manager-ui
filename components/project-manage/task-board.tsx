@@ -59,20 +59,6 @@ const formatDate = (iso?: string | null): string | undefined => {
   }
 }
 
-// Random màu tag (class tailwind an toàn)
-const randomTagColor = () => {
-  const colors = [
-    "bg-pink-200 text-pink-800",
-    "bg-blue-200 text-blue-800",
-    "bg-green-200 text-green-800",
-    "bg-yellow-200 text-yellow-800",
-    "bg-purple-200 text-purple-800",
-    "bg-red-200 text-red-800",
-    "bg-orange-200 text-orange-800",
-  ]
-  return colors[Math.floor(Math.random() * colors.length)]
-}
-
 // ===== Priority UI (export để TaskBoardView dùng) =====
 export const renderPriority = (priority?: "low" | "medium" | "high" | "urgent") => {
   switch (priority) {
@@ -146,7 +132,7 @@ export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
           commentsCount: (t.notes ?? []).length,
           tags: (t.tags ?? []).map(tag => ({
             ...tag,
-            style: { backgroundColor: tag.color, color: "#fff" }, // hoặc màu text phù hợp
+            style: { backgroundColor: tag.color, color: "#fff" },
           })),
           notes: t.notes ?? [],
           status: t.status,

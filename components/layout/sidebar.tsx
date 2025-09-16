@@ -23,7 +23,7 @@ import { EditProjectDialog } from "@/components/project-manage/project/edit-proj
 import { useGetAllProjectsQuery, useDeleteProjectMutation } from "@/services/projectService"
 import { useGetUserStatsQuery } from "@/services/statsService"
 import { Project } from "@/types/projectType"
-import { useToast } from "@/components/ui/use-toast" // import custom toast
+import { useToast } from "@/components/ui/use-toast"
 import { DeleteConfirmationDialog } from "../ui/delete-confirmation-dialog"
 
 const mainNavigation = [
@@ -68,16 +68,16 @@ export function Sidebar() {
     try {
       await deleteProject(projectToDelete.id).unwrap()
       toast({
-        title: "Đã xóa dự án",
-        description: "Dự án đã được xóa thành công.",
+        title: "Xóa thành công",
+        description: "Dự án đã bị xóa khỏi hệ thống.",
       })
       refetchProjects()
       setIsDeleteDialogOpen(false) // Đóng dialog sau khi thành công
     } catch (error) {
-      console.error("Failed to delete project:", error)
       toast({
         title: "Lỗi",
         description: "Không thể xóa dự án. Vui lòng thử lại.",
+        variant: "destructive", // nếu trong Toast bạn có định nghĩa variant
       })
     } finally {
       setProjectToDelete(null) // Reset state

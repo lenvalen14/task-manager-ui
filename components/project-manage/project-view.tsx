@@ -5,12 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BoardPage } from "@/components/project-manage/task-board"
 import { OverviewTab } from "@/components/project-manage/overview-tab"
-import { NotesTab } from "@/components/project-manage/notes-tab"
 import { Edit, ArrowLeft, Star } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useGetProjectByIdQuery } from "@/services/projectService"
-import { EditProjectDialog } from "@/components/project-manage/project/edit-project-dialog" // import mới
+import { EditProjectDialog } from "@/components/project-manage/project/edit-project-dialog"
 import React from "react"
 
 export function ProjectView() {
@@ -111,7 +110,6 @@ export function ProjectView() {
           <TabsList className="w-full max-w-2xl h-16 bg-transparent gap-2 justify-start p-2">
             {[{ value: "overview", label: "Overview", color: "bg-blue-300" },
             { value: "tasks", label: "Tasks", color: "bg-pink-300" },
-              // { value: "notes", label: "Notes", color: "bg-green-300" },
             ].map((tab) => (
               <TabsTrigger
                 key={tab.value}
@@ -142,16 +140,10 @@ export function ProjectView() {
               <div className="bg-white rounded-2xl p-6 mx-2">
                 <BoardPage
                   tasks={project.tasks || []}
-                  onTaskUpdated={() => refetch()} // khi task update thì gọi API lại
+                  onTaskUpdated={() => refetch()}
                 />
               </div>
             </TabsContent>
-
-            {/* <TabsContent value="notes" className="flex-1">
-              <div className="bg-white rounded-2xl p-6 mx-2">
-                <NotesTab />
-              </div>
-            </TabsContent> */}
           </div>
         </Tabs>
       </div>

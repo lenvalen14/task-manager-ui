@@ -14,7 +14,6 @@ import { useToast } from "@/components/ui/use-toast"
 import { UITask } from "../task-board"
 import { useState } from "react"
 import { lightenHex, useTaskDetail } from "./useTaskDetail"
-import { TaskColumn } from "../task-column"
 import { Status, Tag } from "@/types/taskType"
 
 type TaskDetailDialogProps = {
@@ -32,7 +31,6 @@ export function TaskDetailDialog({
   open,
   onOpenChange,
   task,
-  columnId,
   mode = "edit",
   projectTags,
   onTaskSaved,
@@ -89,7 +87,6 @@ export function TaskDetailDialog({
   }
 
   const handleDeleteSubtaskLocal = (id: string) => deleteSubtaskLocal(id)
-  const handleToggleSubtaskLocal = (id: string, checked: boolean) => toggleSubtaskLocal(id, checked)
 
   const handleAddNoteLocal = () => {
     addNoteLocal(newNote)
