@@ -1,151 +1,158 @@
+"use client";
+
 import React from 'react';
-import { ArrowRight, Play, Calendar, CheckCircle, Settings, Users, Sparkles } from 'lucide-react';
+import { ArrowRight, Play, CheckCircle, Users, Sparkles } from 'lucide-react';
+import { useState, useEffect } from "react"
+import Link from 'next/link';
 
 export function HeroSection() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: { clientX: any; clientY: any; }) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
-    <section className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-24 relative overflow-hidden">
-      {/* Decorative Elements */}
-      <div className="absolute top-10 left-10 w-20 h-20 bg-blue-200 rounded-full opacity-30 animate-pulse"></div>
-      <div className="absolute top-20 right-20 w-16 h-16 bg-purple-200 rounded-full opacity-30 animate-pulse delay-1000"></div>
-      <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-pink-200 rounded-full opacity-30 animate-pulse delay-500"></div>
+    <section className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-violet-50 relative overflow-hidden pt-20">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-br from-violet-400/20 to-fuchsia-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-cyan-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute -bottom-40 left-1/3 w-72 h-72 bg-gradient-to-br from-pink-400/20 to-rose-400/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+        
+        {/* Interactive Mouse Follow Element */}
+        <div 
+          className="absolute w-96 h-96 bg-gradient-to-br from-violet-300/10 to-fuchsia-300/10 rounded-full blur-3xl transition-all duration-1000 ease-out pointer-events-none"
+          style={{
+            left: mousePosition.x - 192,
+            top: mousePosition.y - 192,
+          }}
+        ></div>
+      </div>
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-16 items-center min-h-screen py-20">
           <div className="space-y-8">
             {/* New Feature Badge */}
-            <div className="inline-flex items-center bg-gradient-to-r from-yellow-300 to-orange-300 border-2 border-black rounded-full px-6 py-3 text-sm font-bold shadow-lg transform hover:scale-105 transition-transform duration-200">
-              <Sparkles className="w-4 h-4 text-red-600 mr-2 animate-pulse" />
-              <span className="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
-              New: We've just released a new feature
-              <ArrowRight className="w-4 h-4 ml-2 animate-bounce" />
+            <div className="inline-flex items-center bg-gradient-to-r from-violet-100 to-fuchsia-100 border border-violet-200 rounded-full px-6 py-3 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
+              <Sparkles className="w-4 h-4 text-violet-600 mr-3 animate-spin" />
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></span>
+              <span className="text-gray-700">New: Time Log for your Task</span>
+              <ArrowRight className="w-4 h-4 ml-3 text-violet-600 group-hover:translate-x-1 transition-transform duration-300" />
             </div>
 
-            <h1 className="text-6xl font-bold text-black leading-tight">
-              Boost Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Productivity</span>,<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-red-600">Simplify Your Life</span>
-            </h1>
+            {/* Main Heading */}
+            <div className="space-y-6">
+              <h1 className="text-5xl lg:text-7xl font-black leading-tight">
+                <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
+                  Productivity
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 bg-clip-text text-transparent">
+                  Reimagined
+                </span>
+              </h1>
+              <p className="text-xl text-gray-600 leading-relaxed max-w-lg">
+                Manage your personal tasks effortlessly with Kanban View, List View, and detailed Time Logs to track performance. Stay on top of deadlines with smart notifications for upcoming and overdue tasks.
+              </p>
+            </div>
 
-            <p className="text-xl text-gray-800 leading-relaxed max-w-lg">
-              We're here to simplify the intricacies of your life, providing a user-friendly platform that not only manages your tasks effortlessly but also enhances your overall efficiency.
-            </p>
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/auth/register"
+                className="btn-register"
+              >
+                <button className="group relative bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden">
+                  <span className="relative z-10 flex items-center justify-center">
+                    Start Free Trial
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </button>
+              </Link>
+              <button className="group bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-800 px-8 py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 hover:scale-105 hover:bg-white">
+                <div className="flex items-center justify-center">
+                  <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
+                  Watch Demo
+                </div>
+              </button>
+            </div>
 
-            <div className="flex flex-col sm:flex-row gap-6">
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-10 py-4 rounded-xl font-bold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center justify-center border-2 border-black shadow-xl transform hover:scale-105 hover:shadow-2xl">
-                Get Started
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </button>
-              <button className="bg-gradient-to-r from-pink-200 to-purple-200 border-2 border-black text-black px-10 py-4 rounded-xl font-bold hover:from-pink-300 hover:to-purple-300 transition-all duration-300 flex items-center justify-center shadow-xl transform hover:scale-105 hover:shadow-2xl">
-                <Play className="w-5 h-5 mr-2" />
-                Preview Platform
-              </button>
+            {/* Stats */}
+            <div className="flex items-center space-x-8 pt-8">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">50K+</div>
+                <div className="text-sm text-gray-600">Active Users</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">99.9%</div>
+                <div className="text-sm text-gray-600">Uptime</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-gray-900">4.9★</div>
+                <div className="text-sm text-gray-600">App Store</div>
+              </div>
             </div>
           </div>
 
-          {/* Dashboard Preview */}
+          {/* Dashboard Image Preview */}
           <div className="relative">
-            <div className="bg-white rounded-3xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition-all duration-500 border-2 border-black hover:shadow-3xl">
-              {/* Mock Dashboard */}
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden border border-gray-200">
-                {/* Dashboard Header */}
-                <div className="bg-gradient-to-r from-white to-gray-50 px-6 py-4 border-b-2 border-black flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center border-2 border-black shadow-lg">
-                      <span className="text-white text-sm font-bold">AS</span>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-black text-lg">Hi Shakib!</h3>
-                      <p className="text-sm text-gray-600">Team Manager</p>
-                    </div>
-                  </div>
-                  <div className="text-sm text-black font-bold bg-yellow-200 px-3 py-1 rounded-full border border-black">
-                    62% completed
-                  </div>
-                </div>
-
-                {/* Sidebar */}
-                <div className="flex">
-                  <div className="w-24 bg-gradient-to-b from-white to-gray-50 border-r-2 border-black py-6">
-                    <div className="space-y-6">
-                      <div className="flex flex-col items-center">
-                        <div className="w-10 h-10 bg-gradient-to-br from-yellow-200 to-orange-200 rounded-xl flex items-center justify-center mb-2 border-2 border-black shadow-md">
-                          <Calendar className="w-5 h-5 text-yellow-800" />
-                        </div>
-                        <span className="text-xs text-gray-600 font-medium">Menu</span>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <div className="w-10 h-10 bg-gradient-to-br from-green-200 to-emerald-200 rounded-xl flex items-center justify-center mb-2 border-2 border-black shadow-md">
-                          <CheckCircle className="w-5 h-5 text-green-800" />
-                        </div>
-                        <span className="text-xs text-green-800 font-bold">Today</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Main Content */}
-                  <div className="flex-1 p-6">
-                    {/* Task Cards */}
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                      <div className="bg-gradient-to-br from-pink-300 to-rose-300 rounded-xl p-4 border-2 border-black shadow-lg hover:shadow-xl transition-shadow">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-bold text-black">SEO for New Ranking</span>
-                          <Calendar className="w-4 h-4 text-black" />
-                        </div>
-                        <div className="flex -space-x-2">
-                          <div className="w-5 h-5 bg-gradient-to-br from-pink-600 to-rose-600 rounded-full border-2 border-black shadow-md"></div>
-                          <div className="w-5 h-5 bg-gradient-to-br from-pink-600 to-rose-600 rounded-full border-2 border-black shadow-md"></div>
-                        </div>
-                      </div>
-
-                      <div className="bg-gradient-to-br from-blue-300 to-cyan-300 rounded-xl p-4 border-2 border-black shadow-lg hover:shadow-xl transition-shadow">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm font-bold text-black">Create Signup Component</span>
-                          <Settings className="w-4 h-4 text-black" />
-                        </div>
-                        <div className="flex -space-x-2">
-                          <div className="w-5 h-5 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-full border-2 border-black shadow-md"></div>
-                          <div className="w-5 h-5 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-full border-2 border-black shadow-md"></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Today's Schedule */}
-                    <div className="bg-white rounded-xl p-4 border-2 border-black shadow-lg">
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="font-bold text-black text-lg">Today's Schedule</h4>
-                        <Calendar className="w-5 h-5 text-gray-600" />
-                      </div>
-
-                      <div className="space-y-3">
-                        <div className="flex items-center space-x-4 p-3 bg-gradient-to-r from-green-200 to-emerald-200 rounded-xl border border-black">
-                          <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-400 rounded-xl flex items-center justify-center border-2 border-black shadow-md">
-                            <Users className="w-5 h-5 text-green-800" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-bold text-black">Project Discovery Call</p>
-                            <p className="text-xs text-gray-600">10:30 AM</p>
-                          </div>
-                        </div>
-
-                        <div className="p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl border border-black">
-                          <h5 className="text-sm font-bold text-black mb-2">Design Project</h5>
-                          <div className="flex items-center space-x-6 text-xs text-gray-600">
-                            <span className="font-medium">114h</span>
-                            <span className="font-medium">24m</span>
-                            <div className="flex items-center">
-                              <div className="w-3 h-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mr-2 border border-black"></div>
-                              <span className="font-medium">2</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+            <div className="relative group">
+              {/* Main Dashboard Image */}
+              <div className="relative bg-white/60 backdrop-blur-xl rounded-3xl shadow-2xl p-3 border border-white/20 hover:shadow-3xl transition-all duration-500 group-hover:scale-105">
+                <div className="rounded-2xl overflow-hidden">
+                  <img 
+                    src="/dashboard-mockup.png" 
+                    alt="Modern Dashboard Interface"
+                    className="w-full h-auto object-cover rounded-2xl"
+                  />
+                  
+                  {/* Overlay with glassmorphism effect */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  {/* Play button overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="bg-white/90 backdrop-blur-sm rounded-full p-4 shadow-xl hover:scale-110 transition-transform duration-200 cursor-pointer">
+                      <Play className="w-8 h-8 text-violet-600" />
                     </div>
                   </div>
                 </div>
               </div>
+
+              {/* Floating UI Elements */}
+              <div className="absolute -top-4 -left-4 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-xl border border-white/30 animate-float">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-semibold text-gray-700">Live Updates</span>
+                </div>
+              </div>
+
+              <div className="absolute -top-6 -right-8 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-xl border border-white/30 animate-float delay-500">
+                <div className="flex items-center space-x-2">
+                  <Users className="w-4 h-4 text-violet-600" />
+                  <span className="text-sm font-semibold text-gray-700">24 Online</span>
+                </div>
+              </div>
+
+              <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-2xl p-3 shadow-xl text-white animate-float delay-1000">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-sm font-semibold">Tasks: 78%</span>
+                </div>
+              </div>
+
+              {/* Decorative floating elements */}
+              <div className="absolute -top-8 left-1/3 w-16 h-16 bg-gradient-to-br from-violet-400/30 to-fuchsia-400/30 rounded-2xl blur-lg animate-bounce delay-700"></div>
+              <div className="absolute -bottom-8 left-1/4 w-12 h-12 bg-gradient-to-br from-cyan-400/30 to-blue-400/30 rounded-2xl blur-lg animate-bounce delay-300"></div>
             </div>
           </div>
         </div>
       </div>
     </section>
   );
-};
+}

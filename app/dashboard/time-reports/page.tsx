@@ -24,6 +24,7 @@ import { TaskReportDialog } from "@/components/timelog/TimeLogDialog"
 import { TaskHistoryList } from "@/components/timelog/HistoricalTimeLogDialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ProductivityChart } from "@/components/timelog/ProductivityChart"
+import { useGetUserStatsQuery } from "@/services/statsService"
 
 // --- Helper Functions ---
 
@@ -56,9 +57,23 @@ export default function TimeReportsPage() {
     const { data: tasksData } = useGetTasksQuery()
     const { data: summaryResponse, isLoading: isSummaryLoading } = useGetDailySummaryQuery()
 
-    // --- Effects ---
+    const { data: statsResponse, isLoading: isLoadingStats } =
+        useGetUserStatsQuery()
+    const userStats = statsResponse?.data
 
-    // Restore timer state from localStorage on initial render
+    function timeToSeconds(timeString: string) {
+        const [h, m, s] = timeString.split(":").map(Number);
+        return h * 3600 + m * 60 + s;
+    }
+
+    function secondsToHMS(seconds: number) {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return `${h.toString().padStart(2, "0")}:${m
+            .toString()
+            .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    }
     useEffect(() => {
         const storedStart = localStorage.getItem("currentTimeLogStart")
         const storedLogId = localStorage.getItem("currentTimeLogId")
@@ -210,8 +225,25 @@ export default function TimeReportsPage() {
                         <CardHeader className="border-b-2 border-gray-200 bg-gray-50"><CardTitle className="text-2xl font-black text-gray-900">Performance Reports</CardTitle><CardDescription className="text-base font-bold text-gray-600">Analyze your productivity and task completion</CardDescription></CardHeader>
                         <CardContent className="grid gap-6 p-6">
                             <div className="p-4 bg-pink-50 rounded-xl border-2 border-black">
-                                <div className="flex items-center justify-between mb-2"><span className="text-lg font-bold text-gray-900">Tasks Completed</span><span className="text-lg font-black text-pink-600 bg-pink-100 px-4 py-1 rounded-full">12 this week</span></div>
-                                <div className="flex items-center justify-between"><span className="text-lg font-bold text-gray-900">Average Completion</span><span className="text-lg font-black text-pink-600 bg-pink-100 px-4 py-1 rounded-full">3.5 hours</span></div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-lg font-bold text-gray-900">Tasks Completed</span>
+                                    <span className="text-lg font-black text-pink-600 bg-pink-100 px-4 py-1 rounded-full">
+                                        {isLoadingStats ? "..." : `${userStats?.tasks_completed} / ${userStats?.tasks_total}`} Tasks
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-lg font-bold text-gray-900">Average Completion</span>
+                                    <span className="text-lg font-black text-pink-600 bg-pink-100 px-4 py-1 rounded-full">
+                                    {isLoadingStats
+                                        ? "..."
+                                        : secondsToHMS(
+                                            Math.floor(
+                                            timeToSeconds(userStats?.total_time_logged || "00:00:00") /
+                                                (userStats?.tasks_total || 1)
+                                            )
+                                        )}
+                                    </span>
+                                </div>
                             </div>
                             <Button variant="secondary" className="bg-blue-300 hover:bg-blue-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105" onClick={() => setIsDetailedDialogOpen(true)}><BarChart className="w-4 h-4 mr-2" /> Generate Detailed Report</Button>
                             <Button variant="secondary" className="bg-purple-300 hover:bg-purple-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105" onClick={() => setIsHistoryDialogOpen(true)}><CalendarDays className="w-4 h-4 mr-2" /> View Historical Data</Button>
@@ -230,7 +262,7 @@ export default function TimeReportsPage() {
           <Dialog open={isDetailedDialogOpen} onOpenChange={setIsDetailedDialogOpen}>
               <DialogContent className="max-w-5xl border-2 border-black rounded-xl shadow-xl p-6">
                   <DialogHeader>
-                      <DialogTitle className="text-2xl font-black text-gray-900">Báo cáo năng suất 15 ngày qua</DialogTitle>
+                      <DialogTitle className="text-2xl font-black text-gray-900">Performance Report</DialogTitle>
                   </DialogHeader>
                   <div className="bg-gray-50">
                       <ProductivityChart data={summaryResponse?.data} isLoading={isSummaryLoading} />

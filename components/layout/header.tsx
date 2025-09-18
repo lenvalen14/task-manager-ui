@@ -32,8 +32,6 @@ export function Header() {
   })
   const unreadCount = unreadCountData?.data.unread_count ?? 0
 
-  console.log("Unread Count:", unreadCount)
-
   const handleLogout = () => {
     dispatch(logout())
     router.push("/auth/login")

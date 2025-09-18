@@ -7,19 +7,9 @@ import { Mail, Phone, Facebook, Twitter, Instagram, Linkedin } from 'lucide-reac
 export function FooterSection() {
   const footerLinks = {
     product: [
-      { name: "Features", href: "/features" },
-      { name: "Pricing", href: "/pricing" },
-      { name: "API", href: "/api" },
+      { name: "Features", href: "#", label: "feature" },
+      { name: "Home", href: "#", label: "home" },
     ],
-    company: [
-      { name: "About", href: "/about" },
-      { name: "Blog", href: "/blog" },
-      { name: "Contact", href: "/contact" },
-    ],
-    support: [
-      { name: "Help Center", href: "/help" },
-      { name: "Status", href: "/status" },
-    ]
   };
 
   const socialLinks = [
