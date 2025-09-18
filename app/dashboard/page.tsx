@@ -15,7 +15,7 @@ import { DashboardHero } from "@/components/dashboard/DashboardHero"
 import { StatsGrid } from "@/components/dashboard/StatsGrid"
 import { RecentProjects } from "@/components/dashboard/RecentProjects"
 import { toast } from "sonner"
-import { useAppDispatch, useAppSelector } from "@/hooks/redux"
+import { useAppSelector } from "@/hooks/redux"
 import { useGetUserByIdQuery } from "@/services/userService"
 
 export default function DashboardPage() {
@@ -25,12 +25,11 @@ export default function DashboardPage() {
     string | number | null
   >(null)
 
-  const dispatch = useAppDispatch()
-    const user = useAppSelector((state) => state.user)
-  
-    const { data: userData } = useGetUserByIdQuery(user?.sub as number, {
-      skip: !user?.sub,
-    })
+  const user = useAppSelector((state) => state.user)
+
+  const { data: userData } = useGetUserByIdQuery(user?.sub as number, {
+    skip: !user?.sub,
+  })
 
   const { data: projectsData, refetch } = useGetAllProjectsQuery()
   const { data: statsResponse, isLoading: isLoadingStats } =
