@@ -15,6 +15,8 @@ import { DashboardHero } from "@/components/dashboard/DashboardHero"
 import { StatsGrid } from "@/components/dashboard/StatsGrid"
 import { RecentProjects } from "@/components/dashboard/RecentProjects"
 import { toast } from "sonner"
+import { useAppDispatch, useAppSelector } from "@/hooks/redux"
+import { useGetUserByIdQuery } from "@/services/userService"
 
 export default function DashboardPage() {
   const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = useState(false)
@@ -22,6 +24,13 @@ export default function DashboardPage() {
   const [deletingProjectId, setDeletingProjectId] = useState<
     string | number | null
   >(null)
+
+  const dispatch = useAppDispatch()
+    const user = useAppSelector((state) => state.user)
+  
+    const { data: userData } = useGetUserByIdQuery(user?.sub as number, {
+      skip: !user?.sub,
+    })
 
   const { data: projectsData, refetch } = useGetAllProjectsQuery()
   const { data: statsResponse, isLoading: isLoadingStats } =
@@ -49,7 +58,7 @@ export default function DashboardPage() {
   return (
     <>
       <div className="flex-1 min-h-screen overflow-auto bg-gradient-to-br from-yellow-100 via-pink-50 to-blue-100 w-full">
-        <DashboardHero userName="Alison" />
+        <DashboardHero userName={userData?.data.username ?? ""} />
 
         <div className="px-6 pb-12 md:px-12">
           <StatsGrid stats={stats} isLoading={isLoadingStats} />
