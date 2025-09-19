@@ -29,10 +29,10 @@ const getNotificationConfig = (title: string) => {
 export default function NotificationsPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(5)
-  
-  const { data, isLoading, isError } = useGetNotificationsQuery({ 
-    page: currentPage, 
-    pageSize 
+
+  const { data, isLoading, isError } = useGetNotificationsQuery({
+    page: currentPage,
+    pageSize
   })
   const [markAsRead, { isLoading: isMarkingRead }] = useMarkAsReadMutation()
   const [markAllAsRead, { isLoading: isMarkingAllRead }] = useMarkAllAsReadMutation()
@@ -75,7 +75,7 @@ export default function NotificationsPage() {
     const maxVisiblePages = 5
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
-    
+
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1)
     }
@@ -83,7 +83,7 @@ export default function NotificationsPage() {
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i)
     }
-    
+
     return pages
   }
 
@@ -128,25 +128,25 @@ export default function NotificationsPage() {
               Đánh dấu tất cả đã đọc
             </Button>
           </div>
-          
+
           {/* Page Size Selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-700">Hiển thị:</span>
-              <select 
-                value={pageSize} 
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value))
-                  setCurrentPage(1)
-                }}
-                className="px-3 py-1 border-2 border-black rounded-lg font-medium bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-              <span className="text-sm text-gray-600">mỗi trang</span>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">Hiển thị:</span>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value))
+                setCurrentPage(1)
+              }}
+              className="px-3 py-1 border-2 border-black rounded-lg font-medium bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+            <span className="text-sm text-gray-600">mỗi trang</span>
+          </div>
         </div>
       </div>
 
@@ -165,7 +165,7 @@ export default function NotificationsPage() {
             <p className="text-gray-500 text-sm mb-4">
               {data?.code === 404 ? "Trang không tồn tại" : "Vui lòng thử lại sau"}
             </p>
-            <Button 
+            <Button
               onClick={() => {
                 if (data?.code === 404 && currentPage > 1) {
                   setCurrentPage(1)
@@ -254,11 +254,10 @@ export default function NotificationsPage() {
                     variant={pageNum === currentPage ? "default" : "outline"}
                     size="sm"
                     onClick={() => handlePageChange(pageNum)}
-                    className={`border-2 border-black shadow-md hover:shadow-lg transition-all duration-200 min-w-[2.5rem] ${
-                      pageNum === currentPage 
-                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-600" 
+                    className={`border-2 border-black shadow-md hover:shadow-lg transition-all duration-200 min-w-[2.5rem] ${pageNum === currentPage
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-blue-600"
                         : ""
-                    }`}
+                      }`}
                   >
                     {pageNum}
                   </Button>
