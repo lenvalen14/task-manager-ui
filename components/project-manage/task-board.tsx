@@ -166,10 +166,13 @@ export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
 
   return (
     <div className="flex flex-col p-6">
+      {/* Thanh tiêu đề */}
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-black text-gray-900">Task View</h2>
+        <h2 className="text-2xl font-black text-gray-900">Xem Công Việc</h2>
         <div className="flex items-center gap-4">
           <div className="flex bg-white rounded-xl border-black shadow-lg p-2 gap-2">
+
+            {/* Nút chuyển sang dạng Board */}
             <Button
               variant="ghost"
               size="sm"
@@ -182,9 +185,10 @@ export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
               )}
             >
               <LayoutGrid className="w-4 h-4 mr-2" />
-              Board
+              Bảng
             </Button>
 
+            {/* Nút chuyển sang dạng Bảng (Table) */}
             <Button
               variant="ghost"
               size="sm"
@@ -197,9 +201,10 @@ export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
               )}
             >
               <Table className="w-4 h-4 mr-2" />
-              Table
+              Bảng dữ liệu
             </Button>
 
+            {/* Nút chuyển sang dạng Danh sách */}
             <Button
               variant="ghost"
               size="sm"
@@ -212,17 +217,18 @@ export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
               )}
             >
               <List className="w-4 h-4 mr-2" />
-              List
+              Danh sách
             </Button>
           </div>
         </div>
       </div>
 
+      {/* Nội dung hiển thị theo chế độ */}
       {viewMode === "board" && <TaskBoard columns={columns} onTaskUpdated={onTaskUpdated} />}
       {viewMode === "list" && <TaskListView columns={columns} onTaskUpdated={onTaskUpdated} />}
       {viewMode === "table" && (
         <div className="text-gray-500 italic p-4 border rounded-lg text-center">
-          Table view chưa được phát triển.
+          Chế độ xem Bảng dữ liệu hiện chưa được phát triển.
         </div>
       )}
     </div>

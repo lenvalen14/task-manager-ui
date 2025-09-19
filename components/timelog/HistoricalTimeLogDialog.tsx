@@ -31,7 +31,7 @@ export function TaskHistoryList() {
   return (
     <div className="grid gap-3">
       {reports.length === 0 ? (
-        <p className="text-sm text-gray-500">No historical data found</p>
+        <p className="text-sm text-gray-500">Không tìm thấy dữ liệu lịch sử</p>
       ) : (
         reports.map((task) => (
           <Card
@@ -40,10 +40,10 @@ export function TaskHistoryList() {
           >
             <div className="flex items-center justify-between">
               <span className="font-bold text-gray-900">
-                {task.title ?? `Task #${task.task_id}`}
+                {task.title ?? `Công việc #${task.task_id}`}
               </span>
               <span className="px-3 py-1 bg-pink-200 text-pink-900 font-bold rounded-full border-2 border-black">
-                {task.total_minutes} mins
+                {task.total_minutes} phút
               </span>
             </div>
           </Card>
@@ -54,7 +54,7 @@ export function TaskHistoryList() {
         onClick={() => refetch()}
         className="bg-blue-200 hover:bg-blue-300 border-2 border-black font-bold"
       >
-        Refresh
+        Làm mới
       </Button>
     </div>
   )

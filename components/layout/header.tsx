@@ -41,24 +41,16 @@ export function Header() {
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
-      {/* === Left Section === */}
+      {/* === Bên Trái === */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3">
-          <span className="text-lg font-medium text-gray-900">ManageMate</span>
-        </div>
-        <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="h-9 w-80 rounded-md border-gray-200 bg-gray-50 pl-10 focus:border-gray-300 focus:ring-0"
-          />
+          <span className="text-lg font-medium text-gray-900">Task Manager</span>
         </div>
       </div>
 
-      {/* === Right Section === */}
+      {/* === Bên Phải === */}
       <div className="flex items-center gap-3">
-        {/* Notifications Button */}
+        {/* Nút Thông báo */}
         <Button
           variant="ghost"
           size="icon"
@@ -67,7 +59,7 @@ export function Header() {
         >
           <Link href="/dashboard/notifications">
             <Bell className="h-4 w-4" />
-            <span className="sr-only">Notifications</span>
+            <span className="sr-only">Thông báo</span>
             {unreadCount > 0 && (
               <span className="absolute right-0 top-0 rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white">
                 {unreadCount}
@@ -75,8 +67,8 @@ export function Header() {
             )}
           </Link>
         </Button>
-        
-        {/* User Dropdown */}
+
+        {/* Menu Người dùng */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -85,14 +77,14 @@ export function Header() {
             >
               <Avatar className="h-7 w-7">
                 {/* Nếu có avatar_url thì hiển thị ảnh */}
-                <AvatarImage src={userData?.data.avatar_url || ""} alt={user?.user_name || "User"} />
+                <AvatarImage src={userData?.data.avatar_url || ""} alt={user?.user_name || "Người dùng"} />
                 {/* Nếu không có hoặc lỗi load thì fallback ra chữ cái */}
                 <AvatarFallback className="bg-gray-200 text-xs text-gray-700">
                   {avatarFallbackChar}
                 </AvatarFallback>
               </Avatar>
               <span className="hidden text-sm font-medium text-gray-700 sm:block">
-                {user?.user_name || "Guest"}
+                {user?.user_name || "Khách"}
               </span>
             </Button>
           </DropdownMenuTrigger>
@@ -102,7 +94,7 @@ export function Header() {
             className="w-48 border-gray-200 bg-white shadow-sm"
           >
             <DropdownMenuLabel className="text-sm text-gray-900">
-              {user?.email || "No email"}
+              {user?.email || "Chưa có email"}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -111,7 +103,7 @@ export function Header() {
             >
               <Link href="/dashboard/settings" className="flex items-center">
                 <Settings className="mr-2 h-4 w-4" />
-                Settings
+                Cài đặt
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -120,7 +112,7 @@ export function Header() {
               className="cursor-pointer text-sm text-red-600 hover:bg-red-50 focus:bg-red-50 focus:text-red-700"
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
+              Đăng xuất
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

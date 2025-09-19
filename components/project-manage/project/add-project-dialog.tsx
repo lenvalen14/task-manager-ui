@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { Plus, Star, Sparkle, Heart } from "lucide-react"
 import { useCreateProjectMutation } from "@/services/projectService"
 
@@ -26,17 +26,16 @@ export function AddProjectDialog({ open, onOpenChange, onSuccess }: AddProjectDi
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [createProject, { isLoading }] = useCreateProjectMutation()
-  const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       const res = await createProject({ name, description }).unwrap()
 
-      toast({
-        title: "Đã tạo dự án",
-        description: "Dự án đã được tạo thành công.",
+      toast.success("Dự án đã tạo thành công", {
+        description: "Dự án của bạn đã được thêm thành công vào hệ thống",
       })
+
       if (onSuccess) onSuccess()
       onOpenChange(false)
       setName("")

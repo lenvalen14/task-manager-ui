@@ -23,36 +23,36 @@ interface StatsGridProps {
 
 export function StatsGrid({ stats, isLoading }: StatsGridProps) {
   if (isLoading) {
-    return <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 mb-12 mt-8">Loading stats...</div>
+    return <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 mb-12 mt-8">Đang tải thống kê...</div>
   }
 
   return (
     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 mb-12 mt-8">
       <StatCard
-        title="Tasks Completed"
+        title="Công việc đã hoàn thành"
         value={stats?.tasks_completed ?? 0}
-        description={`of ${stats?.tasks_total ?? 0} tasks`}
+        description={`trên tổng ${stats?.tasks_total ?? 0} công việc`}
         Icon={CheckCircle}
         className="bg-green-300 hover:bg-green-400"
       />
       <StatCard
-        title="Tasks Due Soon"
+        title="Công việc sắp đến hạn"
         value={stats?.tasks_due_soon ?? 0}
-        description="due tomorrow"
+        description="đến hạn vào ngày mai"
         Icon={ListTodo}
         className="bg-yellow-300 hover:bg-yellow-400"
       />
       <StatCard
-        title="Total Time Logged"
+        title="Tổng thời gian đã ghi nhận"
         value={stats?.total_time_logged ?? "00:00:00"}
-        description="tracked"
+        description="được theo dõi"
         Icon={Clock}
         className="bg-blue-300 hover:bg-blue-400"
       />
       <StatCard
-        title="Overall Progress"
+        title="Tiến độ tổng thể"
         value={`${stats?.overall_progress ?? 0}%`}
-        description="across all tasks"
+        description="trên tất cả công việc"
         Icon={TrendingUp}
         className="bg-purple-300 hover:bg-purple-400"
       />

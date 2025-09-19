@@ -95,12 +95,15 @@ export default function AllProjectsPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button
-            onClick={() => setIsAddProjectDialogOpen(true)}
-            className="w-full sm:w-auto flex items-center justify-center gap-2"
-          >
-            <Plus className="w-5 h-5" /> Thêm Dự án Mới
-          </Button>
+          <div className="text-center mt-16">
+            <Button
+              onClick={() => setIsAddProjectDialogOpen(true)}
+              className="bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 text-white font-black shadow-xl hover:shadow-2xl rounded-2xl px-12 py-6 text-xl transition-all duration-300 hover:scale-110 border-3 border-black transform hover:-rotate-1"
+            >
+              <Plus className="w-8 h-8 mr-4" />
+              Thêm dự án mới ✨
+            </Button>
+          </div>
         </div>
 
         {/* Danh sách Dự án */}
