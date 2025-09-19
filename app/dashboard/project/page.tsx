@@ -1,21 +1,28 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Input } from "@/components/ui/input"
 import { Search, Plus, ArrowLeft, FolderOpen, Star } from "lucide-react"
 import Link from "next/link"
 import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
 import React from "react"
-import { useGetAllProjectsQuery, useDeleteProjectMutation } from "@/services/projectService"
+import {
+  useGetAllProjectsQuery,
+  useDeleteProjectMutation,
+} from "@/services/projectService"
 import { ProjectCard } from "@/components/dashboard/ProjectCard"
 
 export default function AllProjectsPage() {
   const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
 
-  const { data, isLoading, isError, refetch } = useGetAllProjectsQuery()
-  const [deletingProjectId, setDeletingProjectId] = useState<string | number | null>(null)
+  // gọi API với query page
+  const { data, isLoading, isError, refetch } = useGetAllProjectsQuery(currentPage)
+  const [deletingProjectId, setDeletingProjectId] = useState<
+    string | number | null
+  >(null)
   const [deleteProject] = useDeleteProjectMutation()
 
   // Xử lý xóa dự án
@@ -32,7 +39,7 @@ export default function AllProjectsPage() {
   }
 
   // Lọc danh sách dự án theo từ khóa tìm kiếm
-  const filteredProjects = React.useMemo(() => {
+  const filteredProjects = useMemo(() => {
     if (!searchTerm) return data?.data ?? []
     return (
       data?.data?.filter((p) =>
@@ -44,9 +51,8 @@ export default function AllProjectsPage() {
   return (
     <>
       <div className="flex-1 min-h-screen overflow-auto bg-white w-full px-6 md:px-12 pt-6">
-        {/* Phần Header */}
+        {/* Header */}
         <div className="relative mb-8">
-          {/* Hiệu ứng ngôi sao */}
           <div className="absolute top-4 right-8 animate-pulse">
             <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
           </div>
@@ -70,12 +76,14 @@ export default function AllProjectsPage() {
                   <FolderOpen className="w-8 h-8" />
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-400 border-3 border-black rounded-full shadow-md flex items-center justify-center text-xs font-bold text-gray-900">
-                  {data?.data?.length ?? 0}
+                  {data?.meta?.total ?? 0}
                 </div>
               </div>
             </div>
             <div>
-              <h1 className="text-4xl font-black text-gray-900 mb-2">Tất cả Dự án</h1>
+              <h1 className="text-4xl font-black text-gray-900 mb-2">
+                Tất cả Dự án
+              </h1>
               <p className="text-lg font-bold text-gray-700 bg-yellow-200 px-4 py-2 rounded-full border-2 border-black">
                 Quản lý và theo dõi toàn bộ dự án của bạn! ✨
               </p>
@@ -92,7 +100,10 @@ export default function AllProjectsPage() {
               placeholder="Tìm kiếm dự án..."
               className="pl-12 h-12 border-3 border-black"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value)
+                setCurrentPage(1) // reset về trang 1 khi search
+              }}
             />
           </div>
           <div className="text-center mt-16">
@@ -120,15 +131,50 @@ export default function AllProjectsPage() {
             />
           ))}
         </div>
-      </div>
+
+        {/* Thanh phân trang */}
+        {/* Thanh phân trang */}
+        <div className="mt-12 mb-8 flex justify-end">
+          <div className="flex items-center gap-6">
+            <Button
+              variant="ghost"
+              size="lg"
+              className="bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 
+                 text-white font-bold shadow-md hover:shadow-xl rounded-xl px-6 py-2 
+                 transition-all duration-300 hover:scale-105 border-2 border-black"
+              disabled={!data?.meta?.previous}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            >
+              Trang trước
+            </Button>
+
+            <span className="font-black text-lg text-gray-900">
+              {currentPage} / {data?.meta?.total_pages ?? 1}
+            </span>
+
+            <Button
+              variant="ghost"
+              size="lg"
+              className="bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 
+                 text-white font-bold shadow-md hover:shadow-xl rounded-xl px-6 py-2 
+                 transition-all duration-300 hover:scale-105 border-2 border-black"
+              disabled={!data?.meta?.next}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+            >
+              Trang sau
+            </Button>
+          </div>
+        </div>
+      </div >
 
       {/* Dialog thêm dự án */}
-      <AddProjectDialog
+      < AddProjectDialog
         open={isAddProjectDialogOpen}
         onOpenChange={(open) => {
           setIsAddProjectDialogOpen(open)
           if (!open) refetch()
-        }}
+        }
+        }
       />
     </>
   )

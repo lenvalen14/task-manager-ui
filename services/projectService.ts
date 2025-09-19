@@ -6,9 +6,9 @@ export const projectApi = createApi({
     reducerPath: "projectApi",
     baseQuery: baseQueryWithReauth,
     endpoints: (builder) => ({
-        getAllProjects: builder.query<GetAllProjectsResponse, void>({
-            query: () => ({
-                url: "/projects/",
+        getAllProjects: builder.query<GetAllProjectsResponse, number | void>({
+            query: (page = 1) => ({
+                url: `/projects/?page=${page}`,
                 method: "GET",
             }),
         }),
