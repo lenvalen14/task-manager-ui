@@ -4,7 +4,17 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Camera, Heart, Sparkle, Star, User, Bell, Key, Settings2Icon } from "lucide-react";
+import {
+  ArrowLeft,
+  Camera,
+  User,
+  Bell,
+  Key,
+  Settings2Icon,
+  Star,
+  Heart,
+  Sparkle,
+} from "lucide-react";
 import Link from "next/link";
 import TabDetails from "@/components/settings/TabDetails";
 import TabPassword from "@/components/settings/TabPassword";
@@ -21,19 +31,22 @@ export default function ProfileSettingsPage() {
 
   const userId = useSelector((state: RootState) => state.user.sub);
 
-  const { data, isLoading, isError, refetch } = useGetUserByIdQuery(userId as number, {
-    skip: !userId,
-  });
+  const { data, isLoading, isError, refetch } = useGetUserByIdQuery(
+    userId as number,
+    {
+      skip: !userId,
+    }
+  );
 
   const tabs = [
-    { value: "my-details", label: "Details", icon: User, color: "bg-blue-300" },
-    { value: "password", label: "Password", icon: Key, color: "bg-green-300" },
-    { value: "notifications", label: "Notifications", icon: Bell, color: "bg-yellow-300" },
-    { value: "system", label: "System", icon: Settings2Icon, color: "bg-yellow-300" },
+    { value: "my-details", label: "Thông tin cá nhân", icon: User, color: "bg-blue-300" },
+    { value: "password", label: "Đổi mật khẩu", icon: Key, color: "bg-green-300" },
+    { value: "notifications", label: "Thông báo", icon: Bell, color: "bg-yellow-300" },
+    { value: "system", label: "Hệ thống", icon: Settings2Icon, color: "bg-yellow-300" },
   ];
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
-  if (isError || !data) return <div className="p-6 text-red-500">Failed to load user data.</div>;
+  if (isLoading) return <div className="p-6">Đang tải...</div>;
+  if (isError || !data) return <div className="p-6 text-red-500">Không thể tải dữ liệu người dùng.</div>;
 
   const user = data.data;
 
@@ -65,9 +78,11 @@ export default function ProfileSettingsPage() {
               </div>
 
               <div>
-                <h1 className="text-3xl font-black text-gray-900 mb-2">Profile Settings</h1>
+                <h1 className="text-3xl font-black text-gray-900 mb-2">
+                  Cài đặt tài khoản
+                </h1>
                 <p className="text-lg font-bold text-gray-700 bg-yellow-200 px-4 py-2 rounded-xl border-2 border-black shadow-md inline-block transform -rotate-1">
-                  Manage your account settings and preferences ✨
+                  Quản lý cài đặt và tuỳ chọn tài khoản ✨
                 </p>
               </div>
             </div>
@@ -76,14 +91,17 @@ export default function ProfileSettingsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="h-[calc(100vh-100px)] overflow-y-auto">
-        <div className="px-8 pt-20 pb-8">
+      <div className="w-full">
+        <div className="px-8 pt-12 pb-8">
           {/* Profile Info */}
-          <div className="relative -mt-16 mb-6">
+          <div className="relative mb-6">
             <div className="flex items-end gap-4">
               <div className="relative">
                 <Avatar className="w-32 h-32 border-4 border-black shadow-lg bg-white">
-                  <AvatarImage src={user.avatar_url || "/placeholder.svg"} alt={user.username} />
+                  <AvatarImage
+                    src={user.avatar_url || "/placeholder.svg"}
+                    alt={user.username}
+                  />
                   <AvatarFallback className="bg-pink-100 text-pink-700 text-4xl font-black">
                     {user.first_name?.charAt(0) || "U"}
                   </AvatarFallback>
@@ -104,18 +122,20 @@ export default function ProfileSettingsPage() {
                 />
               </div>
               <div className="pb-4">
-                <h2 className="text-2xl font-black text-gray-900">{user.username}</h2>
+                <h2 className="text-2xl font-black text-gray-900">
+                  {user.username}
+                </h2>
                 <p className="font-bold text-gray-700 bg-blue-200 px-3 py-1 rounded-xl border-2 border-black shadow-sm inline-block mt-2">
-                  No role assigned
+                  Chưa gán vai trò
                 </p>
               </div>
             </div>
           </div>
 
           {/* Tabs */}
-          <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="w-full max-w-2xl h-16 bg-transparent gap-2 justify-start p-2">
-              {tabs.map(tab => (
+              {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}

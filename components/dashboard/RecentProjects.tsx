@@ -28,7 +28,7 @@ export function RecentProjects({
     <div className="mb-12">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-4xl font-black text-gray-900 bg-blue-200 px-6 py-3 rounded-2xl border-3 border-black shadow-lg transform -rotate-1">
-          Recent Projects 🚀
+          Dự án gần đây 🚀
         </h2>
         <Button
           variant="ghost"
@@ -36,7 +36,7 @@ export function RecentProjects({
           className="text-gray-900 font-black px-6 py-3 rounded-xl border-2 border-black bg-white hover:bg-pink-100 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
         >
           <Link href="/dashboard/project" className="flex items-center gap-3">
-            View All Projects
+            Xem tất cả dự án
             <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
           </Link>
         </Button>

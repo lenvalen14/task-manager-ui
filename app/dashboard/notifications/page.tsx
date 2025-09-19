@@ -38,7 +38,7 @@ export default function NotificationsPage() {
     try {
       await markAllAsRead().unwrap()
     } catch (err) {
-      console.error("Failed to mark all as read:", err)
+      console.error("Không thể đánh dấu tất cả đã đọc:", err)
     }
   }
 
@@ -46,7 +46,7 @@ export default function NotificationsPage() {
     try {
       await markAsRead(id).unwrap()
     } catch (err) {
-      console.error("Failed to mark as read:", err)
+      console.error("Không thể đánh dấu đã đọc:", err)
     }
   }
 
@@ -60,7 +60,7 @@ export default function NotificationsPage() {
 
         <div className="flex items-center gap-8 mb-4">
           <Button variant="ghost" size="icon" asChild className="text-gray-600 hover:text-gray-800 hover:bg-pink-50 rounded-full transition-all duration-200">
-            <Link href="/dashboard"><ArrowLeft className="w-5 h-5" /><span className="sr-only">Back to Dashboard</span></Link>
+            <Link href="/dashboard"><ArrowLeft className="w-5 h-5" /><span className="sr-only">Quay lại Dashboard</span></Link>
           </Button>
           <div className="flex items-center gap-6">
             <div className="relative">
@@ -72,9 +72,9 @@ export default function NotificationsPage() {
               </div>
             </div>
             <div>
-              <h1 className="text-4xl font-black text-gray-900 mb-2 tracking-tight">Notifications</h1>
+              <h1 className="text-4xl font-black text-gray-900 mb-2 tracking-tight">Thông báo</h1>
               <p className="text-lg font-bold text-gray-700 bg-yellow-200 px-4 py-2 rounded-full border-2 border-black shadow-sm inline-block">
-                Stay updated with your tasks! 🔔
+                Luôn cập nhật tiến độ công việc! 🔔
               </p>
             </div>
           </div>
@@ -87,16 +87,16 @@ export default function NotificationsPage() {
             className="border-2 border-black shadow-md"
           >
             <Check className="mr-2 h-4 w-4" />
-            Mark all as read
+            Đánh dấu tất cả đã đọc
           </Button>
         </div>
       </div>
 
       <div className="px-8 pt-8 pb-12">
         {isLoading ? (
-          <p className="text-center text-gray-500 mt-8">Loading notifications...</p>
+          <p className="text-center text-gray-500 mt-8">Đang tải thông báo...</p>
         ) : isError ? (
-          <p className="text-center text-red-500 mt-8">Failed to load notifications. Please try again.</p>
+          <p className="text-center text-red-500 mt-8">Không thể tải thông báo. Vui lòng thử lại.</p>
         ) : notifications.length > 0 ? (
           <div className="grid gap-6">
             {notifications.map((notification) => {
@@ -122,7 +122,7 @@ export default function NotificationsPage() {
                           onClick={() => handleMarkAsRead(notification.id)}
                           disabled={isMarkingRead}
                         >
-                          Mark as read
+                          Đánh dấu đã đọc
                         </Button>
                       )}
                     </div>
@@ -132,7 +132,7 @@ export default function NotificationsPage() {
             })}
           </div>
         ) : (
-          <p className="text-center text-gray-500 mt-8">You have no new notifications. ✨</p>
+          <p className="text-center text-gray-500 mt-8">Bạn không có thông báo mới nào. ✨</p>
         )}
       </div>
     </div>

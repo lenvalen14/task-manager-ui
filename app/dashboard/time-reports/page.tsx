@@ -26,7 +26,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ProductivityChart } from "@/components/timelog/ProductivityChart"
 import { useGetUserStatsQuery } from "@/services/statsService"
 
-// --- Helper Functions ---
+// --- Hàm tiện ích ---
 
 function formatTime(seconds: number): string {
     const hours = Math.floor(seconds / 3600)
@@ -35,17 +35,17 @@ function formatTime(seconds: number): string {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
 }
 
-// --- Main Page Component ---
+// --- Component Trang chính ---
 
 export default function TimeReportsPage() {
-    // State for Time Tracking
+    // Trạng thái theo dõi thời gian
     const [isRunning, setIsRunning] = useState(false)
     const [time, setTime] = useState(0)
     const [offset, setOffset] = useState(0)
     const [currentLogId, setCurrentLogId] = useState<number | null>(null)
     const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null)
 
-    // State for Dialogs
+    // Trạng thái Dialog
     const [isReportModalOpen, setIsReportModalOpen] = useState(false)
     const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false)
     const [isDetailedDialogOpen, setIsDetailedDialogOpen] = useState(false)
@@ -74,6 +74,8 @@ export default function TimeReportsPage() {
             .toString()
             .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
     }
+
+    // --- Load trạng thái timer từ localStorage khi vào trang ---
     useEffect(() => {
         const storedStart = localStorage.getItem("currentTimeLogStart")
         const storedLogId = localStorage.getItem("currentTimeLogId")
@@ -90,7 +92,7 @@ export default function TimeReportsPage() {
         }
     }, [])
 
-    // Interval to update the timer every second when it's running
+    // --- Cập nhật timer mỗi giây khi đang chạy ---
     useEffect(() => {
         let interval: NodeJS.Timeout | null = null
         if (isRunning) {
@@ -108,7 +110,7 @@ export default function TimeReportsPage() {
         }
     }, [isRunning, offset])
 
-    // Auto-select the first task if none is selected
+    // --- Tự chọn task đầu tiên nếu chưa chọn ---
     useEffect(() => {
         const taskList = Array.isArray(tasksData?.data) ? tasksData.data : []
         if (selectedTaskId === null && taskList.length > 0) {
@@ -116,6 +118,7 @@ export default function TimeReportsPage() {
         }
     }, [tasksData, selectedTaskId])
 
+    // --- Xử lý bắt đầu timer ---
     const handleStart = async () => {
         if (!selectedTaskId) return
         try {
@@ -134,15 +137,16 @@ export default function TimeReportsPage() {
                 setIsRunning(true)
 
             } else {
-                console.error("Failed to get a valid time log ID from the API response.", res)
-                alert("Error: Could not start the timer. Invalid response from server.");
+                console.error("API trả về ID time log không hợp lệ.", res)
+                alert("Lỗi: Không thể bắt đầu bấm giờ. Phản hồi từ server không hợp lệ.");
             }
 
         } catch (e) {
-            console.error("Failed to start time log:", e)
+            console.error("Không thể bắt đầu time log:", e)
         }
     }
 
+    // --- Xử lý tạm dừng ---
     const handlePause = async () => {
         if (!currentLogId) return
         try {
@@ -152,10 +156,11 @@ export default function TimeReportsPage() {
             localStorage.setItem("currentTimeLogOffset", String(time))
             localStorage.removeItem("currentTimeLogStart")
         } catch (e) {
-            console.error("Failed to pause time log:", e)
+            console.error("Không thể tạm dừng time log:", e)
         }
     }
 
+    // --- Xử lý dừng ---
     const handleStop = async () => {
         if (!currentLogId) return
         try {
@@ -168,42 +173,46 @@ export default function TimeReportsPage() {
             localStorage.removeItem("currentTimeLogStart")
             localStorage.removeItem("currentTimeLogOffset")
         } catch (e) {
-            console.error("Failed to stop time log:", e)
+            console.error("Không thể dừng time log:", e)
         }
     }
 
     return (
         <>
             <div className="flex-1 min-h-screen p-8 overflow-auto bg-white w-full">
-                {/* Decorative elements */}
-                <div className="absolute top-4 right-8"><Star className="w-6 h-6 text-yellow-400 fill-yellow-400 animate-pulse" /></div>
-                <div className="absolute top-8 right-16"><Heart className="w-5 h-5 text-pink-400 fill-pink-400 animate-pulse delay-300" /></div>
-                <div className="absolute top-6 right-24"><Sparkle className="w-4 h-4 text-blue-400 fill-blue-400 animate-pulse delay-700" /></div>
-
-                {/* Page Header */}
+                {/* Header trang */}
                 <div className="flex items-center gap-6 mb-8">
                     <Button variant="ghost" size="icon" asChild className="text-gray-600 hover:text-gray-800 hover:bg-pink-50 rounded-full transition-all">
                         <Link href="/dashboard"><ArrowLeft className="w-5 h-5" /></Link>
                     </Button>
                     <div>
-                        <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2">Time & Reports</h1>
+                        <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2">Thời gian & Báo cáo</h1>
                         <p className="text-lg font-bold text-gray-700 bg-yellow-200 px-4 py-2 rounded-xl border-2 border-black shadow-md inline-block transform -rotate-1">
-                            Track your productivity and performance ✨
+                            Theo dõi năng suất và hiệu suất làm việc ✨
                         </p>
                     </div>
                 </div>
 
                 <div className="grid gap-6 lg:grid-cols-2 md:grid-cols-2">
-                    {/* Time Tracking Card */}
+                    {/* Card theo dõi thời gian */}
                     <Card className="border-3 border-black rounded-xl shadow-xl hover:shadow-2xl transition-all bg-white overflow-hidden">
-                        <CardHeader className="border-b-2 border-gray-200 bg-gray-50"><CardTitle className="text-2xl font-black text-gray-900">Time Tracking</CardTitle><CardDescription className="text-base font-bold text-gray-600">Log and manage your time spent on tasks</CardDescription></CardHeader>
+                        <CardHeader className="border-b-2 border-gray-200 bg-gray-50">
+                            <CardTitle className="text-2xl font-black text-gray-900">Theo dõi thời gian</CardTitle>
+                            <CardDescription className="text-base font-bold text-gray-600">Ghi log và quản lý thời gian bạn dành cho công việc</CardDescription>
+                        </CardHeader>
                         <CardContent className="grid gap-6 p-6">
                             <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border-2 border-black gap-4">
-                                <span className="text-lg font-bold text-gray-900">Current Task:</span>
+                                <span className="text-lg font-bold text-gray-900">Công việc hiện tại:</span>
                                 <div className="min-w-[240px]">
                                     <Select value={selectedTaskId !== null ? String(selectedTaskId) : undefined} onValueChange={(v) => setSelectedTaskId(Number(v))}>
-                                        <SelectTrigger className="bg-white font-bold border-2 border-black"><SelectValue placeholder="Select a task" /></SelectTrigger>
-                                        <SelectContent>{(Array.isArray(tasksData?.data) ? tasksData.data : []).map((t: any) => (<SelectItem key={t.id} value={String(t.id)}>{t.title ?? `Task #${t.id}`}</SelectItem>))}</SelectContent>
+                                        <SelectTrigger className="bg-white font-bold border-2 border-black">
+                                            <SelectValue placeholder="Chọn một công việc" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {(Array.isArray(tasksData?.data) ? tasksData.data : []).map((t: any) => (
+                                                <SelectItem key={t.id} value={String(t.id)}>{t.title ?? `Công việc #${t.id}`}</SelectItem>
+                                            ))}
+                                        </SelectContent>
                                     </Select>
                                 </div>
                             </div>
@@ -212,27 +221,30 @@ export default function TimeReportsPage() {
                                 <span className="text-5xl font-black text-gray-900 tabular-nums">{formatTime(time)}</span>
                             </div>
                             <div className="flex gap-3">
-                                <Button className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105 ${!isRunning ? "bg-green-400 hover:bg-green-500 text-white" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`} onClick={handleStart} disabled={isRunning || starting}><Play className="w-4 h-4 mr-2" /> Start</Button>
-                                <Button variant="outline" className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105 ${isRunning ? "bg-white hover:bg-gray-50 text-gray-900" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`} onClick={handlePause} disabled={!isRunning || pausing}><Pause className="w-4 h-4 mr-2" /> Pause</Button>
-                                <Button variant="destructive" className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105 ${isRunning || time > 0 ? "bg-red-400 hover:bg-red-500 text-white" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`} onClick={handleStop} disabled={(!isRunning && time === 0) || stopping}><Square className="w-4 h-4 mr-2" /> Stop</Button>
+                                <Button className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105 ${!isRunning ? "bg-green-400 hover:bg-green-500 text-white" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`} onClick={handleStart} disabled={isRunning || starting}><Play className="w-4 h-4 mr-2" /> Bắt đầu</Button>
+                                <Button variant="outline" className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105 ${isRunning ? "bg-white hover:bg-gray-50 text-gray-900" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`} onClick={handlePause} disabled={!isRunning || pausing}><Pause className="w-4 h-4 mr-2" /> Tạm dừng</Button>
+                                <Button variant="destructive" className={`flex-1 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105 ${isRunning || time > 0 ? "bg-red-400 hover:bg-red-500 text-white" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`} onClick={handleStop} disabled={(!isRunning && time === 0) || stopping}><Square className="w-4 h-4 mr-2" /> Dừng</Button>
                             </div>
-                            <Button variant="secondary" className="bg-yellow-300 hover:bg-yellow-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105" onClick={() => setIsReportModalOpen(true)} disabled={!selectedTaskId}>View Time Logs</Button>
+                            <Button variant="secondary" className="bg-yellow-300 hover:bg-yellow-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105" onClick={() => setIsReportModalOpen(true)} disabled={!selectedTaskId}>Xem Time Logs</Button>
                         </CardContent>
                     </Card>
 
-                    {/* Reports Card */}
+                    {/* Card báo cáo */}
                     <Card className="border-3 border-black rounded-xl shadow-xl hover:shadow-2xl transition-all bg-white overflow-hidden">
-                        <CardHeader className="border-b-2 border-gray-200 bg-gray-50"><CardTitle className="text-2xl font-black text-gray-900">Performance Reports</CardTitle><CardDescription className="text-base font-bold text-gray-600">Analyze your productivity and task completion</CardDescription></CardHeader>
+                        <CardHeader className="border-b-2 border-gray-200 bg-gray-50">
+                            <CardTitle className="text-2xl font-black text-gray-900">Báo cáo hiệu suất</CardTitle>
+                            <CardDescription className="text-base font-bold text-gray-600">Phân tích năng suất và tiến độ công việc</CardDescription>
+                        </CardHeader>
                         <CardContent className="grid gap-6 p-6">
                             <div className="p-4 bg-pink-50 rounded-xl border-2 border-black">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-lg font-bold text-gray-900">Tasks Completed</span>
+                                    <span className="text-lg font-bold text-gray-900">Công việc đã hoàn thành</span>
                                     <span className="text-lg font-black text-pink-600 bg-pink-100 px-4 py-1 rounded-full">
-                                        {isLoadingStats ? "..." : `${userStats?.tasks_completed} / ${userStats?.tasks_total}`} Tasks
+                                        {isLoadingStats ? "..." : `${userStats?.tasks_completed} / ${userStats?.tasks_total}`} Công việc
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-lg font-bold text-gray-900">Average Completion</span>
+                                    <span className="text-lg font-bold text-gray-900">Thời gian trung bình</span>
                                     <span className="text-lg font-black text-pink-600 bg-pink-100 px-4 py-1 rounded-full">
                                         {isLoadingStats
                                             ? "..."
@@ -245,24 +257,34 @@ export default function TimeReportsPage() {
                                     </span>
                                 </div>
                             </div>
-                            <Button variant="secondary" className="bg-blue-300 hover:bg-blue-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105" onClick={() => setIsDetailedDialogOpen(true)}><BarChart className="w-4 h-4 mr-2" /> Generate Detailed Report</Button>
-                            <Button variant="secondary" className="bg-purple-300 hover:bg-purple-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105" onClick={() => setIsHistoryDialogOpen(true)}><CalendarDays className="w-4 h-4 mr-2" /> View Historical Data</Button>
+                            <Button variant="secondary" className="bg-blue-300 hover:bg-blue-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105" onClick={() => setIsDetailedDialogOpen(true)}><BarChart className="w-4 h-4 mr-2" /> Tạo báo cáo chi tiết</Button>
+                            <Button variant="secondary" className="bg-purple-300 hover:bg-purple-400 text-gray-900 font-bold border-2 border-black rounded-xl shadow-md transition-all transform hover:scale-105" onClick={() => setIsHistoryDialogOpen(true)}><CalendarDays className="w-4 h-4 mr-2" /> Xem dữ liệu lịch sử</Button>
                         </CardContent>
                     </Card>
                 </div>
             </div>
 
-            {/* --- All Dialogs --- */}
+            {/* --- Tất cả Dialogs --- */}
             <TaskReportDialog isOpen={isReportModalOpen} onClose={() => setIsReportModalOpen(false)} taskId={selectedTaskId} />
 
             <Dialog open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen}>
-                <DialogContent className="max-w-2xl border-3 border-black rounded-xl shadow-2xl"><DialogHeader><DialogTitle className="text-2xl font-black text-gray-900 flex items-center gap-2"><History className="w-6 h-6 text-orange-500" />Task History Report</DialogTitle></DialogHeader><div className="mt-4 max-h-[500px] overflow-y-auto"><TaskHistoryList /></div></DialogContent>
+                <DialogContent className="max-w-2xl border-3 border-black rounded-xl shadow-2xl">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-black text-gray-900 flex items-center gap-2">
+                            <History className="w-6 h-6 text-orange-500" />
+                            Báo cáo lịch sử công việc
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="mt-4 max-h-[500px] overflow-y-auto">
+                        <TaskHistoryList />
+                    </div>
+                </DialogContent>
             </Dialog>
 
             <Dialog open={isDetailedDialogOpen} onOpenChange={setIsDetailedDialogOpen}>
                 <DialogContent className="max-w-5xl border-2 border-black rounded-xl shadow-xl p-6">
                     <DialogHeader>
-                        <DialogTitle className="text-2xl font-black text-gray-900">Performance Report</DialogTitle>
+                        <DialogTitle className="text-2xl font-black text-gray-900">Báo cáo chi tiết hiệu suất</DialogTitle>
                     </DialogHeader>
                     <div className="bg-gray-50">
                         <ProductivityChart data={summaryResponse?.data} isLoading={isSummaryLoading} />

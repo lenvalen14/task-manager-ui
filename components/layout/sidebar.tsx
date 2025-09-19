@@ -20,7 +20,10 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
 import { EditProjectDialog } from "@/components/project-manage/project/edit-project-dialog"
-import { useGetAllProjectsQuery, useDeleteProjectMutation } from "@/services/projectService"
+import {
+  useGetAllProjectsQuery,
+  useDeleteProjectMutation,
+} from "@/services/projectService"
 import { useGetUserStatsQuery } from "@/services/statsService"
 import { Project } from "@/types/projectType"
 import { useToast } from "@/components/ui/use-toast"
@@ -28,9 +31,9 @@ import { DeleteConfirmationDialog } from "../ui/delete-confirmation-dialog"
 
 const mainNavigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
-  { name: "Time & Reports", href: "/dashboard/time-reports", icon: Clock },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  { name: "Thông báo", href: "/dashboard/notifications", icon: Bell },
+  { name: "Thời gian & Báo cáo", href: "/dashboard/time-reports", icon: Clock },
+  { name: "Cài đặt", href: "/dashboard/settings", icon: Settings },
 ]
 
 export function Sidebar() {
@@ -42,7 +45,7 @@ export function Sidebar() {
 
   const { toast } = useToast()
 
-  // Lấy danh sách project
+  // Lấy danh sách dự án
   const { data: projectsData, isLoading, refetch: refetchProjects } = useGetAllProjectsQuery()
   const projects = projectsData?.data?.slice(0, 5) || []
 
@@ -69,18 +72,18 @@ export function Sidebar() {
       await deleteProject(projectToDelete.id).unwrap()
       toast({
         title: "Xóa thành công",
-        description: "Dự án đã bị xóa khỏi hệ thống.",
+        description: "Dự án đã được xóa khỏi hệ thống",
       })
       refetchProjects()
-      setIsDeleteDialogOpen(false) // Đóng dialog sau khi thành công
+      setIsDeleteDialogOpen(false)
     } catch (error) {
       toast({
         title: "Lỗi",
-        description: "Không thể xóa dự án. Vui lòng thử lại.",
-        variant: "destructive", // nếu trong Toast bạn có định nghĩa variant
+        description: "Không thể xóa dự án. Vui lòng thử lại sau nhé!",
+        variant: "destructive",
       })
     } finally {
-      setProjectToDelete(null) // Reset state
+      setProjectToDelete(null)
     }
   }
 
@@ -90,15 +93,15 @@ export function Sidebar() {
       <div className="flex items-center justify-center mb-8 px-4">
         <img
           src="/logo.svg"
-          alt="Managemate Logo"
+          alt="Logo Managemate"
           className="w-[100px] h-[100px]"
         />
       </div>
 
-      {/* Projects */}
+      {/* Dự án */}
       <div className="mb-6">
         <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-          Projects
+          Dự án
         </h2>
 
         {isLoading ? (
@@ -112,13 +115,13 @@ export function Sidebar() {
           </div>
         ) : projects.length === 0 ? (
           <div className="flex flex-col items-center text-gray-500 text-sm">
-            <p className="mb-2">No projects yet</p>
+            <p className="mb-2">Chưa có dự án nào</p>
             <Button
               onClick={() => setIsAddProjectDialogOpen(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add New Project
+              Thêm dự án mới
             </Button>
           </div>
         ) : (
@@ -151,13 +154,13 @@ export function Sidebar() {
                       className="shadow-lg rounded-lg"
                     >
                       <DropdownMenuItem onClick={() => handleEditClick(project)}>
-                        Edit Project
+                        Chỉnh sửa dự án
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-red-600"
                         onClick={() => promptForDelete(project)}
                       >
-                        Delete Project
+                        Xóa dự án
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -168,10 +171,10 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Navigation */}
+      {/* Điều hướng */}
       <div className="mb-6">
         <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-          Navigation
+          Điều hướng
         </h2>
         <nav className="grid gap-1">
           {mainNavigation.map((item) => (
@@ -187,11 +190,11 @@ export function Sidebar() {
         </nav>
       </div>
 
-      {/* Time logged */}
+      {/* Thời gian đã ghi nhận */}
       {stats && (
         <div className="mb-6 mt-auto pt-4 border-t border-gray-200">
           <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-            Time Logged
+            Thời gian đã ghi nhận
           </h2>
           <div className="text-2xl font-bold mb-1 text-gray-900">
             {stats.total_time_logged}
@@ -212,23 +215,23 @@ export function Sidebar() {
               <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
               <polyline points="16 7 22 7 22 13" />
             </svg>
-            +5% this month
+            +5% tháng này
           </div>
         </div>
       )}
 
-      {/* Nút Add Project chung */}
+      {/* Nút thêm dự án */}
       {projects.length > 0 && (
         <Button
           onClick={() => setIsAddProjectDialogOpen(true)}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md rounded-lg"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add Project
+          Thêm dự án
         </Button>
       )}
 
-      {/* Dialog thêm project */}
+      {/* Dialog thêm dự án */}
       <AddProjectDialog
         open={isAddProjectDialogOpen}
         onOpenChange={(open) => {
@@ -239,7 +242,7 @@ export function Sidebar() {
         }}
       />
 
-      {/* Dialog chỉnh sửa project */}
+      {/* Dialog chỉnh sửa dự án */}
       {selectedProject && (
         <EditProjectDialog
           open={isEditProjectDialogOpen}
@@ -248,13 +251,14 @@ export function Sidebar() {
           onSuccess={() => {
             refetchProjects()
             toast({
-              title: "Project updated",
-              description: "The project was updated successfully",
+              title: "Cập nhật thành công",
+              description: "Dự án đã được chỉnh sửa thành công ✅",
             })
           }}
         />
       )}
 
+      {/* Dialog xác nhận xóa */}
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}

@@ -37,20 +37,19 @@ export function AddProjectDialog({ open, onOpenChange, onSuccess }: AddProjectDi
         title: "Đã tạo dự án",
         description: "Dự án đã được tạo thành công.",
       })
-      // console.log("Created project:", res.data)
       if (onSuccess) onSuccess()
       onOpenChange(false)
       setName("")
       setDescription("")
     } catch (error) {
-      console.error("Failed to create project:", error)
+      console.error("Không thể tạo dự án:", error)
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] p-6 rounded-xl shadow-xl bg-white">
-        {/* Decorative elements */}
+        {/* Icon trang trí */}
         <div className="absolute top-4 right-8">
           <Star className="w-6 h-6 text-yellow-400 fill-yellow-400 animate-pulse" />
         </div>
@@ -63,23 +62,23 @@ export function AddProjectDialog({ open, onOpenChange, onSuccess }: AddProjectDi
 
         <DialogHeader className="mb-6">
           <DialogTitle className="text-3xl font-black text-gray-900 tracking-tight mb-2">
-            Create New Project
+            Tạo dự án mới
           </DialogTitle>
           <DialogDescription className="text-lg font-bold text-gray-700 bg-yellow-200 px-4 py-2 rounded-xl border-2 border-black shadow-md inline-block transform -rotate-1">
-            Let's bring your project to life ✨
+            Cùng bắt đầu một dự án mới ✨
           </DialogDescription>
         </DialogHeader>
 
         <form className="grid gap-6 py-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="projectName" className="text-base font-bold text-gray-900">
-              Project Name
+              Tên dự án
             </Label>
             <Input
               id="projectName"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Marketing Campaign Q3"
+              placeholder="VD: Chiến dịch Marketing Quý 3"
               required
               className="border-2 border-black rounded-xl focus:ring-2 focus:ring-blue-500 bg-gray-50 font-medium placeholder:text-gray-500"
             />
@@ -87,13 +86,13 @@ export function AddProjectDialog({ open, onOpenChange, onSuccess }: AddProjectDi
 
           <div className="space-y-2">
             <Label htmlFor="projectDescription" className="text-base font-bold text-gray-900">
-              Description
+              Mô tả
             </Label>
             <Textarea
               id="projectDescription"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of the project goals and scope."
+              placeholder="Mô tả ngắn gọn về mục tiêu và phạm vi của dự án."
               rows={4}
               className="border-2 border-black rounded-xl focus:ring-2 focus:ring-blue-500 bg-gray-50 font-medium placeholder:text-gray-500 min-h-[120px]"
             />
@@ -106,7 +105,7 @@ export function AddProjectDialog({ open, onOpenChange, onSuccess }: AddProjectDi
               onClick={() => onOpenChange(false)}
               className="flex-1 border-2 border-black rounded-xl px-6 py-3 bg-white hover:bg-gray-50 font-bold shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
             >
-              Cancel
+              Hủy
             </Button>
             <Button
               type="submit"
@@ -114,7 +113,7 @@ export function AddProjectDialog({ open, onOpenChange, onSuccess }: AddProjectDi
               className="flex-1 bg-pink-400 hover:bg-pink-500 text-white rounded-xl px-6 py-3 font-bold border-2 border-black shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
             >
               <Plus className="w-5 h-5 mr-2" />
-              {isLoading ? "Creating..." : "Create Project"}
+              {isLoading ? "Đang tạo..." : "Tạo dự án"}
             </Button>
           </DialogFooter>
         </form>

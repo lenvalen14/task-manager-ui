@@ -18,30 +18,35 @@ export default function AllProjectsPage() {
   const [deletingProjectId, setDeletingProjectId] = useState<string | number | null>(null)
   const [deleteProject] = useDeleteProjectMutation()
 
+  // Xử lý xóa dự án
   const handleDeleteProject = async (id: string | number) => {
     setDeletingProjectId(id)
     try {
       await deleteProject(Number(id)).unwrap()
       refetch()
     } catch (error) {
-      console.error("Failed to delete project:", error)
+      console.error("Xóa dự án thất bại:", error)
     } finally {
       setDeletingProjectId(null)
     }
   }
 
+  // Lọc danh sách dự án theo từ khóa tìm kiếm
   const filteredProjects = React.useMemo(() => {
     if (!searchTerm) return data?.data ?? []
-    return data?.data?.filter(p =>
-      p.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ) ?? []
+    return (
+      data?.data?.filter((p) =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      ) ?? []
+    )
   }, [data?.data, searchTerm])
 
   return (
     <>
       <div className="flex-1 min-h-screen overflow-auto bg-white w-full px-6 md:px-12 pt-6">
-        {/* Header */}
+        {/* Phần Header */}
         <div className="relative mb-8">
+          {/* Hiệu ứng ngôi sao */}
           <div className="absolute top-4 right-8 animate-pulse">
             <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
           </div>
@@ -57,7 +62,7 @@ export default function AllProjectsPage() {
               <Button variant="ghost" size="icon" asChild>
                 <Link href="/dashboard">
                   <ArrowLeft className="w-5 h-5" />
-                  <span className="sr-only">Back to Dashboard</span>
+                  <span className="sr-only">Quay lại Bảng điều khiển</span>
                 </Link>
               </Button>
               <div className="relative">
@@ -70,21 +75,21 @@ export default function AllProjectsPage() {
               </div>
             </div>
             <div>
-              <h1 className="text-4xl font-black text-gray-900 mb-2">All Projects</h1>
+              <h1 className="text-4xl font-black text-gray-900 mb-2">Tất cả Dự án</h1>
               <p className="text-lg font-bold text-gray-700 bg-yellow-200 px-4 py-2 rounded-full border-2 border-black">
-                Manage and track all your projects! ✨
+                Quản lý và theo dõi toàn bộ dự án của bạn! ✨
               </p>
             </div>
           </div>
         </div>
 
-        {/* Search + Add */}
+        {/* Thanh tìm kiếm + Nút thêm */}
         <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
           <div className="relative w-full sm:max-w-md">
             <Search className="absolute left-4 top-4 h-5 w-5 text-gray-600" />
             <Input
               type="search"
-              placeholder="Search projects..."
+              placeholder="Tìm kiếm dự án..."
               className="pl-12 h-12 border-3 border-black"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -94,29 +99,27 @@ export default function AllProjectsPage() {
             onClick={() => setIsAddProjectDialogOpen(true)}
             className="w-full sm:w-auto flex items-center justify-center gap-2"
           >
-            <Plus className="w-5 h-5" /> Add New Project
+            <Plus className="w-5 h-5" /> Thêm Dự án Mới
           </Button>
         </div>
 
-        {/* Projects Grid */}
-        {isLoading && <p>Loading projects...</p>}
-        {isError && <p>Failed to load projects</p>}
+        {/* Danh sách Dự án */}
+        {isLoading && <p>Đang tải danh sách dự án...</p>}
+        {isError && <p>Không thể tải danh sách dự án</p>}
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {filteredProjects
-            .map((project, index) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                index={index}
-                onDelete={handleDeleteProject}
-                isDeleting={deletingProjectId === project.id}
-              />
-
-            ))}
+          {filteredProjects.map((project, index) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              index={index}
+              onDelete={handleDeleteProject}
+              isDeleting={deletingProjectId === project.id}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Add Project Dialog */}
+      {/* Dialog thêm dự án */}
       <AddProjectDialog
         open={isAddProjectDialogOpen}
         onOpenChange={(open) => {

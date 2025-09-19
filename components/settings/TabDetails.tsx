@@ -26,7 +26,6 @@ export default function TabDetails({ userId }: TabDetailsProps) {
   const [originalData, setOriginalData] = useState<UserUpdateRequest | null>(null)
   const [isEditing, setIsEditing] = useState(false)
 
-  // Load dữ liệu từ API vào form
   useEffect(() => {
     if (data?.data) {
       const user = data.data
@@ -59,18 +58,18 @@ export default function TabDetails({ userId }: TabDetailsProps) {
       setOriginalData(formData)
       setIsEditing(false)
     } catch (err) {
-      console.error("Update failed:", err)
+      console.error("Cập nhật thất bại:", err)
     }
   }
 
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading) return <div>Đang tải...</div>
 
   return (
     <div className="space-y-6 max-w-4xl">
       <div className="bg-white rounded-xl border-2 border-black p-6 shadow-lg hover:shadow-xl transition-all duration-200">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-black text-gray-900 bg-blue-200 px-4 py-2 rounded-xl border-2 border-black shadow-md inline-block transform -rotate-1">
-            Personal Information
+            Thông tin cá nhân
           </h3>
           {!isEditing ? (
             <Button onClick={() => setIsEditing(true)}>Chỉnh sửa</Button>
@@ -86,7 +85,7 @@ export default function TabDetails({ userId }: TabDetailsProps) {
 
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label className="font-bold text-gray-700">First Name</Label>
+            <Label className="font-bold text-gray-700">Tên</Label>
             <Input
               name="first_name"
               value={formData.first_name}
@@ -96,7 +95,7 @@ export default function TabDetails({ userId }: TabDetailsProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label className="font-bold text-gray-700">Last Name</Label>
+            <Label className="font-bold text-gray-700">Họ</Label>
             <Input
               name="last_name"
               value={formData.last_name}
@@ -117,7 +116,7 @@ export default function TabDetails({ userId }: TabDetailsProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label className="font-bold text-gray-700">Phone Number</Label>
+            <Label className="font-bold text-gray-700">Số điện thoại</Label>
             <Input
               type="tel"
               name="phone"

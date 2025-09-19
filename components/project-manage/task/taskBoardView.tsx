@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Star, MoreVertical, MessageSquare } from "lucide-react"
+import { Plus, Star, MoreVertical, MessageSquare, AlarmClock, Paperclip } from "lucide-react"
 import { TaskDetailDialog } from "@/components/project-manage/task/task-detail-dialog"
 import { renderPriority, TaskColumnData, UITask } from "@/components/project-manage/task-board"
 import clsx from "clsx"
@@ -264,7 +264,9 @@ export function TaskBoard({
                                                         {/* Due date */}
                                                         {task.dueDate && (
                                                             <div className="flex items-center gap-2 mb-3">
-                                                                <span className="text-sm font-semibold text-gray-600">📅 Hạn:</span>
+                                                               <span className="flex items-center gap-1 text-sm font-semibold text-gray-600">
+                                                                    <AlarmClock className="w-4 h-4 text-red-500" />:
+                                                                </span>
                                                                 <span
                                                                     className={clsx(
                                                                         "text-sm font-bold",
@@ -344,7 +346,7 @@ export function TaskBoard({
                                                                         className="flex items-center gap-1 text-gray-600 text-sm hover:text-gray-800"
                                                                         onClick={(e) => e.stopPropagation()}
                                                                     >
-                                                                        📎
+                                                                        <Paperclip className="w-4 h-4 text-gray-500" />
                                                                         {task.attachments?.length ?? 0} files
                                                                     </button>
                                                                 </PopoverTrigger>
@@ -414,7 +416,7 @@ export function TaskBoard({
                                             className="w-full bg-gray-100 hover:bg-gray-200 border-4 border-dashed border-gray-400 rounded-xl p-4 text-gray-600 hover:text-gray-800 font-bold transition-all duration-200 hover:border-black"
                                         >
                                             <Plus className="w-5 h-5 mx-auto mb-2" />
-                                            Add new task
+                                            Thêm Task Mới
                                         </button>
                                     </div>
                                 </div>

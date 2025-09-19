@@ -1,7 +1,6 @@
 "use client"
 
-import React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { AddProjectDialog } from "@/components/project-manage/project/add-project-dialog"
@@ -18,9 +17,8 @@ import { toast } from "sonner"
 import { useAppSelector } from "@/hooks/redux"
 import { useGetUserByIdQuery } from "@/services/userService"
 
-export default function DashboardPage() {
+export default function TrangDashboard() {
   const [isAddProjectDialogOpen, setIsAddProjectDialogOpen] = useState(false)
-
   const [deletingProjectId, setDeletingProjectId] = useState<
     string | number | null
   >(null)
@@ -43,16 +41,22 @@ export default function DashboardPage() {
     setDeletingProjectId(id)
     try {
       await deleteProject(Number(id)).unwrap()
-      toast.success("Project deleted successfully ✅")
+
+      toast.success("Dự án đã được xóa", {
+        description: "Dự án của bạn đã được xóa thành công khỏi hệ thống",
+      })
+
       refetch()
     } catch (error) {
-      console.error("Failed to delete project:", error)
-      toast.error("Failed to delete project ❌")
+      console.error("Xóa dự án thất bại:", error)
+
+      toast.error("Không thể xóa dự án", {
+        description: "Đã có lỗi xảy ra, vui lòng thử lại sau nhé!",
+      })
     } finally {
       setDeletingProjectId(null)
     }
   }
-
 
   return (
     <>
@@ -68,14 +72,14 @@ export default function DashboardPage() {
             deletingProjectId={deletingProjectId}
           />
 
-          {/* Nút "Add New Project" */}
+          {/* Nút "Thêm dự án mới" */}
           <div className="text-center mt-16">
             <Button
               onClick={() => setIsAddProjectDialogOpen(true)}
               className="bg-gradient-to-r from-pink-400 to-purple-500 hover:from-pink-500 hover:to-purple-600 text-white font-black shadow-xl hover:shadow-2xl rounded-2xl px-12 py-6 text-xl transition-all duration-300 hover:scale-110 border-3 border-black transform hover:-rotate-1"
             >
               <Plus className="w-8 h-8 mr-4" />
-              Add New Project ✨
+              Thêm dự án mới ✨
             </Button>
           </div>
         </div>

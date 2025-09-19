@@ -21,92 +21,100 @@ interface TaskReportDialogProps {
 }
 
 export function TaskReportDialog({ isOpen, onClose, taskId }: TaskReportDialogProps) {
-    const [displayUnit, setDisplayUnit] = useState<DisplayUnit>('hours')
+  const [displayUnit, setDisplayUnit] = useState<DisplayUnit>('hours')
 
-    const {
+  const {
     data: reportData,
     isLoading,
     isError,
-    } = useGetTaskTimeReportQuery(
+  } = useGetTaskTimeReportQuery(
     { taskId: taskId! },
     { skip: !taskId }
-    )
+  )
 
-    let displayValue = 0
-    let unitLabel = "Hours"
-    const report = reportData?.data
-    if (report) {
+  let displayValue = 0
+  let unitLabel = "Giờ (Hours)"
+  const report = reportData?.data
+  if (report) {
     switch (displayUnit) {
-    case 'minutes':
-    displayValue = Number(report.total_minutes ?? 0)
-    unitLabel = "Total Minutes"
-    break
-    case 'seconds':
-    displayValue = Number(report.total_seconds ?? 0)
-    unitLabel = "Total Seconds"
-    break
-    case 'hours':
-    default:
-    displayValue = Number(report.total_hours ?? 0)
-    unitLabel = "Total Hours"
-    break
+      case 'minutes':
+        displayValue = Number(report.total_minutes ?? 0)
+        unitLabel = "Phút (Minutes)"
+        break
+      case 'seconds':
+        displayValue = Number(report.total_seconds ?? 0)
+        unitLabel = "Giây (Seconds)"
+        break
+      case 'hours':
+      default:
+        displayValue = Number(report.total_hours ?? 0)
+        unitLabel = "Giờ (Hours)"
+        break
     }
-    }
+  }
 
-    return (
+  return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Task Time Report</DialogTitle>
-            <DialogDescription>
-            A summary of the total time spent on this task.
-            </DialogDescription>
+          <DialogTitle className="text-2xl font-bold">Báo cáo thời gian Task</DialogTitle>
+          <DialogDescription>
+            Tóm tắt tổng thời gian đã làm việc trên task này.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="mt-4 space-y-6">
-            {isLoading && <p className="text-center py-8">Loading report...</p>}
-            {isError && <p className="text-center text-red-500 py-8">Failed to load report.</p>}
+          {isLoading && <p className="text-center py-8">Đang tải báo cáo...</p>}
+          {isError && <p className="text-center text-red-500 py-8">Không thể tải báo cáo.</p>}
 
-            {report && !isLoading && (
+          {report && !isLoading && (
             <>
-                <div className="text-center bg-gray-50 p-6 rounded-lg">
+              <div className="text-center bg-gray-50 p-6 rounded-lg">
                 <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">{unitLabel}</p>
                 <p className="text-6xl font-bold text-blue-600 my-2">
-                    {(displayValue ?? 0).toFixed(2)}
+                  {(displayValue ?? 0).toFixed(2)}
                 </p>
-                </div>
+              </div>
 
-                <div className="flex items-center justify-center gap-4">
-                <span className="font-medium text-gray-700">Display unit:</span>
+              <div className="flex items-center justify-center gap-4">
+                <span className="font-medium text-gray-700">Đơn vị hiển thị:</span>
                 <Select
-                    value={displayUnit}
-                    onValueChange={(value: DisplayUnit) => setDisplayUnit(value)}
+                  value={displayUnit}
+                  onValueChange={(value: DisplayUnit) => setDisplayUnit(value)}
                 >
-                    <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select a unit" />
-                    </SelectTrigger>
-                    <SelectContent>
-                    <SelectItem value="hours">Hours (h)</SelectItem>
-                    <SelectItem value="minutes">Minutes (m)</SelectItem>
-                    <SelectItem value="seconds">Seconds (s)</SelectItem>
-                    </SelectContent>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Chọn đơn vị" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hours">Giờ (h)</SelectItem>
+                    <SelectItem value="minutes">Phút (m)</SelectItem>
+                    <SelectItem value="seconds">Giây (s)</SelectItem>
+                  </SelectContent>
                 </Select>
+              </div>
+
+              <div className="pt-4 border-t space-y-2 text-sm">
+                <div className="flex justify-between items-center text-gray-600">
+                  <span className="flex items-center gap-2 font-medium">
+                    <Hourglass size={14} /> Thời gian định dạng:
+                  </span>
+                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                    {report.formatted_time}
+                  </span>
                 </div>
-                
-                <div className="pt-4 border-t space-y-2 text-sm">
-                    <div className="flex justify-between items-center text-gray-600">
-                    <span className="flex items-center gap-2 font-medium"><Hourglass size={14} /> Formatted Time:</span>
-                    <span className="font-mono bg-gray-100 px-2 py-1 rounded">{report.formatted_time}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-gray-600">
-                    <span className="flex items-center gap-2 font-medium"><History size={14} /> Work Sessions:</span>
-                    <span className="font-mono bg-gray-100 px-2 py-1 rounded">{report.logs_count}</span>
-                    </div>
+                <div className="flex justify-between items-center text-gray-600">
+                  <span className="flex items-center gap-2 font-medium">
+                    <History size={14} /> Work Sessions:
+                  </span>
+                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                    {report.logs_count}
+                  </span>
                 </div>
+              </div>
             </>
-            )}
+          )}
         </div>
-        </DialogContent>
+      </DialogContent>
     </Dialog>
-    )
+  )
 }

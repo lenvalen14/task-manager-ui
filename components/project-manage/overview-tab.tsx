@@ -32,7 +32,7 @@ export function OverviewTab({ projectProgress, totalTasks, timeSpent }: Overview
           <CardContent className="p-6">
             <div className="text-4xl font-black text-gray-900 mb-3">{projectProgress}% Complete</div>
 
-            {/* Custom Progress Bar */}
+            {/* Thanh Progress */}
             <div className="relative w-full h-4 bg-white rounded-full border border-gray-300 shadow-inner overflow-hidden mb-3">
               <div
                 className="h-full bg-blue-400 rounded-full transition-all duration-500 ease-out"
@@ -41,7 +41,7 @@ export function OverviewTab({ projectProgress, totalTasks, timeSpent }: Overview
             </div>
 
             <p className="text-sm font-bold text-gray-700 bg-white px-3 py-1 rounded-full border border-gray-400 inline-block">
-              Based on completed tasks
+              Dựa trên số Task đã hoàn thành
             </p>
           </CardContent>
         </Card>
@@ -79,7 +79,7 @@ export function OverviewTab({ projectProgress, totalTasks, timeSpent }: Overview
             <div className="text-4xl font-black text-gray-900 mb-3">{timeSpent}</div>
             <div className="bg-white px-3 py-1 rounded-full border border-gray-400 inline-flex items-center gap-2">
               <span className="text-green-600 font-bold text-lg">↗</span>
-              <span className="text-sm font-bold text-green-600">2.5% from last week</span>
+              <span className="text-sm font-bold text-green-600">+2.5% so với tuần trước</span>
             </div>
           </CardContent>
         </Card>
@@ -95,9 +95,9 @@ export function OverviewTab({ projectProgress, totalTasks, timeSpent }: Overview
           <CardContent className="p-6">
             <div className="space-y-4">
               {[
-                { action: 'completed "Wireframing" task', time: '2 hours ago', color: 'bg-green-200' },
-                { action: 'added a new note to "Customer Journey Mapping"', time: 'yesterday', color: 'bg-blue-200' },
-                { action: 'updated "Persona development" description', time: '3 days ago', color: 'bg-purple-200' }
+                { action: 'đã hoàn thành Task "Wireframing"', time: '2 giờ trước', color: 'bg-green-200' },
+                { action: 'thêm một note mới vào "Customer Journey Mapping"', time: 'hôm qua', color: 'bg-blue-200' },
+                { action: 'cập nhật mô tả cho "Persona development"', time: '3 ngày trước', color: 'bg-purple-200' }
               ].map((activity, index) => (
                 <div key={index} className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-300 shadow-sm">
                   <div className={`w-4 h-4 rounded-full ${activity.color} border border-gray-400`}></div>
@@ -117,7 +117,7 @@ export function OverviewTab({ projectProgress, totalTasks, timeSpent }: Overview
             {/* View More Button */}
             <div className="text-center mt-6">
               <button className="bg-yellow-300 hover:bg-yellow-400 text-gray-900 font-black px-6 py-3 rounded-xl border border-gray-400 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
-                View All Activity
+                Xem tất cả Activity
               </button>
             </div>
           </CardContent>

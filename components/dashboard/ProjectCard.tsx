@@ -33,8 +33,8 @@ interface Project {
 interface ProjectCardProps {
   project: Project
   index: number
-  onDelete: (id: string | number) => void // Hàm callback khi người dùng xác nhận xóa
-  isDeleting: boolean // Prop để hiển thị trạng thái loading khi đang xóa
+  onDelete: (id: string | number) => void
+  isDeleting: boolean
 }
 
 export function ProjectCard({
@@ -43,10 +43,8 @@ export function ProjectCard({
   onDelete,
   isDeleting,
 }: ProjectCardProps) {
-  // State để quản lý việc đóng/mở dialog xác nhận xóa
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
 
-  // --- Logic tính toán cho hiển thị ---
   const colors = [
     "bg-red-500",
     "bg-green-500",
@@ -66,7 +64,6 @@ export function ProjectCard({
   const progress =
     totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
 
-  // Hàm xử lý khi người dùng xác nhận xóa
   const handleDeleteConfirm = () => {
     onDelete(project.id)
   }
@@ -79,6 +76,7 @@ export function ProjectCard({
       >
         <CardHeader className="relative pb-4">
           <div className="flex items-start justify-between">
+            {/* Tên dự án + biểu tượng màu */}
             <div className="flex items-center gap-4 mb-4">
               <div
                 className={`w-12 h-12 rounded-2xl ${color} flex items-center justify-center text-white text-lg font-black shadow-lg border-2 border-black transform rotate-3 group-hover:rotate-0 transition-transform duration-300`}
@@ -95,6 +93,7 @@ export function ProjectCard({
               </CardTitle>
             </div>
 
+            {/* Menu thao tác */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -116,12 +115,13 @@ export function ProjectCard({
                     setIsDeleteDialogOpen(true)
                   }}
                 >
-                  Delete Project
+                  Xóa dự án
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
 
+          {/* Thanh tiến độ */}
           <CardDescription>
             <div className="relative mb-3">
               <div className="w-full h-4 bg-gray-200 rounded-full shadow-inner overflow-hidden">
@@ -132,17 +132,18 @@ export function ProjectCard({
               </div>
             </div>
             <span className="text-lg font-black text-gray-900 bg-yellow-200 px-3 py-1 rounded-full border-2 border-black shadow-sm">
-              {progress}% Complete
+              Hoàn thành {progress}%
             </span>
           </CardDescription>
         </CardHeader>
 
+        {/* Footer: số task + nút xem chi tiết */}
         <CardContent className="flex justify-between items-center pt-0 mt-auto">
           <div className="text-sm font-bold text-gray-700">
             <span className="text-gray-900 font-black text-lg">
               {completedTasks}
             </span>{" "}
-            / {totalTasks} Tasks
+            / {totalTasks} Công việc
           </div>
           <Button
             variant="outline"
@@ -150,11 +151,12 @@ export function ProjectCard({
             asChild
             className="border-2 border-black bg-white text-gray-900 rounded-xl font-black shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 hover:bg-gray-50"
           >
-            <Link href={`/dashboard/project/${project.id}`}>View Project</Link>
+            <Link href={`/dashboard/project/${project.id}`}>Xem dự án</Link>
           </Button>
         </CardContent>
       </Card>
 
+      {/* Dialog xác nhận xóa */}
       <DeleteConfirmationDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}

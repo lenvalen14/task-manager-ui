@@ -3,14 +3,15 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { useResetPasswordMutation } from "@/services/passwordService"
 import { useSelector } from "react-redux"
 import { selectUser } from "@/lib/slices/authSlice"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function TabPassword() {
   const user = useSelector(selectUser)
+  const { toast } = useToast()
 
   const [form, setForm] = useState({
     old_password: "",
@@ -27,7 +28,11 @@ export default function TabPassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (form.new_password !== form.confirm_password) {
-      alert("New password and confirm password do not match!")
+      toast({
+        title: "Lỗi",
+        description: "Mật khẩu mới và mật khẩu xác nhận không khớp!",
+        variant: "destructive",
+      })
       return
     }
 
@@ -39,56 +44,62 @@ export default function TabPassword() {
         confirm_password: form.confirm_password,
       }).unwrap()
 
-      console.log("Change password success:", res)
-      alert("Password changed successfully!")
+      console.log("Đổi mật khẩu thành công:", res)
+      toast({
+        title: "Thành công 🎉",
+        description: "Đổi mật khẩu thành công!",
+      })
       setForm({ old_password: "", new_password: "", confirm_password: "" })
     } catch (err: any) {
-      console.error("Change password error:", err)
-      alert(err?.data?.message || "Failed to change password")
+      console.error("Lỗi đổi mật khẩu:", err)
+      toast({
+        title: "Lỗi",
+        description: err?.data?.message || "Không thể đổi mật khẩu",
+        variant: "destructive",
+      })
     }
   }
 
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Change Password */}
       <form
         onSubmit={handleSubmit}
         className="bg-white rounded-xl border-2 border-black p-6 shadow-lg hover:shadow-xl transition-all duration-200"
       >
         <h3 className="text-xl font-black text-gray-900 mb-6 bg-green-200 px-4 py-2 rounded-xl border-2 border-black shadow-md inline-block transform -rotate-1">
-          Change Password
+          Đổi mật khẩu
         </h3>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label className="font-bold text-gray-700">Current Password</Label>
+            <Label className="font-bold text-gray-700">Mật khẩu hiện tại</Label>
             <Input
               type="password"
               value={form.old_password}
               onChange={(e) => handleChange("old_password", e.target.value)}
-              placeholder="Enter current password"
+              placeholder="Nhập mật khẩu hiện tại"
               className="border-2 border-grey rounded-xl focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="font-bold text-gray-700">New Password</Label>
+            <Label className="font-bold text-gray-700">Mật khẩu mới</Label>
             <Input
               type="password"
               value={form.new_password}
               onChange={(e) => handleChange("new_password", e.target.value)}
-              placeholder="Enter new password"
+              placeholder="Nhập mật khẩu mới"
               className="border-2 border-grey rounded-xl focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="font-bold text-gray-700">Confirm New Password</Label>
+            <Label className="font-bold text-gray-700">Xác nhận mật khẩu mới</Label>
             <Input
               type="password"
               value={form.confirm_password}
               onChange={(e) => handleChange("confirm_password", e.target.value)}
-              placeholder="Confirm new password"
+              placeholder="Xác nhận mật khẩu mới"
               className="border-2 border-grey rounded-xl focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -99,7 +110,7 @@ export default function TabPassword() {
           disabled={isLoading}
           className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold px-8 py-3 rounded-xl border-2 border-black shadow-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 hover:shadow-xl transition-all duration-300"
         >
-          {isLoading ? "Changing..." : "Change Password"}
+          {isLoading ? "Đang đổi..." : "Đổi mật khẩu"}
         </Button>
       </form>
     </div>

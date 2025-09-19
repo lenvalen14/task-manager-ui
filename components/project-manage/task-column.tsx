@@ -12,14 +12,6 @@ type Task = {
   description: string
 }
 
-type TaskColumnData = {
-  id: string
-  title: string
-  status: "to-do" | "in-progress" | "need-review" | "done"
-  tasks: Task[]
-  color: string
-}
-
 type TaskColumnProps = {
   column: {
     id: string
