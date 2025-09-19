@@ -58,19 +58,19 @@ export default function VerifyOtpPage() {
     e.preventDefault()
     const code = otp.join("")
     if (code.length < 6) {
-      toast.error("Please enter all 6 digits")
+      toast.error("Vui lòng nhập đủ 6 số")
       return
     }
 
     try {
       await verifyOtp({ email, otp: Number(code) }).unwrap()
-      toast.success("OTP verified successfully")
+      toast.success("Xác thực OTP thành công")
       router.push(`/auth/reset-password?email=${encodeURIComponent(email)}`)
     } catch (err: any) {
       const detail =
         err?.data?.non_field_errors?.[0] ||
         err?.data?.message ||
-        "Invalid OTP. Please try again."
+        "OTP không hợp lệ. Vui lòng thử lại."
       toast.error(detail)
     }
   }
@@ -84,10 +84,10 @@ export default function VerifyOtpPage() {
               <Button variant="ghost" size="icon" asChild className="text-gray-600 hover:text-gray-800 bg-gray-100 rounded-full p-2">
                 <Link href="/auth/forgot-password">
                   <ArrowLeft className="w-5 h-5" />
-                  <span className="sr-only">Back</span>
+                  <span className="sr-only">Quay lại</span>
                 </Link>
               </Button>
-              <CardTitle className="text-3xl font-bold text-black">Verify OTP</CardTitle>
+              <CardTitle className="text-3xl font-bold text-black">Xác thực OTP</CardTitle>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-blue-400 rounded-sm flex items-center justify-center">
@@ -108,19 +108,19 @@ export default function VerifyOtpPage() {
           <div className="bg-gradient-to-r from-yellow-200 to-orange-200 rounded-xl p-4 border-2 border-black mb-6">
             <div className="flex items-center justify-center space-x-2">
               <ShieldCheck className="w-5 h-5 text-green-600" />
-              <span className="text-black font-semibold">Enter the 6-digit code sent to {email}</span>
+              <span className="text-black font-semibold">Nhập mã gồm 6 chữ số đã gửi tới {email}</span>
             </div>
           </div>
 
           <CardDescription className="text-gray-600 text-lg">
-            Please enter your OTP to continue.
+            Vui lòng nhập OTP để tiếp tục.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={handleSubmit} className="grid gap-6">
             <div className="grid gap-3">
-              <Label className="text-black font-bold text-lg text-center">OTP Code</Label>
+              <Label className="text-black font-bold text-lg text-center">Mã OTP</Label>
               <div className="flex justify-between gap-2">
                 {otp.map((digit, i) => (
                   <input
@@ -143,12 +143,12 @@ export default function VerifyOtpPage() {
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-xl border-2 border-black transform hover:scale-105"
             >
-              {isLoading ? "Verifying..." : "Verify OTP"}
+              {isLoading ? "Đang xác thực..." : "Xác thực OTP"}
             </Button>
             <div className="mt-6 text-center text-gray-600 text-sm">
-              Didn’t receive the code?{" "}
+              Chưa nhận được mã?{" "}
               <Link href="/auth/forgot-password" className="text-pink-600 hover:text-pink-700 font-semibold underline">
-                Resend OTP
+                Gửi lại OTP
               </Link>
             </div>
           </form>

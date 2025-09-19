@@ -18,48 +18,48 @@ export function FeatureSection() {
   const features = [
     {
       icon: Users,
-      title: "Project Management",
-      description: "Create and manage projects with clear objectives, milestones, and team collaboration features.",
+      title: "Quản lý dự án",
+      description: "Tạo và quản lý dự án với mục tiêu rõ ràng, mốc thời gian và tính năng cộng tác nhóm.",
       bgGradient: "from-violet-500 to-purple-500",
       bgLight: "from-violet-50 to-purple-50",
       iconColor: "text-violet-600",
-      stats: "Unlimited projects"
+      stats: "Không giới hạn dự án"
     },
     {
       icon: CheckCircle,
-      title: "Task Management",
-      description: "Organize tasks with priorities, due dates, assignments, and progress tracking for better productivity.",
+      title: "Quản lý công việc",
+      description: "Sắp xếp công việc với mức độ ưu tiên, hạn chót, người phụ trách và theo dõi tiến độ để tăng năng suất.",
       bgGradient: "from-emerald-500 to-green-500",
       bgLight: "from-emerald-50 to-green-50",
       iconColor: "text-emerald-600",
-      stats: "Smart organization"
+      stats: "Tổ chức thông minh"
     },
     {
       icon: Clock,
-      title: "Time Logging",
-      description: "Track time spent on tasks and projects with detailed logs and comprehensive time reports.",
+      title: "Theo dõi thời gian",
+      description: "Ghi lại thời gian dành cho từng công việc/dự án với báo cáo chi tiết và log đầy đủ.",
       bgGradient: "from-blue-500 to-cyan-500",
       bgLight: "from-blue-50 to-cyan-50",
       iconColor: "text-blue-600",
-      stats: "Accurate tracking"
+      stats: "Theo dõi chính xác"
     },
     {
       icon: BarChart3,
-      title: "Dashboard Analytics",
-      description: "Get insights into your productivity with visual charts, progress reports, and performance metrics.",
+      title: "Phân tích Dashboard",
+      description: "Nhận thông tin chi tiết về năng suất với biểu đồ trực quan, báo cáo tiến độ và các chỉ số hiệu suất.",
       bgGradient: "from-pink-500 to-rose-500",
       bgLight: "from-pink-50 to-rose-50",
       iconColor: "text-pink-600",
-      stats: "Real-time insights"
+      stats: "Thống kê thời gian thực"
     },
     {
       icon: Sparkles,
-      title: "Smart Notifications",
-      description: "Stay updated with intelligent alerts for deadlines, task updates, and important project changes.",
+      title: "Thông báo thông minh",
+      description: "Luôn được cập nhật với các nhắc nhở thông minh về deadline, cập nhật công việc và thay đổi quan trọng.",
       bgGradient: "from-amber-500 to-orange-500",
       bgLight: "from-amber-50 to-orange-50",
       iconColor: "text-amber-600",
-      stats: "Never miss anything"
+      stats: "Không bỏ lỡ điều gì"
     }
   ];
 
@@ -87,22 +87,22 @@ export function FeatureSection() {
           <div className="inline-flex items-center bg-gradient-to-r from-violet-100 to-fuchsia-100 border border-violet-200 rounded-full px-6 py-3 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group mb-8">
             <Sparkles className="w-4 h-4 text-violet-600 mr-3 animate-spin" />
             <span className="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-gray-700">Powerful Features</span>
+            <span className="text-gray-700">Tính năng mạnh mẽ</span>
             <ArrowRight className="w-4 h-4 ml-3 text-violet-600 group-hover:translate-x-1 transition-transform duration-300" />
           </div>
 
           <h2 className="text-5xl lg:text-6xl font-black leading-tight mb-6">
             <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-              Everything you need to
+              Mọi thứ bạn cần để
             </span>
             <br />
             <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 bg-clip-text text-transparent">
-              Stay Productive
+              Luôn năng suất
             </span>
           </h2>
 
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Experience the next generation of productivity tools with AI-powered features, seamless collaboration, and intelligent automation.
+            Trải nghiệm thế hệ công cụ quản lý công việc tiếp theo với AI, cộng tác mượt mà và tự động hóa thông minh.
           </p>
         </div>
 
@@ -153,30 +153,30 @@ export function FeatureSection() {
                 <div className="space-y-6">
                   <div className="inline-flex items-center bg-gradient-to-r from-emerald-100 to-green-100 border border-emerald-200 rounded-full px-4 py-2 text-sm font-semibold">
                     <Star className="w-4 h-4 text-emerald-600 mr-2" />
-                    <span className="text-emerald-700">All-in-One Solution</span>
+                    <span className="text-emerald-700">Giải pháp tất cả trong một</span>
                   </div>
                   
                   <h3 className="text-4xl lg:text-5xl font-black leading-tight">
                     <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                      Complete Project
+                      Quản lý dự án
                     </span>
                     <br />
                     <span className="bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                      Management
+                      Hoàn chỉnh
                     </span>
                   </h3>
                   
                   <p className="text-xl text-gray-600 leading-relaxed">
-                    Everything you need to manage projects, track tasks, log time, and stay organized in one intuitive platform.
+                    Tất cả những gì bạn cần để quản lý dự án, theo dõi công việc, ghi log thời gian và giữ mọi thứ gọn gàng trong một nền tảng trực quan.
                   </p>
                 </div>
                 
                 {/* Feature List */}
                 <div className="space-y-4">
                   {[
-                    { icon: Users, text: "Multi-project workspace", color: "violet" },
-                    { icon: CheckCircle, text: "Task progress tracking", color: "emerald" },
-                    { icon: Clock, text: "Detailed time reports", color: "blue" },
+                    { icon: Users, text: "Không gian đa dự án", color: "violet" },
+                    { icon: CheckCircle, text: "Theo dõi tiến độ công việc", color: "emerald" },
+                    { icon: Clock, text: "Báo cáo thời gian chi tiết", color: "blue" },
                   ].map((item, index) => (
                     <div key={index} className={`flex items-center space-x-4 p-4 bg-gradient-to-r from-${item.color}-100 to-${item.color}-50 rounded-2xl border border-${item.color}-200/50 hover:shadow-lg transition-all duration-300 group`}>
                       <div className={`w-12 h-12 bg-gradient-to-br from-${item.color}-500 to-${item.color}-600 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
@@ -198,7 +198,7 @@ export function FeatureSection() {
                     <div className="rounded-2xl overflow-hidden">
                       <img 
                         src="/dashboard-mockup-2.png" 
-                        alt="Project Owner Interface"
+                        alt="Giao diện quản lý dự án"
                         className="w-full h-auto object-cover rounded-2xl"
                       />
                       
@@ -209,7 +209,7 @@ export function FeatureSection() {
                       <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-xl p-2 shadow-lg animate-pulse">
                         <div className="flex items-center space-x-2">
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          <span className="text-xs font-semibold text-gray-700">Live Sync</span>
+                          <span className="text-xs font-semibold text-gray-700">Đồng bộ trực tiếp</span>
                         </div>
                       </div>
                     </div>
@@ -218,7 +218,7 @@ export function FeatureSection() {
                   <div className="absolute -bottom-6 -left-6 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-2xl p-3 shadow-xl text-white animate-float delay-1000">
                     <div className="flex items-center space-x-2">
                       <Zap className="w-4 h-4" />
-                      <span className="text-sm font-semibold">Fast & Secure</span>
+                      <span className="text-sm font-semibold">Nhanh & An toàn</span>
                     </div>
                   </div>
 

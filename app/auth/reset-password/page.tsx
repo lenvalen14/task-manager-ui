@@ -23,7 +23,7 @@ export default function ResetPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match")
+      toast.error("Mật khẩu nhập lại không khớp")
       return
     }
     try {
@@ -32,10 +32,10 @@ export default function ResetPasswordPage() {
         new_password: password,
         confirm_password: confirmPassword,
       }).unwrap()
-      toast.success("Password updated successfully")
+      toast.success("Cập nhật mật khẩu thành công")
       router.push("/auth/login")
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to update password")
+      toast.error(err?.data?.message || "Cập nhật mật khẩu thất bại")
     }
   }
 
@@ -53,10 +53,10 @@ export default function ResetPasswordPage() {
               >
                 <Link href="/auth/login">
                   <ArrowLeft className="w-5 h-5" />
-                  <span className="sr-only">Back to Login</span>
+                  <span className="sr-only">Quay lại đăng nhập</span>
                 </Link>
               </Button>
-              <CardTitle className="text-3xl font-bold text-black">Create Password</CardTitle>
+              <CardTitle className="text-3xl font-bold text-black">Tạo mật khẩu mới</CardTitle>
             </div>
 
             <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center shadow-md border border-black">
@@ -65,7 +65,7 @@ export default function ResetPasswordPage() {
           </div>
 
           <CardDescription className="text-gray-600 text-lg">
-            Enter and confirm your new password
+            Nhập và xác nhận mật khẩu mới của bạn
           </CardDescription>
         </CardHeader>
 
@@ -73,31 +73,33 @@ export default function ResetPasswordPage() {
           <form onSubmit={handleSubmit} className="grid gap-6">
             <div className="grid gap-3">
               <Label htmlFor="password" className="text-black font-bold text-lg">
-                New Password
+                Mật khẩu mới
               </Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter new password"
+                placeholder="Nhập mật khẩu mới"
                 required
-                className="border-2 border-black focus:border-pink-500 focus:ring-pink-500 rounded-xl bg-white text-black placeholder-gray-400 py-4 text-lg shadow-lg"
+                className="border-2 border-black focus:border-pink-500 focus:ring-pink-500 rounded-xl 
+                           bg-white text-black placeholder-gray-400 py-4 text-lg shadow-lg"
               />
             </div>
 
             <div className="grid gap-3">
               <Label htmlFor="confirmPassword" className="text-black font-bold text-lg">
-                Confirm Password
+                Xác nhận mật khẩu
               </Label>
               <Input
                 id="confirmPassword"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm new password"
+                placeholder="Nhập lại mật khẩu mới"
                 required
-                className="border-2 border-black focus:border-pink-500 focus:ring-pink-500 rounded-xl bg-white text-black placeholder-gray-400 py-4 text-lg shadow-lg"
+                className="border-2 border-black focus:border-pink-500 focus:ring-pink-500 rounded-xl 
+                           bg-white text-black placeholder-gray-400 py-4 text-lg shadow-lg"
               />
             </div>
 
@@ -108,13 +110,13 @@ export default function ResetPasswordPage() {
                          text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-xl border-2 border-black 
                          transform hover:scale-105"
             >
-              {isLoading ? "Updating..." : "Update Password"}
+              {isLoading ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
             </Button>
 
             <div className="mt-6 text-center text-gray-600">
-              Remember your password?{" "}
+              Nhớ mật khẩu rồi?{" "}
               <Link href="/auth/login" className="text-pink-600 hover:text-pink-700 font-semibold underline">
-                Back to login
+                Quay lại đăng nhập
               </Link>
             </div>
           </form>

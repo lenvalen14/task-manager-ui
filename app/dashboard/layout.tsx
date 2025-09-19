@@ -2,7 +2,6 @@ import type React from "react"
 import { Sidebar } from "@/components/layout/sidebar"
 import { Header } from "@/components/layout/header"
 import { Metadata } from "next"
-import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: "Personal Task Manager",
@@ -20,7 +19,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Header />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
-      <Toaster />
     </div>
   )
 }

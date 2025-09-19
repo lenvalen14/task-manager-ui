@@ -41,7 +41,7 @@ export function HeroSection() {
             <div className="inline-flex items-center bg-gradient-to-r from-violet-100 to-fuchsia-100 border border-violet-200 rounded-full px-6 py-3 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
               <Sparkles className="w-4 h-4 text-violet-600 mr-3 animate-spin" />
               <span className="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></span>
-              <span className="text-gray-700">New: Time Log for your Task</span>
+              <span className="text-gray-700">Mới: Nhật ký thời gian cho công việc</span>
               <ArrowRight className="w-4 h-4 ml-3 text-violet-600 group-hover:translate-x-1 transition-transform duration-300" />
             </div>
 
@@ -49,15 +49,15 @@ export function HeroSection() {
             <div className="space-y-6">
               <h1 className="text-5xl lg:text-7xl font-black leading-tight">
                 <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-                  Productivity
+                  Năng suất
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 bg-clip-text text-transparent">
-                  Reimagined
+                  Được tái định nghĩa
                 </span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed max-w-lg">
-                Manage your personal tasks effortlessly with Kanban View, List View, and detailed Time Logs to track performance. Stay on top of deadlines with smart notifications for upcoming and overdue tasks.
+                Quản lý công việc cá nhân của bạn một cách dễ dàng với Kanban, danh sách và nhật ký thời gian chi tiết để theo dõi hiệu suất. Luôn theo sát deadline với thông báo thông minh cho công việc sắp đến hạn và quá hạn.
               </p>
             </div>
 
@@ -69,7 +69,7 @@ export function HeroSection() {
               >
                 <button className="group relative bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-8 py-4 rounded-2xl font-semibold hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden">
                   <span className="relative z-10 flex items-center justify-center">
-                    Start Free Trial
+                    Bắt đầu dùng thử miễn phí
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -78,7 +78,7 @@ export function HeroSection() {
               <button className="group bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-800 px-8 py-4 rounded-2xl font-semibold hover:shadow-xl transition-all duration-300 hover:scale-105 hover:bg-white">
                 <div className="flex items-center justify-center">
                   <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
-                  Watch Demo
+                  Xem demo
                 </div>
               </button>
             </div>
@@ -87,15 +87,15 @@ export function HeroSection() {
             <div className="flex items-center space-x-8 pt-8">
               <div className="text-center">
                 <div className="text-3xl font-bold text-gray-900">50K+</div>
-                <div className="text-sm text-gray-600">Active Users</div>
+                <div className="text-sm text-gray-600">Người dùng hoạt động</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-gray-900">99.9%</div>
-                <div className="text-sm text-gray-600">Uptime</div>
+                <div className="text-sm text-gray-600">Thời gian hoạt động</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-gray-900">4.9★</div>
-                <div className="text-sm text-gray-600">App Store</div>
+                <div className="text-sm text-gray-600">Trên App Store</div>
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@ export function HeroSection() {
                 <div className="rounded-2xl overflow-hidden">
                   <img 
                     src="/dashboard-mockup.png" 
-                    alt="Modern Dashboard Interface"
+                    alt="Giao diện bảng điều khiển hiện đại"
                     className="w-full h-auto object-cover rounded-2xl"
                   />
                   
@@ -128,21 +128,21 @@ export function HeroSection() {
               <div className="absolute -top-4 -left-4 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-xl border border-white/30 animate-float">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-semibold text-gray-700">Live Updates</span>
+                  <span className="text-sm font-semibold text-gray-700">Cập nhật trực tiếp</span>
                 </div>
               </div>
 
               <div className="absolute -top-6 -right-8 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-xl border border-white/30 animate-float delay-500">
                 <div className="flex items-center space-x-2">
                   <Users className="w-4 h-4 text-violet-600" />
-                  <span className="text-sm font-semibold text-gray-700">24 Online</span>
+                  <span className="text-sm font-semibold text-gray-700">24 đang online</span>
                 </div>
               </div>
 
               <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-2xl p-3 shadow-xl text-white animate-float delay-1000">
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="w-4 h-4" />
-                  <span className="text-sm font-semibold">Tasks: 78%</span>
+                  <span className="text-sm font-semibold">Hoàn thành: 78%</span>
                 </div>
               </div>
 

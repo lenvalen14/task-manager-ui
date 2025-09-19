@@ -2,7 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "sonner"
 import { ReduxProvider } from "@/components/providers/redux-provider"
 import { NotificationProvider } from "@/components/providers/NotificationProvider"
 
@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Personal Task Manager",
   description: "A personal task and project management web application.",
-  generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <NotificationProvider />
         </ReduxProvider>
-        <Toaster />
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   )

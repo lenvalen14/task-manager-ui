@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Star, Quote, ArrowRight, Sparkles, TrendingUp, Users, Award, Heart } from 'lucide-react';
+import { Star, Quote, ArrowRight } from 'lucide-react';
 
 export function TestimonialSection() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -18,33 +18,33 @@ export function TestimonialSection() {
   const testimonials = [
     {
       name: "Sarah Johnson",
-      role: "Freelance Designer",
+      role: "Nhà thiết kế tự do",
       company: "Independent",
       avatar: "SJ",
-      content: "This task manager has completely transformed my workflow. The dashboard gives me clear insights into my productivity and the time tracking helps me bill clients accurately.",
+      content: "Công cụ quản lý công việc này đã thay đổi hoàn toàn quy trình làm việc của tôi. Bảng điều khiển giúp tôi có cái nhìn rõ ràng về năng suất và tính năng ghi log thời gian giúp tôi tính phí khách hàng chính xác.",
       rating: 5,
       bgGradient: "from-blue-500 to-cyan-500",
-      highlight: "40% more organized"
+      highlight: "Tổ chức tốt hơn 40%"
     },
     {
       name: "Michael Chen",
-      role: "Software Developer",
-      company: "Self-employed",
+      role: "Lập trình viên phần mềm",
+      company: "Freelancer",
       avatar: "MC",
-      content: "The project management features are perfect for juggling multiple client projects. I love how I can track time and see exactly where I'm spending my hours.",
+      content: "Các tính năng quản lý dự án rất phù hợp để xử lý nhiều dự án khách hàng cùng lúc. Tôi thích việc có thể theo dõi thời gian và biết chính xác mình đã dành bao nhiêu giờ.",
       rating: 5,
       bgGradient: "from-emerald-500 to-green-500",
-      highlight: "Perfect for freelancers"
+      highlight: "Hoàn hảo cho freelancer"
     },
     {
       name: "Emily Rodriguez",
-      role: "Marketing Consultant",
+      role: "Chuyên viên tư vấn Marketing",
       company: "Freelancer",
       avatar: "ER",
-      content: "Finally found a simple yet powerful tool that keeps all my projects organized. The notifications ensure I never miss deadlines and stay on top of everything.",
+      content: "Cuối cùng tôi đã tìm thấy một công cụ đơn giản nhưng mạnh mẽ để giữ cho tất cả dự án được tổ chức gọn gàng. Thông báo thông minh giúp tôi không bao giờ bỏ lỡ deadline.",
       rating: 5,
       bgGradient: "from-violet-500 to-purple-500",
-      highlight: "Never miss deadlines"
+      highlight: "Không lo trễ hạn"
     }
   ];
 
@@ -72,22 +72,22 @@ export function TestimonialSection() {
           <div className="inline-flex items-center bg-gradient-to-r from-violet-100 to-fuchsia-100 border border-violet-200 rounded-full px-6 py-3 text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group mb-8">
             <Quote className="w-4 h-4 text-violet-600 mr-3" />
             <span className="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"></span>
-            <span className="text-gray-700">User Stories</span>
+            <span className="text-gray-700">Câu chuyện người dùng</span>
             <ArrowRight className="w-4 h-4 ml-3 text-violet-600 group-hover:translate-x-1 transition-transform duration-300" />
           </div>
 
           <h2 className="text-5xl lg:text-6xl font-black leading-tight mb-6">
             <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-              Loved by Teams
+              Được tin dùng bởi các nhóm
             </span>
             <br />
             <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 bg-clip-text text-transparent">
-              Worldwide
+              Trên toàn thế giới
             </span>
           </h2>
 
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            See how individuals and freelancers are boosting their productivity and staying organized with our simple yet powerful tools.
+            Xem cách các cá nhân và freelancer nâng cao năng suất, giữ mọi thứ ngăn nắp với công cụ đơn giản nhưng mạnh mẽ của chúng tôi.
           </p>
         </div>
 

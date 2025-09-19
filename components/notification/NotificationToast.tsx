@@ -39,17 +39,20 @@ export function useNotificationToast() {
     }
 
     toast(
-      <div className="flex items-start gap-2">
-        <Icon className="h-5 w-5 mt-1" />
+      <div className="flex items-start gap-3 text-base">
+        <Icon className="h-6 w-6 mt-1" />
         <div>
-          <p className="font-medium">{config.title}</p>
-          <p>{message}</p>
+          <p className="font-semibold text-lg">{config.title}</p>
+          <p className="text-base">{message}</p>
           {formattedDeadline && (
-            <p className="text-xs text-gray-500">Due: {formattedDeadline}</p>
+            <p className="text-sm text-gray-500">Due: {formattedDeadline}</p>
           )}
         </div>
       </div>,
-      { duration: 5000 }
+      {
+        duration: 10000,
+        className: "p-6 max-w-md text-lg",
+      }
     )
   }
 

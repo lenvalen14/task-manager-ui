@@ -29,23 +29,19 @@ export default function LoginPage() {
     const username = formData.username.trim();
     const password = formData.password.trim();
 
-    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    // if (emailRegex.test(username)) {
-    //   toast.error("Username cannot be an email address.");
-    //   return;
-    // }
+    if (!username || !password) {
+      toast.error("Vui lòng điền đầy đủ thông tin.")
+      return
+    }
     if (password.length < 8) {
-      toast.error("Password must be at least 8 characters.");
-      return;
+      toast.error("Mật khẩu phải có ít nhất 8 ký tự.")
+      return
     }
 
     dispatch(loginRequest())
 
     try {
       const response: LoginResponse = await login(formData).unwrap()
-
-      console.log(response.data);
 
       if (response.code === 200 && response.data?.data) {
         const { user_id, email, username, access_token, refresh_token } = response.data.data
@@ -63,11 +59,9 @@ export default function LoginPage() {
         toast.success("Đăng nhập thành công!")
         router.push("../../dashboard")
       } else {
-        console.warn("Login thất bại:", response)
         throw new Error(response.message || "Đăng nhập thất bại")
       }
     } catch (error: any) {
-      console.error("Lỗi khi login:", error)
       const message = error?.data?.message || error?.message || "Đăng nhập thất bại"
       dispatch(loginFailure(message))
       toast.error(message)
@@ -79,7 +73,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl rounded-2xl border-2 border-black bg-white/95 backdrop-blur-sm">
         <CardHeader className="text-center pb-6">
           <div className="flex items-center justify-between mb-4">
-            <CardTitle className="text-3xl font-bold text-black">Welcome Back!</CardTitle>
+            <CardTitle className="text-3xl font-bold text-black">Chào mừng trở lại!</CardTitle>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-blue-400 rounded-sm flex items-center justify-center">
                 <Sparkles className="w-3 h-3 text-white" />
@@ -98,13 +92,13 @@ export default function LoginPage() {
 
           <div className="bg-gradient-to-r from-yellow-200 to-orange-200 rounded-xl p-4 border-2 border-black mb-6">
             <div className="flex items-center justify-center space-x-2">
-              <span className="text-black font-semibold">Let's get you back to productivity!</span>
+              <span className="text-black font-semibold">Hãy quay lại với hiệu suất làm việc cao nào!</span>
               <Sparkles className="w-4 h-4 text-orange-500" />
             </div>
           </div>
 
           <CardDescription className="text-gray-600 text-lg">
-            Enter your credentials to access your account.
+            Nhập thông tin để truy cập vào tài khoản của bạn.
           </CardDescription>
         </CardHeader>
 
@@ -112,7 +106,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="grid gap-6">
             <div className="grid gap-3">
               <Label htmlFor="username" className="text-black font-bold text-lg">
-                Username
+                Tên đăng nhập
               </Label>
               <Input
                 id="username"
@@ -129,13 +123,13 @@ export default function LoginPage() {
             <div className="grid gap-3">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-black font-bold text-lg">
-                  Password
+                  Mật khẩu
                 </Label>
                 <Link
                   href="/auth/forgot-password"
                   className="text-sm text-pink-600 hover:text-pink-700 font-medium underline"
                 >
-                  Forgot password?
+                  Quên mật khẩu?
                 </Link>
               </div>
               <div className="relative">
@@ -164,13 +158,13 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold py-4 rounded-xl transition-all duration-300 shadow-xl border-2 border-black transform hover:scale-105"
             >
-              {isLoading ? "Signing in..." : "+ Sign In"}
+              {isLoading ? "Đang đăng nhập..." : "+ Đăng nhập"}
             </Button>
 
             <div className="mt-6 text-center text-gray-600">
-              Don&apos;t have an account?{" "}
+              Chưa có tài khoản?{" "}
               <Link href="/auth/register" className="text-pink-600 hover:text-pink-700 font-semibold underline">
-                Create account
+                Tạo tài khoản
               </Link>
             </div>
           </form>
