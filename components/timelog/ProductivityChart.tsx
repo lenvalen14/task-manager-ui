@@ -61,7 +61,7 @@ export function ProductivityChart({ data, isLoading }: ProductivityChartProps) {
       <div className="h-[500px] relative overflow-hidden rounded-3xl">
         <div className="absolute inset-0 bg-gradient-to-br from-violet-50 via-white to-indigo-50"></div>
         <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 to-indigo-500/5"></div>
-        
+
         <div className="relative h-full flex flex-col items-center justify-center">
           <LoadingSpinner />
           <div className="mt-6 text-center">
@@ -71,7 +71,7 @@ export function ProductivityChart({ data, isLoading }: ProductivityChartProps) {
             <p className="text-gray-500 mt-2 text-sm">Vui lòng chờ trong giây lát...</p>
           </div>
         </div>
-        
+
         {/* Floating particles effect */}
         <div className="absolute top-10 left-10 w-2 h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
         <div className="absolute top-20 right-16 w-1 h-1 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
@@ -87,7 +87,7 @@ export function ProductivityChart({ data, isLoading }: ProductivityChartProps) {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-slate-50"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(139,92,246,0.1),transparent_50%)]"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(99,102,241,0.1),transparent_50%)]"></div>
-        
+
         <div className="relative h-full flex flex-col items-center justify-center text-center">
           <div className="relative mb-6">
             <div className="absolute -inset-4 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-full blur-lg opacity-20 animate-pulse"></div>
@@ -95,14 +95,14 @@ export function ProductivityChart({ data, isLoading }: ProductivityChartProps) {
               <TrendingUp className="w-10 h-10 text-violet-600" />
             </div>
           </div>
-          
+
           <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent mb-2">
             Chưa có dữ liệu
           </h3>
           <p className="text-gray-500 mb-6 max-w-md">
             Bắt đầu ghi lại thời gian làm việc để xem biểu đồ năng suất của bạn tại đây
           </p>
-          
+
           <div className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-500 to-indigo-500 text-white rounded-full text-sm font-semibold shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer">
             <Zap className="w-4 h-4" />
             <span>Bắt đầu ngay</span>
@@ -111,7 +111,7 @@ export function ProductivityChart({ data, isLoading }: ProductivityChartProps) {
       </div>
     )
   }
-  
+
   const formattedData = data.map(item => ({
     ...item,
     formattedDate: formatDate(item.date),
@@ -126,10 +126,10 @@ export function ProductivityChart({ data, isLoading }: ProductivityChartProps) {
       <div className="absolute inset-0 bg-gradient-to-br from-violet-50/50 via-white to-indigo-50/50"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(139,92,246,0.05),transparent_40%)]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(99,102,241,0.05),transparent_40%)]"></div>
-      
+
       {/* Glassmorphism container */}
       <div className="relative h-full bg-white/40 backdrop-blur-sm border border-white/20 rounded-3xl p-6">
-        
+
         {/* Header Stats */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -143,7 +143,7 @@ export function ProductivityChart({ data, isLoading }: ProductivityChartProps) {
               <p className="text-sm text-gray-500">Theo dõi thời gian hàng ngày</p>
             </div>
           </div>
-          
+
           <div className="flex gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
@@ -167,88 +167,88 @@ export function ProductivityChart({ data, isLoading }: ProductivityChartProps) {
               <defs>
                 {/* Modern gradient */}
                 <linearGradient id="modernGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.8}/>
-                  <stop offset="50%" stopColor="#6366f1" stopOpacity={0.4}/>
-                  <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.8} />
+                  <stop offset="50%" stopColor="#6366f1" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.1} />
                 </linearGradient>
 
                 {/* Glow effect */}
                 <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                  <feMerge> 
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                  <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
                   </feMerge>
                 </filter>
 
                 {/* Shadow */}
                 <filter id="modernShadow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feDropShadow dx="0" dy="8" stdDeviation="8" floodColor="#8b5cf6" floodOpacity="0.2"/>
+                  <feDropShadow dx="0" dy="8" stdDeviation="8" floodColor="#8b5cf6" floodOpacity="0.2" />
                 </filter>
               </defs>
 
-              <CartesianGrid 
-                strokeDasharray="2 6" 
-                stroke="url(#gridGradient)" 
+              <CartesianGrid
+                strokeDasharray="2 6"
+                stroke="url(#gridGradient)"
                 vertical={false}
                 strokeOpacity={0.3}
               />
-              
+
               <defs>
                 <linearGradient id="gridGradient" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#e5e7eb" stopOpacity={0}/>
-                  <stop offset="50%" stopColor="#d1d5db" stopOpacity={1}/>
-                  <stop offset="100%" stopColor="#e5e7eb" stopOpacity={0}/>
+                  <stop offset="0%" stopColor="#e5e7eb" stopOpacity={0} />
+                  <stop offset="50%" stopColor="#d1d5db" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#e5e7eb" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              
-              <XAxis 
-                dataKey="formattedDate" 
-                tick={{ 
-                  fill: '#6b7280', 
-                  fontSize: 12, 
+
+              <XAxis
+                dataKey="formattedDate"
+                tick={{
+                  fill: '#6b7280',
+                  fontSize: 12,
                   fontWeight: 600,
                   fontFamily: 'Inter, system-ui, sans-serif'
-                }} 
+                }}
                 axisLine={false}
                 tickLine={false}
                 dy={10}
               />
-              
-              <YAxis 
-                tickFormatter={(value) => `${value}h`} 
-                tick={{ 
-                  fill: '#6b7280', 
-                  fontSize: 12, 
+
+              <YAxis
+                tickFormatter={(value) => `${value}h`}
+                tick={{
+                  fill: '#6b7280',
+                  fontSize: 12,
                   fontWeight: 600,
                   fontFamily: 'Inter, system-ui, sans-serif'
-                }} 
+                }}
                 axisLine={false}
                 tickLine={false}
                 dx={-10}
               />
-              
+
               <Tooltip content={<CustomTooltip />} />
-              
-              <Area 
-                type="monotone" 
-                dataKey="total_duration_hours" 
+
+              <Area
+                type="monotone"
+                dataKey="total_duration_hours"
                 stroke="url(#modernGradient)"
                 strokeWidth={3}
-                fillOpacity={1} 
+                fillOpacity={1}
                 fill="url(#modernGradient)"
                 filter="url(#modernShadow)"
-                dot={{ 
-                  r: 4, 
-                  stroke: '#6366f1', 
-                  fill: 'white', 
+                dot={{
+                  r: 4,
+                  stroke: '#6366f1',
+                  fill: 'white',
                   strokeWidth: 3,
                   filter: 'url(#glow)'
                 }}
-                activeDot={{ 
-                  r: 8, 
-                  stroke: '#8b5cf6', 
-                  fill: 'white', 
+                activeDot={{
+                  r: 8,
+                  stroke: '#8b5cf6',
+                  fill: 'white',
                   strokeWidth: 4,
                   className: "drop-shadow-lg",
                   style: {

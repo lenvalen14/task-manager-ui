@@ -261,6 +261,23 @@ export function TaskBoard({
                                                             {task.description}
                                                         </p>
 
+                                                        {/* Due date */}
+                                                        {task.dueDate && (
+                                                            <div className="flex items-center gap-2 mb-3">
+                                                                <span className="text-sm font-semibold text-gray-600">📅 Hạn:</span>
+                                                                <span
+                                                                    className={clsx(
+                                                                        "text-sm font-bold",
+                                                                        new Date(task.dueDate) < new Date()
+                                                                            ? "text-red-600" // quá hạn
+                                                                            : "text-green-700"
+                                                                    )}
+                                                                >
+                                                                    {new Date(task.dueDate).toLocaleDateString("vi-VN")}
+                                                                </span>
+                                                            </div>
+                                                        )}
+
                                                         {/* Progress */}
                                                         <div className="mt-4 mb-3">
                                                             <div className="flex justify-between text-sm mb-1">

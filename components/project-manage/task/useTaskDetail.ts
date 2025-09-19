@@ -119,7 +119,7 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
       setDescription("")
       setStatus("to-do")
       setPriority("medium")
-      setDueDateStr(undefined)
+      setDueDateStr(toDateString(new Date()))
       setLocalSubtasks([])
       setLocalNotes([])
       setLocalTags([])

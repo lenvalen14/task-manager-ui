@@ -120,7 +120,7 @@ export default function TimeReportsPage() {
         if (!selectedTaskId) return
         try {
             const res = await startTimeLog({ taskId: selectedTaskId }).unwrap()
-            
+
             const newLogObject = res.data;
 
             if (newLogObject && typeof newLogObject.id === 'number') {
@@ -234,14 +234,14 @@ export default function TimeReportsPage() {
                                 <div className="flex items-center justify-between">
                                     <span className="text-lg font-bold text-gray-900">Average Completion</span>
                                     <span className="text-lg font-black text-pink-600 bg-pink-100 px-4 py-1 rounded-full">
-                                    {isLoadingStats
-                                        ? "..."
-                                        : secondsToHMS(
-                                            Math.floor(
-                                            timeToSeconds(userStats?.total_time_logged || "00:00:00") /
-                                                (userStats?.tasks_total || 1)
-                                            )
-                                        )}
+                                        {isLoadingStats
+                                            ? "..."
+                                            : secondsToHMS(
+                                                Math.floor(
+                                                    timeToSeconds(userStats?.total_time_logged || "00:00:00") /
+                                                    (userStats?.tasks_total || 1)
+                                                )
+                                            )}
                                     </span>
                                 </div>
                             </div>
@@ -259,16 +259,16 @@ export default function TimeReportsPage() {
                 <DialogContent className="max-w-2xl border-3 border-black rounded-xl shadow-2xl"><DialogHeader><DialogTitle className="text-2xl font-black text-gray-900 flex items-center gap-2"><History className="w-6 h-6 text-orange-500" />Task History Report</DialogTitle></DialogHeader><div className="mt-4 max-h-[500px] overflow-y-auto"><TaskHistoryList /></div></DialogContent>
             </Dialog>
 
-          <Dialog open={isDetailedDialogOpen} onOpenChange={setIsDetailedDialogOpen}>
-              <DialogContent className="max-w-5xl border-2 border-black rounded-xl shadow-xl p-6">
-                  <DialogHeader>
-                      <DialogTitle className="text-2xl font-black text-gray-900">Performance Report</DialogTitle>
-                  </DialogHeader>
-                  <div className="bg-gray-50">
-                      <ProductivityChart data={summaryResponse?.data} isLoading={isSummaryLoading} />
-                  </div>
-              </DialogContent>
-          </Dialog>
+            <Dialog open={isDetailedDialogOpen} onOpenChange={setIsDetailedDialogOpen}>
+                <DialogContent className="max-w-5xl border-2 border-black rounded-xl shadow-xl p-6">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-black text-gray-900">Performance Report</DialogTitle>
+                    </DialogHeader>
+                    <div className="bg-gray-50">
+                        <ProductivityChart data={summaryResponse?.data} isLoading={isSummaryLoading} />
+                    </div>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }
