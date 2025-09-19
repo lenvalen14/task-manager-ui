@@ -13,16 +13,23 @@ export interface Notification {
 
 export type NotificationType = "deadline" | "completed" | "milestone" | "overdue"
 
-export interface NotificationListResponse {
-  count: number
-  next: string | null
-  previous: string | null
-  results: Notification[]
-}
 export interface APIResponse<T> {
     code: number
     message: string
     data: T
+}
+
+export interface APIResponseList<T> {
+  code: number
+  message: string
+  data: T[]
+  meta: Meta
+}
+
+interface Meta {
+  count: number
+  next: string | null
+  previous: string | null
 }
 
 export interface UnreadCountResponse {

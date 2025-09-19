@@ -3,7 +3,7 @@ import { baseQueryWithReauth } from "./baseQuery"
 import {
   APIResponse,
   Notification,
-  NotificationListResponse,
+  APIResponseList,
   UnreadCountResponse,
 } from "@/types/notification"
 
@@ -13,20 +13,23 @@ export const notificationApi = createApi({
   tagTypes: ["Notifications"],
 
   endpoints: (builder) => ({
-    getNotifications: builder.query<{ data: Notification[] }, void>({
-      query: () => ({
-        url: "/notifications/",
+      getNotifications: builder.query<APIResponseList<Notification>, {
+      page?: number;
+      pageSize?: number;
+    }>({
+      query: ({ page = 1, pageSize = 10 }) => ({
+        url: `/notifications/?page=${page}&page_size=${pageSize}`,
         method: "GET",
       }),
       providesTags: (result) =>
         result
           ? [
-            ...result.data.map(({ id }) => ({
-              type: "Notifications" as const,
-              id,
-            })),
-            { type: "Notifications", id: "LIST" },
-          ]
+              ...result.data.map(({ id }) => ({
+                type: "Notifications" as const,
+                id,
+              })),
+              { type: "Notifications", id: "LIST" },
+            ]
           : [{ type: "Notifications", id: "LIST" }],
     }),
 
