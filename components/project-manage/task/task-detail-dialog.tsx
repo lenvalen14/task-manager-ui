@@ -9,8 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Star, Heart, Sparkle, Plus, Trash2 } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
-// shadcn toast
-import { useToast } from "@/components/ui/use-toast"
+import { toast} from "sonner"
 import { UITask } from "../task-board"
 import { useState } from "react"
 import { lightenHex, useTaskDetail } from "./useTaskDetail"
@@ -35,7 +34,6 @@ export function TaskDetailDialog({
   projectTags,
   onTaskSaved,
 }: TaskDetailDialogProps) {
-  const { toast } = useToast()
   const {
     title, setTitle,
     description, setDescription,
@@ -102,13 +100,12 @@ export function TaskDetailDialog({
   const handleSaveChanges = async () => {
     try {
       await saveChanges()
-      toast({ description: mode === "create" ? "Task created successfully!" : "Task updated successfully!" })
+      toast.success(mode === "create" ? "Tạo Task thành công!" : "Cập nhật Task thành công!")
     } catch (err) {
       console.error("Error saving changes:", err)
-      toast({ variant: "destructive", description: "Failed to save changes." })
+      toast.error("Lưu thay đổi thất bại. Vui lòng thử lại")
     }
   }
-
   // ------- Cancel -------
   const handleCancel = () => {
     onOpenChange(false)
@@ -134,7 +131,7 @@ export function TaskDetailDialog({
           </div>
           <DialogHeader>
             <DialogTitle className="text-2xl font-black text-gray-900 tracking-tight">
-              {mode === "create" ? "Create New Task ✨" : "Task Details ✨"}
+              {mode === "create" ? "Tạo Task Mới ✨" : "Chi Tiết Task ✨"}
             </DialogTitle>
           </DialogHeader>
         </div>
@@ -143,7 +140,7 @@ export function TaskDetailDialog({
         <div className="max-h-[calc(100vh-200px)] overflow-y-auto p-6 space-y-6">
           {/* Title & Description */}
           <div className="space-y-2">
-            <Label className="font-bold text-gray-900">Task Title</Label>
+            <Label className="font-bold text-gray-900">Tiêu đề Task</Label>
             <Input
               value={title}
               onChange={e => setTitle(e.target.value)}
@@ -151,7 +148,7 @@ export function TaskDetailDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label className="font-bold text-gray-900">Description</Label>
+            <Label className="font-bold text-gray-900">Mô tả</Label>
             <Textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
@@ -162,9 +159,9 @@ export function TaskDetailDialog({
           {/* Status & Priority */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Status</Label>
+              <Label>Trạng thái</Label>
               <Select value={status} onValueChange={(v: any) => setStatus(v)}>
-                <SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Chọn trạng thái" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="to-do">To Do</SelectItem>
                   <SelectItem value="in-progress">In Progress</SelectItem>
@@ -174,9 +171,9 @@ export function TaskDetailDialog({
               </Select>
             </div>
             <div>
-              <Label>Priority</Label>
+              <Label>Độ ưu tiên</Label>
               <Select value={priority} onValueChange={(v: any) => setPriority(v)}>
-                <SelectTrigger><SelectValue placeholder="Select priority" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Chọn độ ưu tiên" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="low">Low</SelectItem>
                   <SelectItem value="medium">Medium</SelectItem>
@@ -189,12 +186,12 @@ export function TaskDetailDialog({
 
           {/* Due Date */}
           <div className="space-y-2">
-            <Label className="font-bold text-gray-900">Due Date</Label>
+            <Label className="font-bold text-gray-900">Hạn chót</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start text-left font-normal border-2 border-black rounded-xl bg-gray-50">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {dueDate ? dueDate.toDateString() : <span>Pick a date</span>}
+                  {dueDate ? dueDate.toDateString() : <span>Chọn ngày</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -206,9 +203,9 @@ export function TaskDetailDialog({
           {/* Subtasks */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label className="font-bold text-gray-900">Subtasks</Label>
+              <Label className="font-bold text-gray-900">Sub Tasks</Label>
               <span className="text-sm font-bold text-gray-600">
-                {completedCount}/{localSubtasks.length} completed
+                {completedCount}/{localSubtasks.length} đã hoàn thành
               </span>
             </div>
             <Progress value={progressValue} className="h-2 border-2 border-black bg-gray-100" />
@@ -219,22 +216,22 @@ export function TaskDetailDialog({
                     checked={subtask.status === "done"}
                     disabled
                     className="w-5 h-5 border-2 border-black rounded-md"
-                  />                  <span className={`flex-1 text-sm font-medium ${subtask.completed ? "line-through text-gray-500" : "text-gray-900"}`}>
+                  />                  
+                  <span className={`flex-1 text-sm font-medium ${subtask.completed ? "line-through text-gray-500" : "text-gray-900"}`}>
                     {subtask.title}
                   </span>
-                  {/* Dropdown cho trạng thái subtask */}
                   <Select
                     value={subtask.status || "to-do"}
                     onValueChange={(v) => updateSubtaskStatusLocal(subtask.id, v as Status)}
                   >
                     <SelectTrigger className="w-[120px]">
-                      <SelectValue placeholder="Status" />
+                      <SelectValue placeholder="Trạng thái" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="to-do">To Do</SelectItem>
-                      <SelectItem value="in-progress">In Progress</SelectItem>
-                      <SelectItem value="need-review">Review</SelectItem>
-                      <SelectItem value="done">Done</SelectItem>
+                      <SelectItem value="to-do">Cần làm</SelectItem>
+                      <SelectItem value="in-progress">Đang làm</SelectItem>
+                      <SelectItem value="need-review">Cần review</SelectItem>
+                      <SelectItem value="done">Hoàn thành</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button size="sm" variant="ghost" onClick={() => handleDeleteSubtaskLocal(subtask.id)} className="hover:bg-red-100 hover:text-red-600">
@@ -244,7 +241,7 @@ export function TaskDetailDialog({
               ))}
             </div>
             <div className="flex gap-2">
-              <Input placeholder="Add a subtask..." value={newSubtask} onChange={(e) => setNewSubtask(e.target.value)} className="border-2 border-black rounded-xl bg-gray-50" />
+              <Input placeholder="Thêm công việc con..." value={newSubtask} onChange={(e) => setNewSubtask(e.target.value)} className="border-2 border-black rounded-xl bg-gray-50" />
               <Button onClick={handleAddSubtaskLocal} className="bg-green-400 hover:bg-green-500 text-white rounded-xl font-bold border-2 border-black">
                 <Plus className="w-4 h-4" />
               </Button>
@@ -253,7 +250,7 @@ export function TaskDetailDialog({
 
           {/* Files */}
           <div className="space-y-4">
-            <Label className="font-bold text-gray-900">Files</Label>
+            <Label className="font-bold text-gray-900">Tệp đính kèm</Label>
             <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
               {localAttachments.map((file) => (
                 <div key={file.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border-2 border-black group">
@@ -267,14 +264,14 @@ export function TaskDetailDialog({
             <div className="flex gap-2">
               <Input type="file" onChange={(e) => setPendingFile(e.target.files?.[0] || null)} className="border-2 border-black rounded-xl bg-gray-50" />
               <Button onClick={handleAddFile} disabled={!pendingFile} className="bg-purple-400 hover:bg-purple-500 text-white rounded-xl font-bold border-2 border-black">
-                Add File
+                Thêm tệp
               </Button>
             </div>
           </div>
 
           {/* Notes */}
           <div className="space-y-4">
-            <Label className="font-bold text-gray-900">Notes</Label>
+            <Label className="font-bold text-gray-900">Ghi chú</Label>
             <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
               {localNotes.map((note) => (
                 <div key={note.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border-2 border-black group">
@@ -287,7 +284,7 @@ export function TaskDetailDialog({
             </div>
             <div className="flex gap-2">
               <Input
-                placeholder="Add a note..."
+                placeholder="Thêm ghi chú..."
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
                 className="border-2 border-black rounded-xl bg-gray-50"
@@ -300,13 +297,12 @@ export function TaskDetailDialog({
 
           {/* Tags */}
           <div className="space-y-2">
-            <Label className="font-bold text-gray-900">Tags</Label>
+            <Label className="font-bold text-gray-900">Nhãn (Tags)</Label>
 
-            {/* Selected tags */}
             <div className="flex flex-wrap gap-2">
               {localTags.map((t, idx) => (
                 <div
-                  key={idx} // dùng index hoặc tạo id local
+                  key={idx}
                   className="flex items-center gap-2 px-2 py-1 rounded-md"
                   style={{
                     backgroundColor: lightenHex(t.color, 0.5),
@@ -326,23 +322,21 @@ export function TaskDetailDialog({
               ))}
             </div>
 
-            {/* Dropdown chọn từ tag có sẵn */}
             <div className="flex gap-2 mt-2">
               <Select
                 onValueChange={(value) => {
                   const selectedTag = projectTags?.find((t) => String(t.id) === value)
                   if (selectedTag) {
-                    // 🚀 Thêm tag mới dựa trên name + color, không mang id cũ
                     addTagLocal(selectedTag.tag_name, selectedTag.color)
                   }
                 }}
               >
                 <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Select existing tag" />
+                  <SelectValue placeholder="Chọn nhãn có sẵn" />
                 </SelectTrigger>
                 <SelectContent>
                   {projectTags
-                    ?.filter(tag => !localTags.some(t => t.tag_name === tag.tag_name)) // bỏ tag đã có
+                    ?.filter(tag => !localTags.some(t => t.tag_name === tag.tag_name))
                     .map((tag) => (
                       <SelectItem key={Number(tag.id)} value={String(tag.id)}>
                         {tag.tag_name}
@@ -351,9 +345,8 @@ export function TaskDetailDialog({
                 </SelectContent>
               </Select>
 
-              {/* Ô nhập nếu muốn thêm mới */}
               <Input
-                placeholder="Add new tag..."
+                placeholder="Thêm nhãn mới..."
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 className="border-2 border-black rounded-xl bg-gray-50"
@@ -379,10 +372,10 @@ export function TaskDetailDialog({
         <div className="p-6 border-t border-gray-200 bg-white bottom-0 z-10">
           <div className="flex justify-end gap-3">
             <Button variant="outline" onClick={handleCancel} className="border-2 border-black rounded-xl bg-white font-bold">
-              Cancel
+              Hủy
             </Button>
             <Button type="button" onClick={handleSaveChanges} className="bg-pink-400 hover:bg-pink-500 text-white rounded-xl font-bold border-2 border-black">
-              {mode === "create" ? "Create Task" : "Save Changes"}
+              {mode === "create" ? "Tạo Task" : "Lưu thay đổi"}
             </Button>
           </div>
         </div>
