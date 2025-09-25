@@ -103,8 +103,6 @@ type BoardPageProps = {
 
 // ===== Component =====
 export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
-
-  console.log(tasks);
   const [viewMode, setViewMode] = useState<"board" | "table" | "list">("board")
 
   const columns: TaskColumnData[] = useMemo(() => {
