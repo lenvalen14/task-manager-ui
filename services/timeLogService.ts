@@ -99,8 +99,12 @@ export const timeLogApi = createApi({
           method: 'GET',
         };
       },
-      providesTags: (result) => 
-        result ? [...result.data.map(() => ({ type: 'TimeLogs' as const, id: 'LIST' }))] : [{ type: 'TimeLogs', id: 'LIST' }],
+      providesTags: (result) => {
+        const dataArray = Array.isArray(result?.data) ? result.data : [];
+        return dataArray.length
+          ? dataArray.map(() => ({ type: 'TimeLogs' as const, id: 'LIST' }))
+          : [{ type: 'TimeLogs', id: 'LIST' }];
+      }
     }),
   }),
 })
