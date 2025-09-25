@@ -13,11 +13,11 @@ export const taskApi = createApi({
                 method: "GET",
             }),
             providesTags: (result) => {
-                const list = result?.data ?? []
+                const list = Array.isArray(result?.data) ? result.data : [];
                 return [
                     { type: "Tasks" as const, id: "LIST" },
                     ...list.map((t) => ({ type: "Tasks" as const, id: t.id })),
-                ]
+                ];
             },
         }),
         createTask: builder.mutation<TaskCreateResponse, TaskCreateRequset>({
