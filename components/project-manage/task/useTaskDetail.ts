@@ -269,6 +269,8 @@ export function useTaskDetail({ open, mode = "edit", task, onClose, onSaved }: U
       }
       const newTask = await createAllOfTask(payload).unwrap()
 
+      console.log(newTask);
+
       if (newFiles.length) {
         console.log(newFiles
         );
