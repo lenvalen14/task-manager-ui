@@ -61,8 +61,6 @@ export const baseQueryWithReauth: BaseQueryFn<
             extraOptions
         )
 
-        console.log(refreshResult);
-
         if (refreshResult.data) {
             const data = refreshResult.data as RefreshTokenResponse
             const newAccess = data.data.access

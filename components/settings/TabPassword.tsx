@@ -43,8 +43,6 @@ export default function TabPassword() {
         new_password: form.new_password,
         confirm_password: form.confirm_password,
       }).unwrap()
-
-      console.log("Đổi mật khẩu thành công:", res)
       toast({
         title: "Thành công 🎉",
         description: "Đổi mật khẩu thành công!",

@@ -105,8 +105,6 @@ type BoardPageProps = {
 export function BoardPage({ tasks, onTaskUpdated }: BoardPageProps) {
   const [viewMode, setViewMode] = useState<"board" | "table" | "list">("board")
 
-  console.log(tasks);
-
   const columns: TaskColumnData[] = useMemo(() => {
     const colMap: Record<Status, TaskColumnData> = {
       "to-do": { id: statusMeta["to-do"].id, title: statusMeta["to-do"].title, status: "to-do", color: statusMeta["to-do"].color, tasks: [] },
